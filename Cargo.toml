@@ -6,7 +6,7 @@ description = "A dashboard for visualizing progress of asynchronous and possibly
 edition = "2018"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE.md"]
 license = "MIT"
-repository = "https://github.com/Byron/crates-io-cli-rs"
+repository = "https://github.com/crates-io/prodash"
 readme = "README.md"
 
 [lib]
