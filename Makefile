@@ -8,7 +8,10 @@ help:  ## Display this help
 feature-check: ## build features in commmon combination to be sure it all stays together
 	cargo check --no-default-features && cargo check
 
-tests: feature-check ## Run all tests we have
+unit-test: ## Run all unit tests
+	cargo test --examples
+
+tests: feature-check unit-test ## Run all tests we have
 
 bench: ## Run criterion based benchmark, works on stable Rust
 	cargo bench
