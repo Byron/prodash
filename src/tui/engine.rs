@@ -1,6 +1,7 @@
 use crate::{tree::Root, tui::draw, tui::ticker};
 
 use futures::{channel::mpsc, SinkExt, StreamExt};
+use std::io::Write;
 use std::{io, time::Duration};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{backend::TermionBackend, layout::Rect};
@@ -156,6 +157,8 @@ pub fn render_with_input(
                 terminal.post_render().expect("post render to work");
             }
         }
+        // Make sure the terminal responds right away when this future stops, to reset back to the 'non-alternate' buffer
+        io::stdout().flush().ok();
     };
     Ok(render_fut)
 }

@@ -49,6 +49,10 @@ Or run the demo application like so `cd prodash && cargo run --example dashboard
 
 ## Changelog
 
+### v1.1.5
+
+* Flush stdout when the TUI stopped running. That way, the alternate/original screen will be shown right away.
+
 ### v1.1.4
 
 * Don't pretend to use &str if in fact an owned string is required. This caused unnecessary clones for those who pass owned strings.

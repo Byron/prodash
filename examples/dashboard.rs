@@ -128,10 +128,7 @@ async fn work_item(mut progress: Item, speed: f32) {
             thread_rng().gen_range(SHORT_DELAY_MS, WORK_DELAY_MS)
         };
         if thread_rng().gen_bool(0.01) {
-            progress.init(
-                Some(max.into()),
-                UNITS.choose(&mut thread_rng()).copied(),
-            )
+            progress.init(Some(max.into()), UNITS.choose(&mut thread_rng()).copied())
         }
         if thread_rng().gen_bool(0.01) {
             progress.info(*INFO_MESSAGES.choose(&mut thread_rng()).unwrap());
