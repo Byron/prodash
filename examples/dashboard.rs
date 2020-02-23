@@ -77,7 +77,7 @@ fn launch_ambient_gui(
     let render_fut = tui::render_with_input(
         progress,
         tui::TuiOptions {
-            title: TITLES.choose(&mut thread_rng()).map(|t| *t).unwrap().into(),
+            title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
             frames_per_second: args.fps,
             ..tui::TuiOptions::default()
         },
@@ -99,7 +99,7 @@ fn launch_ambient_gui(
     Ok((handle.map(|_| ()), abort_handle))
 }
 
-async fn work_item(mut progress: Item, speed: f32) -> () {
+async fn work_item(mut progress: Item, speed: f32) {
     let max: u8 = thread_rng().gen_range(25, 125);
     progress.init(
         if max > WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK {
@@ -110,7 +110,7 @@ async fn work_item(mut progress: Item, speed: f32) -> () {
         if (max as usize % UNITS.len() + 1) == 0 {
             None
         } else {
-            UNITS.choose(&mut thread_rng()).map(|&s| s)
+            UNITS.choose(&mut thread_rng()).copied()
         },
     );
 
@@ -130,7 +130,7 @@ async fn work_item(mut progress: Item, speed: f32) -> () {
         if thread_rng().gen_bool(0.01) {
             progress.init(
                 Some(max.into()),
-                UNITS.choose(&mut thread_rng()).map(|&s| s),
+                UNITS.choose(&mut thread_rng()).copied(),
             )
         }
         if thread_rng().gen_bool(0.01) {
@@ -219,15 +219,15 @@ fn generate_statistics() -> Vec<Line> {
         Line::Title("Statistics".into()),
         Line::Text(format!(
             "lines of unsafe code: {}",
-            thread_rng().gen_range(0usize, 1000000)
+            thread_rng().gen_range(0usize, 1_000_000)
         )),
         Line::Text(format!(
             "wasted space in crates: {} Kb",
-            thread_rng().gen_range(100usize, 1000000)
+            thread_rng().gen_range(100usize, 1_000_000)
         )),
         Line::Text(format!(
             "unused dependencies: {} crates",
-            thread_rng().gen_range(100usize, 1000)
+            thread_rng().gen_range(100usize, 1_000)
         )),
         Line::Text(format!(
             "average #dependencies: {} crates",
@@ -235,7 +235,7 @@ fn generate_statistics() -> Vec<Line> {
         )),
         Line::Text(format!(
             "bloat in code: {} Kb",
-            thread_rng().gen_range(100usize, 5000)
+            thread_rng().gen_range(100usize, 5_000)
         )),
     ]);
     lines
@@ -256,15 +256,15 @@ fn window_resize_stream(animate: bool) -> impl futures::Stream<Item = Event> {
             match direction {
                 Direction::Shrink => {
                     *ofs_x = ofs_x
-                        .saturating_add((1 as f32 * (width as f32 / height as f32)).ceil() as u16);
+                        .saturating_add((1_f32 * (width as f32 / height as f32)).ceil() as u16);
                     *ofs_y = ofs_y
-                        .saturating_add((1 as f32 * (height as f32 / width as f32)).ceil() as u16);
+                        .saturating_add((1_f32 * (height as f32 / width as f32)).ceil() as u16);
                 }
                 Direction::Grow => {
                     *ofs_x = ofs_x
-                        .saturating_sub((1 as f32 * (width as f32 / height as f32)).ceil() as u16);
+                        .saturating_sub((1_f32 * (width as f32 / height as f32)).ceil() as u16);
                     *ofs_y = ofs_y
-                        .saturating_sub((1 as f32 * (height as f32 / width as f32)).ceil() as u16);
+                        .saturating_sub((1_f32 * (height as f32 / width as f32)).ceil() as u16);
                 }
             }
             let bound = tui::tui_export::layout::Rect {
