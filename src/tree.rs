@@ -102,12 +102,17 @@ impl MessageRingBuffer {
         self.buf.len() < self.buf.capacity()
     }
 
-    pub fn push_overwrite(&mut self, level: MessageLevel, origin: String, message: &str) {
+    pub fn push_overwrite(
+        &mut self,
+        level: MessageLevel,
+        origin: String,
+        message: impl Into<String>,
+    ) {
         let msg = Message {
             time: SystemTime::now(),
             level,
             origin,
-            message: message.to_string(),
+            message: message.into(),
         };
         if self.has_capacity() {
             self.buf.push(msg)
@@ -250,7 +255,7 @@ impl Item {
     ///
     /// Use this to provide additional,human-readable information about the progress
     /// made, including indicating success or failure.
-    pub fn message(&mut self, level: MessageLevel, message: impl AsRef<str>) {
+    pub fn message(&mut self, level: MessageLevel, message: impl Into<String> + std::fmt::Display) {
         self.messages.lock().push_overwrite(
             level,
             {
@@ -262,30 +267,30 @@ impl Item {
 
                 #[cfg(feature = "log-renderer")]
                 match level {
-                    MessageLevel::Failure => crate::warn!("{} → {}", name, message.as_ref()),
+                    MessageLevel::Failure => crate::warn!("{} → {}", name, message),
                     MessageLevel::Info | MessageLevel::Success => {
-                        crate::info!("{} → {}", name, message.as_ref())
+                        crate::info!("{} → {}", name, message)
                     }
                 };
 
                 name
             },
-            message.as_ref(),
+            message,
         )
     }
 
     /// Create a message indicating the task is done
-    pub fn done(&mut self, message: impl AsRef<str>) {
+    pub fn done(&mut self, message: impl Into<String> + std::fmt::Display) {
         self.message(MessageLevel::Success, message)
     }
 
     /// Create a message indicating the task failed
-    pub fn fail(&mut self, message: impl AsRef<str>) {
+    pub fn fail(&mut self, message: impl Into<String> + std::fmt::Display) {
         self.message(MessageLevel::Failure, message)
     }
 
     /// Create a message providing additional information about the progress thus far.
-    pub fn info(&mut self, message: impl AsRef<str>) {
+    pub fn info(&mut self, message: impl Into<String> + std::fmt::Display) {
         self.message(MessageLevel::Info, message)
     }
 }

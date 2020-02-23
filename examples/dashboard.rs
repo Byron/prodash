@@ -134,7 +134,7 @@ async fn work_item(mut progress: Item, speed: f32) -> () {
             )
         }
         if thread_rng().gen_bool(0.01) {
-            progress.info(INFO_MESSAGES.choose(&mut thread_rng()).unwrap());
+            progress.info(*INFO_MESSAGES.choose(&mut thread_rng()).unwrap());
         }
         if thread_rng().gen_bool(0.01) {
             progress.set_name(WORK_NAMES.choose(&mut thread_rng()).unwrap().to_string());
@@ -142,9 +142,9 @@ async fn work_item(mut progress: Item, speed: f32) -> () {
         Delay::new(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
     }
     if thread_rng().gen_bool(0.95) {
-        progress.done(DONE_MESSAGES.choose(&mut thread_rng()).unwrap());
+        progress.done(*DONE_MESSAGES.choose(&mut thread_rng()).unwrap());
     } else {
-        progress.fail(FAIL_MESSAGES.choose(&mut thread_rng()).unwrap());
+        progress.fail(*FAIL_MESSAGES.choose(&mut thread_rng()).unwrap());
     }
 }
 
