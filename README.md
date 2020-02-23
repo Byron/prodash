@@ -46,3 +46,9 @@ Or run the demo application like so `cd prodash && cargo run --example dashboard
   * fix
     * Use a join handle and await it - this will drop the future properly
 * `select()` might not work with complex futures - these should then be `boxed()` if `Unpin` isn't implemented.
+
+## Changelog
+
+### v1.1.3
+
+* hide cursor or a nicer visual experience

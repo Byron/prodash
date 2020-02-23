@@ -84,6 +84,7 @@ pub fn render_with_input(
         let backend = TermionBackend::new(stdout);
         Terminal::new(backend)?
     };
+    terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
     let (mut key_send, key_receive) = mpsc::channel::<Key>(1);
