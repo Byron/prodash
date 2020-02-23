@@ -49,6 +49,10 @@ Or run the demo application like so `cd prodash && cargo run --example dashboard
 
 ## Changelog
 
+### v1.1.4
+
+* Don't pretend to use &str if in fact an owned string is required. This caused unnecessary clones for those who pass owned strings.
+
 ### v1.1.3
 
 * hide cursor or a nicer visual experience
