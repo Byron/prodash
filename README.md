@@ -47,16 +47,3 @@ Or run the demo application like so `cd prodash && cargo run --example dashboard
     * Use a join handle and await it - this will drop the future properly
 * `select()` might not work with complex futures - these should then be `boxed()` if `Unpin` isn't implemented.
 
-## Changelog
-
-### v1.1.5
-
-* Flush stdout when the TUI stopped running. That way, the alternate/original screen will be shown right away.
-
-### v1.1.4
-
-* Don't pretend to use &str if in fact an owned string is required. This caused unnecessary clones for those who pass owned strings.
-
-### v1.1.3
-
-* hide cursor or a nicer visual experience

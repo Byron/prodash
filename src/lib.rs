@@ -33,6 +33,18 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v1.1.5
+
+* Flush stdout when the TUI stopped running. That way, the alternate/original screen will be shown right away.
+
+## v1.1.4
+
+* Don't pretend to use &str if in fact an owned string is required. This caused unnecessary clones for those who pass owned strings.
+
+## v1.1.3
+
+* hide cursor or a nicer visual experience
+
 ## v1.1.0
 
 * fix toggles - previously prodash, withoug tui, would always build humantime and unicode width
