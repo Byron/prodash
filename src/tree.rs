@@ -208,6 +208,11 @@ impl Item {
         });
     }
 
+    /// Get the name of this task's progress
+    pub fn name(&self) -> Option<String> {
+        self.tree.get(&self.key).map(|r| r.value().name.to_owned())
+    }
+
     /// Set the current progress to the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.

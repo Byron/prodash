@@ -33,6 +33,10 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v1.1.6
+
+* improve API symmetry by providing a `Tree::name()` to accompany `Tree::set_name(…)`
+
 ## v1.1.5
 
 * Flush stdout when the TUI stopped running. That way, the alternate/original screen will be shown right away.
