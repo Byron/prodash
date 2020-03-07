@@ -210,15 +210,7 @@ pub fn draw_progress(
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
-                if let ProgressState::Blocked(Some(eta)) = state {
-                    let now = SystemTime::now();
-                    if eta > now {
-                        progress_text.push_str(&format!(
-                            " → {} to unblock",
-                            format_duration(eta.duration_since(now).expect("computation to work"))
-                        ))
-                    }
-                }
+                add_block_eta(state, &mut progress_text);
                 let (bound, style) =
                     draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| {
                         if let ProgressState::Blocked(_) = state {
@@ -240,6 +232,8 @@ pub fn draw_progress(
                 draw_text_nowrap_fn(progress_rect, buf, progress_text, style_fn);
             }
             Some((None, state, step)) => {
+                let mut progress_text = progress_text;
+                add_block_eta(state, &mut progress_text);
                 draw_text_nowrap(progress_rect, buf, progress_text, None);
                 let bar_rect = rect::offset_x(line_bound, max_progress_label_width as u16);
                 draw_spinner(
@@ -274,6 +268,18 @@ pub fn draw_progress(
                 draw_text_nowrap(progress_rect, buf, progress_text, None);
                 draw_text_nowrap(center_rect, buf, title_text, None);
             }
+        }
+    }
+}
+
+fn add_block_eta(state: ProgressState, progress_text: &mut String) {
+    if let ProgressState::Blocked(Some(eta)) = state {
+        let now = SystemTime::now();
+        if eta > now {
+            progress_text.push_str(&format!(
+                " → {} to unblock",
+                format_duration(eta.duration_since(now).expect("computation to work"))
+            ))
         }
     }
 }

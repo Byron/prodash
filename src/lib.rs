@@ -33,6 +33,10 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v1.2.0
+
+* Support for eta messages in blocked unbounded tasks
+
 ## v1.1.6
 
 * improve API symmetry by providing a `Tree::name()` to accompany `Tree::set_name(…)`
