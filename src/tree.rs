@@ -229,8 +229,8 @@ impl Item {
     /// make progress again.
     ///
     /// The blocked-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
-    pub fn blocked(&mut self, eta: Option<SystemTime>) {
-        self.alter_progress(|p| p.state = ProgressState::Blocked(eta));
+    pub fn blocked(&mut self, reason: &'static str, eta: Option<SystemTime>) {
+        self.alter_progress(|p| p.state = ProgressState::Blocked(reason, eta));
     }
 
     /// Adds a new child `Tree`, whose parent is this instance, with the given `name`.
@@ -350,7 +350,7 @@ impl Key {
 pub enum ProgressState {
     /// Indicates a task is blocked and cannot make progress, optionally until the
     /// given time.
-    Blocked(Option<SystemTime>),
+    Blocked(&'static str, Option<SystemTime>),
     /// The task is running
     Running,
 }

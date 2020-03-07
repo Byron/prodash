@@ -122,7 +122,7 @@ async fn work_item(mut progress: Item, speed: f32) {
             } else {
                 None
             };
-            progress.blocked(eta);
+            progress.blocked(REASONS.choose(&mut thread_rng()).unwrap(), eta);
             thread_rng().gen_range(WORK_DELAY_MS, LONG_WORK_DELAY_MS)
         } else {
             thread_rng().gen_range(SHORT_DELAY_MS, WORK_DELAY_MS)
@@ -333,6 +333,12 @@ use std::{error::Error, ops::Add, time::Duration, time::SystemTime};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];
+const REASONS: &[&str] = &[
+    "due to star alignment",
+    "IO takes time",
+    "仪表板演示",
+    "just because",
+];
 const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 const WORK_NAMES: &[&str] = &[
     "Downloading Crate",

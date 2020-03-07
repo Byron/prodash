@@ -33,6 +33,11 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v2.0.0
+
+* BREAKING: `progress.blocked(eta)` now takes a statically known reason for the blocked state `progress.blocked(reason, eta)`. This is
+  useful to provide more context.
+
 ## v1.2.0
 
 * Support for eta messages in blocked unbounded tasks
