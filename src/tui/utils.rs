@@ -69,7 +69,7 @@ pub fn draw_text_nowrap<'a>(
                 cell.style = s;
             }
 
-            x_offset += (width - 1) as u16;
+            x_offset += width.saturating_sub(1) as u16;
             if x + x_offset >= bound.right() {
                 break;
             }

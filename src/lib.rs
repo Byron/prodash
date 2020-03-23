@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v2.0.0 - fix integer underflow with graphemes that report width of 0
+
 ## v2.0.0
 
 * BREAKING: `progress.blocked(eta)` now takes a statically known reason for the blocked state `progress.blocked(reason, eta)`. This is
