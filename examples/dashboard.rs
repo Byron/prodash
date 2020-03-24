@@ -83,7 +83,7 @@ fn launch_ambient_gui(
         },
         futures::stream::select(
             window_resize_stream(args.animate_terminal_size),
-            ticker(Duration::from_millis(1000)).map(|_| {
+            ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(|_| {
                 if thread_rng().gen_bool(0.5) {
                     Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
                 } else {
