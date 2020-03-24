@@ -72,6 +72,14 @@ pub mod tree;
 pub use config::TreeOptions;
 pub use tree::Root as Tree;
 
+pub mod ext {
+    #[cfg(feature = "tui-renderer")]
+    pub use tui;
+
+    #[cfg(feature = "with-chrono")]
+    pub use chrono;
+}
+
 #[cfg(feature = "tui-renderer")]
 pub mod tui;
 
