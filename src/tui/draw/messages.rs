@@ -1,5 +1,6 @@
 use crate::{
     tree::{Message, MessageLevel},
+    tui::draw::time::{format_time_for_messages, DATE_TIME_HMS},
     tui::utils::{block_width, draw_text_nowrap, rect, sanitize_offset},
 };
 use std::time::SystemTime;
@@ -10,9 +11,6 @@ use tui::{
     widgets::{Block, Borders, Widget},
 };
 use unicode_width::UnicodeWidthStr;
-
-const TIME_COLUMN_PREFIX: u16 = "20-02-13T".len() as u16;
-const TIME_COLUMN_SUFFIX: u16 = "00:51:45".len() as u16;
 
 pub fn pane(
     messages: &[Message],
@@ -133,16 +131,7 @@ fn level_to_style(level: MessageLevel) -> Style {
 }
 
 fn format_time_column(time: &SystemTime) -> String {
-    format!(
-        "{}{}",
-        String::from_utf8_lossy(
-            &format!("{}", humantime::format_rfc3339_seconds(*time)).as_bytes()[(TIME_COLUMN_PREFIX
-                + 2)
-                as usize
-                ..(TIME_COLUMN_PREFIX + TIME_COLUMN_SUFFIX + 2) as usize],
-        ),
-        rect::VERTICAL_LINE
-    )
+    format!("{}{}", format_time_for_messages(*time), rect::VERTICAL_LINE)
 }
 
 fn compute_bounds(
@@ -153,7 +142,7 @@ fn compute_bounds(
     let mythical_offset_we_should_not_need = 1;
 
     let time_bound = Rect {
-        width: TIME_COLUMN_SUFFIX + vertical_line_width,
+        width: DATE_TIME_HMS as u16 + vertical_line_width,
         ..line
     };
 

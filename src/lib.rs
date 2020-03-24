@@ -33,7 +33,9 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
-## v2.0.0 - fix integer underflow with graphemes that report width of 0
+## v2.1.0 - Optional cargo feature "localtime" shows all times in the local timezone
+
+## v2.0.1 - fix integer underflow with graphemes that report width of 0
 
 ## v2.0.0
 
@@ -71,14 +73,6 @@ pub mod tree;
 
 pub use config::TreeOptions;
 pub use tree::Root as Tree;
-
-pub mod ext {
-    #[cfg(feature = "tui-renderer")]
-    pub use tui;
-
-    #[cfg(feature = "with-chrono")]
-    pub use chrono;
-}
 
 #[cfg(feature = "tui-renderer")]
 pub mod tui;

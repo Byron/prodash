@@ -1,8 +1,11 @@
 use crate::{
     tree::{Key, Progress, ProgressState, ProgressStep, Value},
-    tui::utils::{
-        block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
-        GraphemeCountWriter,
+    tui::{
+        draw::time::format_now_datetime_seconds,
+        utils::{
+            block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
+            GraphemeCountWriter,
+        },
     },
 };
 use humantime::format_duration;
@@ -99,11 +102,7 @@ pub fn headline(
             format!(
                 " Every {}s → {}",
                 duration_per_frame.as_secs(),
-                String::from_utf8_lossy(
-                    &humantime::format_rfc3339_seconds(SystemTime::now())
-                        .to_string()
-                        .as_bytes()[.."2020-02-13T00:51:45".len()]
-                )
+                format_now_datetime_seconds()
             )
         } else {
             "".into()

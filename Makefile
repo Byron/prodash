@@ -6,7 +6,9 @@ help:  ## Display this help
 ##@ Testing
 
 feature-check: ## build features in commmon combination to be sure it all stays together
-	cargo check --no-default-features && cargo check
+	cargo check --all-features
+	cargo check --no-default-features
+	cargo check
 
 unit-test: ## Run all unit tests
 	cargo test --examples

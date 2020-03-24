@@ -76,7 +76,7 @@ pub enum MessageLevel {
 pub struct Message {
     /// The time at which the message was sent.
     pub time: SystemTime,
-    /// The serverity of the message
+    /// The severity of the message
     pub level: MessageLevel,
     /// The name of the task that created the `Message`
     pub origin: String,

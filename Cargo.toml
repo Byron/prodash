@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "2.0.1"
+version = "2.1.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -16,7 +16,7 @@ doctest = true
 default = ["tui-renderer", "log-renderer"]
 tui-renderer = ["tui", "tui-react", "termion", "futures-timer", "futures", "unicode-segmentation", "unicode-width", "humantime" ]
 log-renderer = ["log"]
-with-chrono = ["chrono"]
+localtime = ["time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
@@ -35,7 +35,7 @@ futures = { version = "0.3.4", optional = true }
 unicode-segmentation = { version = "1.6.0", optional = true }
 humantime = { version = "2.0.0", optional = true }
 unicode-width = { version = "0.1.7", optional = true }
-chrono = { version = "0.4.11", default-features = false, optional = true }
+time = { version = "0.2.9", optional = true, features = ["std"], default-features = false }
 
 [dev-dependencies]
 futures = { version = "0.3.4", features = ["thread-pool"] }
