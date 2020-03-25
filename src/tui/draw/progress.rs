@@ -44,17 +44,16 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
         .as_ref()
         .unwrap_or(&initial_column_width);
     {
-        let computed_max_tree_draw_width = if desired_max_tree_draw_width >= MIN_TREE_WIDTH {
+        if desired_max_tree_draw_width >= MIN_TREE_WIDTH {
             let tree_bound = Rect {
                 width: desired_max_tree_draw_width,
                 ..bound
             };
-            draw_tree(entries, buf, tree_bound, state.task_offset)
+            let computed = draw_tree(entries, buf, tree_bound, state.task_offset);
+            state.last_tree_column_width = Some(computed);
         } else {
-            0
+            state.last_tree_column_width = Some(initial_column_width);
         };
-
-        state.last_tree_column_width = Some(computed_max_tree_draw_width);
     }
 
     {

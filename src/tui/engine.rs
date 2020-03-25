@@ -124,7 +124,7 @@ pub fn render_with_input(
         ]);
 
         let mut tick = 0usize;
-        let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).min(1);
+        let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {

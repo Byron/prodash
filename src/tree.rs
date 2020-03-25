@@ -348,8 +348,8 @@ impl Key {
 /// Indicate whether a progress can or cannot be made.
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub enum ProgressState {
-    /// Indicates a task is blocked and cannot make progress, optionally until the
-    /// given time.
+    /// Indicates a task is blocked and cannot indicate progress, optionally until the
+    /// given time. The task cannot easily be interrupted.
     Blocked(&'static str, Option<SystemTime>),
     /// The task is running
     Running,
