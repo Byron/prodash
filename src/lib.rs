@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.0.1 - Bugfix: Don't allow values of 0 for when to recompute task column widths
+
 ## v3.0.0 - New TUI option to delay computation of column width for stability with rapidly changing tasks
 
 ## v2.1.0 - Optional cargo feature "localtime" shows all times in the local timezone
