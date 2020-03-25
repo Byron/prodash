@@ -99,7 +99,9 @@ pub fn headline(
         |(mut running, mut blocked, mut groups), (_key, Value { progress, .. })| {
             match progress.map(|p| p.state) {
                 Some(ProgressState::Running) => running += 1,
-                Some(ProgressState::Blocked(_, _)) => blocked += 1,
+                Some(ProgressState::Blocked(_, _)) | Some(ProgressState::Halted(_, _)) => {
+                    blocked += 1
+                }
                 None => groups += 1,
             }
             (running, blocked, groups)
@@ -220,14 +222,15 @@ pub fn draw_progress(
                 let mut progress_text = progress_text;
                 add_block_eta(state, &mut progress_text);
                 let (bound, style) =
-                    draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| {
-                        if let ProgressState::Blocked(_, _) = state {
-                            return Color::Red;
-                        }
-                        if fraction >= 0.8 {
-                            Color::Green
-                        } else {
-                            Color::Yellow
+                    draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| match state {
+                        ProgressState::Blocked(_, _) => Color::Red,
+                        ProgressState::Halted(_, _) => Color::LightRed,
+                        ProgressState::Running => {
+                            if fraction >= 0.8 {
+                                Color::Green
+                            } else {
+                                Color::Yellow
+                            }
                         }
                     });
                 let style_fn = move |_t: &str, x: u16, _y: u16| {
@@ -249,10 +252,10 @@ pub fn draw_progress(
                     bar_rect,
                     step,
                     line,
-                    if let ProgressState::Blocked(_, _) = state {
-                        Color::Red
-                    } else {
-                        Color::White
+                    match state {
+                        ProgressState::Blocked(_, _) => Color::Red,
+                        ProgressState::Halted(_, _) => Color::LightRed,
+                        ProgressState::Running => Color::White,
                     },
                 );
             }
@@ -281,19 +284,27 @@ pub fn draw_progress(
 }
 
 fn add_block_eta(state: ProgressState, progress_text: &mut String) {
-    if let ProgressState::Blocked(reason, maybe_eta) = state {
-        progress_text.push_str(" [");
-        progress_text.push_str(reason);
-        progress_text.push_str("]");
-        if let Some(eta) = maybe_eta {
-            let now = SystemTime::now();
-            if eta > now {
-                progress_text.push_str(&format!(
-                    " → {} to unblock",
-                    format_duration(eta.duration_since(now).expect("computation to work"))
-                ))
+    match state {
+        ProgressState::Blocked(reason, maybe_eta) | ProgressState::Halted(reason, maybe_eta) => {
+            progress_text.push_str(" [");
+            progress_text.push_str(reason);
+            progress_text.push_str("]");
+            if let Some(eta) = maybe_eta {
+                let now = SystemTime::now();
+                if eta > now {
+                    progress_text.push_str(&format!(
+                        " → {} to {}",
+                        format_duration(eta.duration_since(now).expect("computation to work")),
+                        if let ProgressState::Blocked(_, _) = state {
+                            "unblock"
+                        } else {
+                            "continue"
+                        }
+                    ))
+                }
             }
         }
+        ProgressState::Running => {}
     }
 }
 

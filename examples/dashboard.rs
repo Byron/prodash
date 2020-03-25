@@ -126,7 +126,11 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
             } else {
                 None
             };
-            progress.blocked(REASONS.choose(&mut thread_rng()).unwrap(), eta);
+            if thread_rng().gen_bool(0.5) {
+                progress.halted(REASONS.choose(&mut thread_rng()).unwrap(), eta);
+            } else {
+                progress.blocked(REASONS.choose(&mut thread_rng()).unwrap(), eta);
+            }
             thread_rng().gen_range(WORK_DELAY_MS, LONG_WORK_DELAY_MS)
         } else {
             thread_rng().gen_range(SHORT_DELAY_MS, WORK_DELAY_MS)

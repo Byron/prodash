@@ -223,7 +223,9 @@ impl Item {
         });
     }
 
-    /// Call to indicate that progress cannot be made.
+    /// Call to indicate that progress cannot be indicated, and that the task cannot be interrupted.
+    /// Use this, as opposed to `halted(…)`, if a non-interruptable call is about to be made without support
+    /// for any progress indication.
     ///
     /// If `eta` is `Some(…)`, it specifies the time at which this task is expected to
     /// make progress again.
@@ -231,6 +233,18 @@ impl Item {
     /// The blocked-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
     pub fn blocked(&mut self, reason: &'static str, eta: Option<SystemTime>) {
         self.alter_progress(|p| p.state = ProgressState::Blocked(reason, eta));
+    }
+
+    /// Call to indicate that progress cannot be indicated, even though the task can be interrupted.
+    /// Use this, as opposed to `blocked(…)`, if an interruptable call is about to be made without support
+    /// for any progress indication.
+    ///
+    /// If `eta` is `Some(…)`, it specifies the time at which this task is expected to
+    /// make progress again.
+    ///
+    /// The halted-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
+    pub fn halted(&mut self, reason: &'static str, eta: Option<SystemTime>) {
+        self.alter_progress(|p| p.state = ProgressState::Halted(reason, eta));
     }
 
     /// Adds a new child `Tree`, whose parent is this instance, with the given `name`.
@@ -351,6 +365,9 @@ pub enum ProgressState {
     /// Indicates a task is blocked and cannot indicate progress, optionally until the
     /// given time. The task cannot easily be interrupted.
     Blocked(&'static str, Option<SystemTime>),
+    /// Indicates a task cannot indicate progress, optionally until the
+    /// given time. The task can be interrupted.
+    Halted(&'static str, Option<SystemTime>),
     /// The task is running
     Running,
 }

@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.1.0 - Tree::halted(…) indicates interruptable tasks without progress. Tree::blocked(…) means non-interruptable without progress.
+
 ## v3.0.2 - Bugfix: Allow column-width computation to recover from becoming 0
 
 ## v3.0.1 - Bugfix: Don't allow values of 0 for when to recompute task column widths
