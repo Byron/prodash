@@ -44,7 +44,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
         .as_ref()
         .unwrap_or(&initial_column_width);
     {
-        if desired_max_tree_draw_width >= MIN_TREE_WIDTH {
+        if initial_column_width >= MIN_TREE_WIDTH {
             let tree_bound = Rect {
                 width: desired_max_tree_draw_width,
                 ..bound
@@ -52,7 +52,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
             let computed = draw_tree(entries, buf, tree_bound, state.task_offset);
             state.last_tree_column_width = Some(computed);
         } else {
-            state.last_tree_column_width = Some(initial_column_width);
+            state.last_tree_column_width = Some(0);
         };
     }
 
@@ -342,40 +342,42 @@ fn draw_progress_bar_fn(
 
 pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
     let mut max_prefix_len = 0;
-    for (
-        line,
-        (
-            key,
-            Value {
-                progress,
-                name: title,
-            },
-        ),
-    ) in entries
+    for (line, entry) in entries
         .iter()
         .skip(offset as usize)
         .take(bound.height as usize)
         .enumerate()
     {
         let line_bound = rect::line_bound(bound, line);
-        let tree_prefix = format!(
-            "{:>width$} {} ",
-            if key.level() == 1 {
-                "‧"
-            } else {
-                if progress.is_none() {
-                    "…"
-                } else {
-                    "└"
-                }
-            },
-            if progress.is_none() { "" } else { &title },
-            width = key.level() as usize
-        );
+        let tree_prefix = to_tree_prefix(entry);
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
         draw_text_nowrap(line_bound, buf, tree_prefix, None);
     }
     max_prefix_len
+}
+
+fn to_tree_prefix(entry: &(Key, Value)) -> String {
+    let (
+        key,
+        Value {
+            progress,
+            name: title,
+        },
+    ) = entry;
+    format!(
+        "{:>width$} {} ",
+        if key.level() == 1 {
+            "‧"
+        } else {
+            if progress.is_none() {
+                "…"
+            } else {
+                "└"
+            }
+        },
+        if progress.is_none() { "" } else { &title },
+        width = key.level() as usize
+    )
 }
 
 pub fn draw_overflow<'a>(

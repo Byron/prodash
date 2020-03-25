@@ -167,7 +167,10 @@ pub fn render_with_input(
                 progress.copy_messages(&mut messages);
 
                 draw::all(&mut state, &entries, &messages, window_size, buf);
-                if tick == 1 || tick % store_task_size_every == 0 {
+                if tick == 1
+                    || tick % store_task_size_every == 0
+                    || state.last_tree_column_width.unwrap_or(0) == 0
+                {
                     state.next_tree_column_width = state.last_tree_column_width;
                 }
                 terminal.post_render().expect("post render to work");
