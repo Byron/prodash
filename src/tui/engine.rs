@@ -19,6 +19,14 @@ pub struct TuiOptions {
     ///
     /// *e.g.* 1.0/4.0 is one frame every 4 seconds.
     pub frames_per_second: f32,
+    /// If set, recompute the column width of the task tree only every given frame. Otherwise the width will be recomputed every frame.
+    ///
+    /// Use this if there are many short-running tasks with varying names paired with high refresh rates of multiple frames per second to
+    /// stabilize the appearance of the TUI.
+    ///
+    /// For example, setting the value to 40 will with a frame rate of 20 per second will recompute the column width to fit all task names
+    /// every 2 seconds.
+    pub recompute_column_width_every_nth_frame: Option<usize>,
     /// The initial window size.
     ///
     /// If unset, it will be retrieved from the current terminal.
@@ -30,6 +38,7 @@ impl Default for TuiOptions {
         TuiOptions {
             title: "Progress Dashboard".into(),
             frames_per_second: 10.0,
+            recompute_column_width_every_nth_frame: None,
             window_size: None,
         }
     }
@@ -78,6 +87,7 @@ pub fn render_with_input(
         title,
         frames_per_second,
         window_size,
+        recompute_column_width_every_nth_frame,
     } = options;
     let mut terminal = {
         let stdout = io::stdout().into_raw_mode()?;
@@ -114,11 +124,7 @@ pub fn render_with_input(
         ]);
 
         let mut tick = 0usize;
-        let store_task_size_every = if frames_per_second <= 1.0 {
-            1
-        } else {
-            frames_per_second as usize
-        };
+        let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1);
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {

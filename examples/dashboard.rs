@@ -82,6 +82,7 @@ fn launch_ambient_gui(
         tui::TuiOptions {
             title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
             frames_per_second: args.fps,
+            recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
             ..tui::TuiOptions::default()
         },
         futures::stream::select(
@@ -316,6 +317,16 @@ mod arg {
         /// 0.25 shows a frame every 4 seconds.
         #[argh(option, default = "10.0")]
         pub fps: f32,
+
+        /// if set, recompute the column width of the task tree only every given frame. Otherwise the width will be recomputed every frame.
+        ///
+        /// Use this if there are many short-running tasks with varying names paired with high refresh rates of multiple frames per second to
+        /// stabilize the appearance of the TUI.
+        ///
+        /// For example, setting the value to 40 will with a frame rate of 20 per second will recompute the column width to fit all task names
+        /// every 2 seconds.
+        #[argh(option, short = 'r')]
+        pub recompute_column_width_every_nth_frame: Option<usize>,
 
         /// the amount of scrollback for task messages.
         #[argh(option, default = "80")]
