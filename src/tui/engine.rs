@@ -113,6 +113,12 @@ pub fn render_with_input(
             events.boxed(),
         ]);
 
+        let mut tick = 0usize;
+        let store_task_size_every = if frames_per_second <= 1.0 {
+            1
+        } else {
+            frames_per_second as usize
+        };
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {
@@ -144,6 +150,7 @@ pub fn render_with_input(
                 Event::SetInformation(info) => state.information = info,
             }
             if !skip_redraw {
+                tick += 1;
                 let terminal_window_size = terminal.pre_render().expect("pre-render to work");
                 let window_size = state
                     .user_provided_window_size
@@ -154,6 +161,9 @@ pub fn render_with_input(
                 progress.copy_messages(&mut messages);
 
                 draw::all(&mut state, &entries, &messages, window_size, buf);
+                if tick == 1 || tick % store_task_size_every == 0 {
+                    state.next_tree_column_width = state.last_tree_column_width;
+                }
                 terminal.post_render().expect("post render to work");
             }
         }

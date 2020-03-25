@@ -19,6 +19,7 @@ async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Opti
     .create();
     // Now we should handle signals to be able to cleanup properly
     let speed = args.speed_multitplier;
+    let changing_names = args.changing_names;
 
     let (mut gui_handle, abort_gui) = if args.no_tui {
         let (never_ending, abort_handle) =
@@ -36,6 +37,7 @@ async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Opti
             progress.clone(),
             pool.clone(),
             speed,
+            changing_names,
         );
         let pooled_work = (0..thread_rng().gen_range(6, 16usize)).map(|_| {
             pool.spawn_with_handle(new_chunk_of_work(
@@ -43,6 +45,7 @@ async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Opti
                 progress.clone(),
                 pool.clone(),
                 speed,
+                changing_names,
             ))
             .expect("spawning to work - SpawnError cannot be ")
             .boxed_local()
@@ -99,7 +102,7 @@ fn launch_ambient_gui(
     Ok((handle.map(|_| ()), abort_handle))
 }
 
-async fn work_item(mut progress: Item, speed: f32) {
+async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     let max: u8 = thread_rng().gen_range(25, 125);
     progress.init(
         if max > WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK {
@@ -133,7 +136,7 @@ async fn work_item(mut progress: Item, speed: f32) {
         if thread_rng().gen_bool(0.01) {
             progress.info(*INFO_MESSAGES.choose(&mut thread_rng()).unwrap());
         }
-        if thread_rng().gen_bool(0.01) {
+        if thread_rng().gen_bool(if changing_names { 0.5 } else { 0.01 }) {
             progress.set_name(WORK_NAMES.choose(&mut thread_rng()).unwrap().to_string());
         }
         Delay::new(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
@@ -145,7 +148,13 @@ async fn work_item(mut progress: Item, speed: f32) {
     }
 }
 
-async fn new_chunk_of_work(max: NestingLevel, tree: Tree, pool: impl Spawn, speed: f32) -> Result {
+async fn new_chunk_of_work(
+    max: NestingLevel,
+    tree: Tree,
+    pool: impl Spawn,
+    speed: f32,
+    changing_names: bool,
+) -> Result {
     let NestingLevel(max_level) = max;
     let mut progresses = Vec::new();
     let mut level_progress = tree.add_child(format!("level {} of {}", 1, max_level));
@@ -163,6 +172,7 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, pool: impl Spawn, spee
                         id + 1
                     )),
                     speed,
+                    changing_names,
                 ))
                 .expect("spawn to work");
             handles.push(handle);
@@ -291,12 +301,16 @@ mod arg {
     /// Reach new heights.
     pub struct Options {
         /// if set, there will only be logging. Use 'RUST_LOG=info cargo run --example dashboard to see the messages
-        #[argh(switch, short = 'a')]
+        #[argh(switch, short = 'n')]
         pub no_tui: bool,
 
         /// if set, the terminal window will be animated to assure resizing works as expected.
         #[argh(switch, short = 'a')]
         pub animate_terminal_size: bool,
+
+        /// if set, names of tasks will change rapidly, causing the delay at which column sizes are recalculated to show
+        #[argh(switch, short = 'c')]
+        pub changing_names: bool,
 
         /// the amount of frames to show per second, can be below zero, e.g.
         /// 0.25 shows a frame every 4 seconds.

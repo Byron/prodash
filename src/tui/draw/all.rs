@@ -25,6 +25,8 @@ pub struct State {
     pub information: Vec<Line>,
     pub hide_info: bool,
     pub maximize_info: bool,
+    pub last_tree_column_width: Option<u16>,
+    pub next_tree_column_width: Option<u16>,
 }
 
 pub fn all(
@@ -65,13 +67,13 @@ pub fn all(
     );
 
     let inner = window.inner(bound);
-    let (tasks_pane, messages_pane) = compute_pane_bounds(
+    let (progress_pane, messages_pane) = compute_pane_bounds(
         if state.hide_messages { &[] } else { messages },
         inner,
         state.messages_fullscreen,
     );
 
-    draw::progress::pane(&entries, tasks_pane, &mut state.task_offset, buf);
+    draw::progress::pane(&entries, progress_pane, buf, state);
     if let Some(messages_pane) = messages_pane {
         draw::messages::pane(
             messages,

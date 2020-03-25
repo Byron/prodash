@@ -1,7 +1,7 @@
 use crate::{
     tree::{Key, Progress, ProgressState, ProgressStep, Value},
     tui::{
-        draw::time::format_now_datetime_seconds,
+        draw::{time::format_now_datetime_seconds, State},
         utils::{
             block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
             GraphemeCountWriter,
@@ -22,60 +22,70 @@ use tui_react::fill_background;
 
 const MIN_TREE_WIDTH: u16 = 20;
 
-pub fn pane(entries: &[(Key, Value)], mut bound: Rect, offset: &mut u16, buf: &mut Buffer) {
-    *offset = sanitize_offset(*offset, entries.len(), bound.height);
-    let needs_overflow_line =
-        if entries.len() > bound.height as usize || (*offset).min(entries.len() as u16) > 0 {
-            bound.height = bound.height.saturating_sub(1);
-            true
-        } else {
-            false
-        };
-    *offset = sanitize_offset(*offset, entries.len(), bound.height);
+pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
+    state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
+    let needs_overflow_line = if entries.len() > bound.height as usize
+        || (state.task_offset).min(entries.len() as u16) > 0
+    {
+        bound.height = bound.height.saturating_sub(1);
+        true
+    } else {
+        false
+    };
+    state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
 
-    if !entries.is_empty() {
-        let column_width = bound.width / 2;
-        let max_tree_draw_width = if column_width >= MIN_TREE_WIDTH {
-            let prefix_area = Rect {
-                width: column_width,
+    if entries.is_empty() {
+        return;
+    }
+
+    let initial_column_width = bound.width / 2;
+    let desired_max_tree_draw_width = *state
+        .next_tree_column_width
+        .as_ref()
+        .unwrap_or(&initial_column_width);
+    {
+        let computed_max_tree_draw_width = if desired_max_tree_draw_width >= MIN_TREE_WIDTH {
+            let tree_bound = Rect {
+                width: desired_max_tree_draw_width,
                 ..bound
             };
-            draw_tree(entries, buf, prefix_area, *offset)
+            draw_tree(entries, buf, tree_bound, state.task_offset)
         } else {
             0
         };
 
-        {
-            let max_tree_draw_width = max_tree_draw_width;
-            let progress_area = rect::offset_x(bound, max_tree_draw_width);
-            draw_progress(
-                entries,
-                buf,
-                progress_area,
-                if max_tree_draw_width == 0 {
-                    false
-                } else {
-                    true
-                },
-                *offset,
-            );
-        }
+        state.last_tree_column_width = Some(computed_max_tree_draw_width);
+    }
 
-        if needs_overflow_line {
-            let overflow_rect = Rect {
-                y: bound.height + 1,
-                height: 1,
-                ..bound
-            };
-            draw_overflow(
-                entries,
-                buf,
-                overflow_rect,
-                max_tree_draw_width,
-                bound.height,
-                *offset,
-            );
-        }
+    {
+        let progress_area = rect::offset_x(bound, desired_max_tree_draw_width);
+        draw_progress(
+            entries,
+            buf,
+            progress_area,
+            if desired_max_tree_draw_width == 0 {
+                false
+            } else {
+                true
+            },
+            state.task_offset,
+        );
+    }
+
+    if needs_overflow_line {
+        let overflow_rect = Rect {
+            y: bound.height + 1,
+            height: 1,
+            ..bound
+        };
+        draw_overflow(
+            entries,
+            buf,
+            overflow_rect,
+            desired_max_tree_draw_width,
+            bound.height,
+            state.task_offset,
+        );
     }
 }
 
@@ -352,7 +362,8 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
             if progress.is_none() { "" } else { &title },
             width = key.level() as usize
         );
-        max_prefix_len = max_prefix_len.max(draw_text_nowrap(line_bound, buf, tree_prefix, None));
+        max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
+        draw_text_nowrap(line_bound, buf, tree_prefix, None);
     }
     max_prefix_len
 }
