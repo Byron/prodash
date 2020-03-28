@@ -45,6 +45,7 @@ impl Default for TuiOptions {
 }
 
 /// A line as used in [`Event::SetInformation`](./enum.Event.html#variant.SetInformation)
+#[derive(Debug, Clone)]
 pub enum Line {
     /// Set a title with the given text
     Title(String),
@@ -52,9 +53,28 @@ pub enum Line {
     Text(String),
 }
 
+/// The variants represented here allow the user to control when the GUI can be shutdown.
+#[derive(Debug, Clone, Copy)]
+pub enum Interrupt {
+    /// Immediately exit the GUI event loop when there is an interrupt request.
+    ///
+    /// This is the default when the event loop is entered.
+    Instantly,
+    /// Instead of exiting the event loop instantly, wait until the next Interrupt::Instantly
+    /// event is coming in.
+    Deferred,
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum InterruptDrawInfo {
+    Instantly,
+    Deferred(bool),
+}
+
 /// An event to be sent in the [`tui::render_with_input(…events)`](./fn.render_with_input.html) stream.
 ///
 /// This way, the TUI can be instructed to draw frames or change the information to be displayed.
+#[derive(Debug, Clone)]
 pub enum Event {
     /// Draw a frame
     Tick,
@@ -68,6 +88,8 @@ pub enum Event {
     SetTitle(String),
     /// Provide a list of titles and lines to populate the side bar on the right.
     SetInformation(Vec<Line>),
+    /// The way the GUI will respond to interrupt requests. See `Interrupt` for more information.
+    SetInterruptMode(Interrupt),
 }
 
 /// Returns a future that draws the terminal user interface indefinitely.
@@ -115,6 +137,7 @@ pub fn render_with_input(
             duration_per_frame,
             ..draw::State::default()
         };
+        let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());
         let mut messages = Vec::with_capacity(progress.messages_capacity());
         let mut events = futures::stream::select_all(vec![
@@ -131,7 +154,12 @@ pub fn render_with_input(
                 Event::Tick => {}
                 Event::Input(key) => match key {
                     Key::Esc | Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('[') => {
-                        break;
+                        match interrupt_mode {
+                            InterruptDrawInfo::Instantly => break,
+                            InterruptDrawInfo::Deferred(_) => {
+                                interrupt_mode = InterruptDrawInfo::Deferred(true)
+                            }
+                        }
                     }
                     Key::Char('`') => state.hide_messages = !state.hide_messages,
                     Key::Char('~') => state.messages_fullscreen = !state.messages_fullscreen,
@@ -154,6 +182,20 @@ pub fn render_with_input(
                 Event::SetWindowSize(bound) => state.user_provided_window_size = Some(bound),
                 Event::SetTitle(title) => state.title = title,
                 Event::SetInformation(info) => state.information = info,
+                Event::SetInterruptMode(mode) => {
+                    interrupt_mode = match mode {
+                        Interrupt::Instantly => {
+                            if let InterruptDrawInfo::Deferred(interrupt_requested) = interrupt_mode
+                            {
+                                if interrupt_requested {
+                                    break;
+                                }
+                            }
+                            InterruptDrawInfo::Instantly
+                        }
+                        Interrupt::Deferred => InterruptDrawInfo::Deferred(false),
+                    };
+                }
             }
             if !skip_redraw {
                 tick += 1;
@@ -166,7 +208,14 @@ pub fn render_with_input(
                 progress.sorted_snapshot(&mut entries);
                 progress.copy_messages(&mut messages);
 
-                draw::all(&mut state, &entries, &messages, window_size, buf);
+                draw::all(
+                    &mut state,
+                    interrupt_mode,
+                    &entries,
+                    &messages,
+                    window_size,
+                    buf,
+                );
                 if tick == 1
                     || tick % store_task_size_every == 0
                     || state.last_tree_column_width.unwrap_or(0) == 0

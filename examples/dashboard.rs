@@ -77,6 +77,8 @@ fn launch_ambient_gui(
     progress: Tree,
     args: arg::Options,
 ) -> std::result::Result<(impl Future<Output = ()>, AbortHandle), std::io::Error> {
+    let mut ticks: usize = 0;
+    let mut interruptible = true;
     let render_fut = tui::render_with_input(
         progress,
         tui::TuiOptions {
@@ -87,7 +89,17 @@ fn launch_ambient_gui(
         },
         futures::stream::select(
             window_resize_stream(args.animate_terminal_size),
-            ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(|_| {
+            ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
+                ticks += 1;
+                if ticks % 10 == 0 {
+                    let is_interruptible = interruptible;
+                    interruptible = !interruptible;
+                    return if is_interruptible {
+                        Event::SetInterruptMode(Interrupt::Instantly)
+                    } else {
+                        Event::SetInterruptMode(Interrupt::Deferred)
+                    };
+                }
                 if thread_rng().gen_bool(0.5) {
                     Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
                 } else {
@@ -354,7 +366,7 @@ use futures_timer::Delay;
 use prodash::{
     tree::Item,
     tree::Key,
-    tui::{self, ticker, Event, Line},
+    tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
 use rand::prelude::*;

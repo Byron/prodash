@@ -3,7 +3,7 @@ use crate::{
     tui::{
         draw,
         utils::{block_width, rect},
-        Line,
+        InterruptDrawInfo, Line,
     },
 };
 use std::time::Duration;
@@ -29,8 +29,9 @@ pub struct State {
     pub next_tree_column_width: Option<u16>,
 }
 
-pub fn all(
+pub(crate) fn all(
     state: &mut State,
+    interrupt_mode: InterruptDrawInfo,
     entries: &[(Key, Value)],
     messages: &[Message],
     bound: Rect,
@@ -54,6 +55,7 @@ pub fn all(
     let border_width = 1;
     draw::progress::headline(
         &entries,
+        interrupt_mode,
         state.duration_per_frame,
         buf,
         rect::offset_x(

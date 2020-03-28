@@ -4,4 +4,4 @@ mod messages;
 mod progress;
 pub mod time;
 
-pub use all::{all, State};
+pub(crate) use all::{all, State};

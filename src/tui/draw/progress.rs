@@ -6,6 +6,7 @@ use crate::{
             block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
             GraphemeCountWriter,
         },
+        InterruptDrawInfo,
     },
 };
 use humantime::format_duration;
@@ -88,8 +89,9 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
     }
 }
 
-pub fn headline(
+pub(crate) fn headline(
     entries: &[(Key, Value)],
+    interrupt_mode: InterruptDrawInfo,
     duration_per_frame: Duration,
     buf: &mut Buffer,
     bound: Rect,
@@ -108,7 +110,17 @@ pub fn headline(
         },
     );
     let text = format!(
-        "{} {:3} running + {:3} blocked + {:3} groups = {} ",
+        " {} {} {:3} running + {:3} blocked + {:3} groups = {} ",
+        match interrupt_mode {
+            InterruptDrawInfo::Instantly => "'q' or CTRL+c to quit",
+            InterruptDrawInfo::Deferred(interrupt_requested) => {
+                if interrupt_requested {
+                    "interrupt requested - please wait"
+                } else {
+                    "cannot interrupt current operation"
+                }
+            }
+        },
         if duration_per_frame > Duration::from_secs(1) {
             format!(
                 " Every {}s → {}",
