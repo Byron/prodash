@@ -68,6 +68,7 @@ pub enum Interrupt {
 #[derive(Clone, Copy)]
 pub(crate) enum InterruptDrawInfo {
     Instantly,
+    /// Boolean signals if interrupt is requested
     Deferred(bool),
 }
 
@@ -185,15 +186,15 @@ pub fn render_with_input(
                 Event::SetInterruptMode(mode) => {
                     interrupt_mode = match mode {
                         Interrupt::Instantly => {
-                            if let InterruptDrawInfo::Deferred(interrupt_requested) = interrupt_mode
-                            {
-                                if interrupt_requested {
-                                    break;
-                                }
+                            if let InterruptDrawInfo::Deferred(true) = interrupt_mode {
+                                break;
                             }
                             InterruptDrawInfo::Instantly
                         }
-                        Interrupt::Deferred => InterruptDrawInfo::Deferred(false),
+                        Interrupt::Deferred => InterruptDrawInfo::Deferred(match interrupt_mode {
+                            InterruptDrawInfo::Deferred(interrupt_requested) => interrupt_requested,
+                            _ => false,
+                        }),
                     };
                 }
             }

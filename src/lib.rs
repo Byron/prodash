@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.2.0 - Application can control if the GUI will respond to interrupt requests
+
 ## v3.1.1 - Bugfix (really): Finally delayed column resizing works correctly.
 
 ## v3.1.0 - Tree::halted(…) indicates interruptable tasks without progress. Tree::blocked(…) means non-interruptable without progress.
