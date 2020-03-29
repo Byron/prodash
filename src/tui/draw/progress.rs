@@ -4,7 +4,7 @@ use crate::{
         draw::{time::format_now_datetime_seconds, State},
         utils::{
             block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
-            GraphemeCountWriter,
+            GraphemeCountWriter, VERTICAL_LINE,
         },
         InterruptDrawInfo,
     },
@@ -226,7 +226,7 @@ pub fn draw_progress(
             progress = ProgressFormat(progress, bound.width.saturating_sub(title_spacing))
         );
 
-        draw_text_nowrap(line_bound, buf, rect::VERTICAL_LINE, None);
+        draw_text_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
         let progress_rect = rect::offset_x(line_bound, column_line_width);
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
@@ -421,11 +421,7 @@ pub fn draw_overflow<'a>(
     progress_fraction /= count as f32;
     let label = format!(
         "{} …{} skipped and {} more",
-        if label_offset == 0 {
-            ""
-        } else {
-            rect::VERTICAL_LINE
-        },
+        if label_offset == 0 { "" } else { VERTICAL_LINE },
         offset,
         entries
             .len()

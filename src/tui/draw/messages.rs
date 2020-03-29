@@ -1,7 +1,7 @@
 use crate::{
     tree::{Message, MessageLevel},
     tui::draw::time::{format_time_for_messages, DATE_TIME_HMS},
-    tui::utils::{block_width, draw_text_nowrap, rect, sanitize_offset},
+    tui::utils::{block_width, draw_text_nowrap, rect, sanitize_offset, VERTICAL_LINE},
 };
 use std::time::SystemTime;
 use tui::{
@@ -69,7 +69,7 @@ pub fn pane(
             draw_text_nowrap(
                 rect::offset_x(level_bound, LEVEL_TEXT_WIDTH),
                 buf,
-                rect::VERTICAL_LINE,
+                VERTICAL_LINE,
                 None,
             );
         }
@@ -131,14 +131,14 @@ fn level_to_style(level: MessageLevel) -> Style {
 }
 
 fn format_time_column(time: &SystemTime) -> String {
-    format!("{}{}", format_time_for_messages(*time), rect::VERTICAL_LINE)
+    format!("{}{}", format_time_for_messages(*time), VERTICAL_LINE)
 }
 
 fn compute_bounds(
     line: Rect,
     max_origin_width: u16,
 ) -> (Option<Rect>, Option<Rect>, Option<Rect>, Rect) {
-    let vertical_line_width = rect::VERTICAL_LINE.width() as u16;
+    let vertical_line_width = VERTICAL_LINE.width() as u16;
     let mythical_offset_we_should_not_need = 1;
 
     let time_bound = Rect {
