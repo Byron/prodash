@@ -23,4 +23,4 @@ pub fn ticker(dur: Duration) -> impl futures::Stream<Item = ()> {
 pub const VERTICAL_LINE: &str = "│";
 
 pub use tui_react::util::*;
-pub use tui_react::{draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap as draw_text_nowrap};
+pub use tui_react::{draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap};

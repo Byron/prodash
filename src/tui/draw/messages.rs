@@ -1,7 +1,9 @@
 use crate::{
     tree::{Message, MessageLevel},
     tui::draw::time::{format_time_for_messages, DATE_TIME_HMS},
-    tui::utils::{block_width, draw_text_nowrap, rect, sanitize_offset, VERTICAL_LINE},
+    tui::utils::{
+        block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE,
+    },
 };
 use std::time::SystemTime;
 use tui::{
@@ -22,7 +24,7 @@ pub fn pane(
     let mut block = Block::default().title("Messages").borders(Borders::TOP);
     block.draw(bound, buf);
     let help_text = " ⨯ = `| ▢ = ~ ";
-    draw_text_nowrap(
+    draw_text_with_ellipsis_nowrap(
         rect::snap_to_right(bound, block_width(help_text)),
         buf,
         help_text,
@@ -57,16 +59,16 @@ pub fn pane(
         let (time_bound, level_bound, origin_bound, message_bound) =
             compute_bounds(line_bound, max_origin_width);
         if let Some(time_bound) = time_bound {
-            draw_text_nowrap(time_bound, buf, format_time_column(time), None);
+            draw_text_with_ellipsis_nowrap(time_bound, buf, format_time_column(time), None);
         }
         if let Some(level_bound) = level_bound {
-            draw_text_nowrap(
+            draw_text_with_ellipsis_nowrap(
                 level_bound,
                 buf,
                 format_level_column(*level),
                 Some(level_to_style(*level)),
             );
-            draw_text_nowrap(
+            draw_text_with_ellipsis_nowrap(
                 rect::offset_x(level_bound, LEVEL_TEXT_WIDTH),
                 buf,
                 VERTICAL_LINE,
@@ -74,15 +76,15 @@ pub fn pane(
             );
         }
         if let Some(origin_bound) = origin_bound {
-            draw_text_nowrap(origin_bound, buf, origin, None);
-            draw_text_nowrap(
+            draw_text_with_ellipsis_nowrap(origin_bound, buf, origin, None);
+            draw_text_with_ellipsis_nowrap(
                 rect::offset_x(origin_bound, max_origin_width),
                 buf,
                 "→",
                 None,
             );
         }
-        draw_text_nowrap(message_bound, buf, message, None);
+        draw_text_with_ellipsis_nowrap(message_bound, buf, message, None);
     }
 
     if (bound.height as usize) < messages.len().saturating_sub(*offset as usize)
@@ -92,14 +94,14 @@ pub fn pane(
             .len()
             .saturating_sub(bound.height.saturating_add(*offset) as usize);
         let messages_skipped = (*offset).min(messages.len() as u16);
-        draw_text_nowrap(
+        draw_text_with_ellipsis_nowrap(
             rect::offset_x(overflow_bound, 2),
             buf,
             format!("… {} skipped and {} more", messages_skipped, messages_below),
             None,
         );
         let help_text = " ⇊ = D|↓ = J|⇈ = U|↑ = K ┘";
-        draw_text_nowrap(
+        draw_text_with_ellipsis_nowrap(
             rect::snap_to_right(overflow_bound, block_width(help_text)),
             buf,
             help_text,

@@ -3,8 +3,8 @@ use crate::{
     tui::{
         draw::{time::format_now_datetime_seconds, State},
         utils::{
-            block_width, draw_text_nowrap, draw_text_nowrap_fn, rect, sanitize_offset,
-            GraphemeCountWriter, VERTICAL_LINE,
+            block_width, draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, rect,
+            sanitize_offset, GraphemeCountWriter, VERTICAL_LINE,
         },
         InterruptDrawInfo,
     },
@@ -135,7 +135,7 @@ pub(crate) fn headline(
         num_groups,
         entries.len()
     );
-    draw_text_nowrap(
+    draw_text_with_ellipsis_nowrap(
         rect::snap_to_right(bound, block_width(&text) + 1),
         buf,
         text,
@@ -211,7 +211,7 @@ pub fn draw_progress(
             progress = ProgressFormat(progress, bound.width.saturating_sub(title_spacing))
         );
 
-        draw_text_nowrap(line_bound, buf, VERTICAL_LINE, None);
+        draw_text_with_ellipsis_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
         let tree_prefix = level_prefix(
             prev_level,
@@ -224,7 +224,7 @@ pub fn draw_progress(
             line_bound,
             (column_line_width + block_width(&tree_prefix)) as u16,
         );
-        draw_text_nowrap(
+        draw_text_with_ellipsis_nowrap(
             rect::offset_x(line_bound, column_line_width),
             buf,
             tree_prefix,
@@ -258,7 +258,7 @@ pub fn draw_progress(
             Some((None, state, step)) => {
                 let mut progress_text = progress_text;
                 add_block_eta(state, &mut progress_text);
-                draw_text_nowrap(progress_rect, buf, progress_text, None);
+                draw_text_with_ellipsis_nowrap(progress_rect, buf, progress_text, None);
                 let bar_rect = rect::offset_x(line_bound, max_progress_label_width as u16);
                 draw_spinner(
                     buf,
@@ -273,8 +273,10 @@ pub fn draw_progress(
                 );
             }
             None => {
-                draw_text_nowrap(progress_rect, buf, progress_text, None);
-                draw_text_nowrap(progress_rect, buf, format!(" {} ", title), None);
+                draw_text_nowrap_fn(progress_rect, buf, progress_text, |_, _, _| {
+                    Style::default()
+                });
+                draw_text_with_ellipsis_nowrap(progress_rect, buf, format!(" {} ", title), None);
             }
         }
     }
@@ -355,7 +357,7 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
         );
         prev_level = Some(entry.0.level());
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
-        draw_text_nowrap(line_bound, buf, tree_prefix, None);
+        draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
     }
     max_prefix_len
 }
