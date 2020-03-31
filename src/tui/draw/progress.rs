@@ -350,18 +350,9 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
     max_prefix_len
 }
 
-fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) -> String {
-    let (
-        key,
-        Value {
-            progress: _,
-            name: title,
-        },
-    ) = entry;
-    let cur_level = key.level();
-
+fn level_prefix(prev_level: Option<u8>, cur_level: u8, next_level: u8) -> String {
     format!(
-        "{:>width$} {} ",
+        "{:>width$}",
         match (prev_level, cur_level, next_level) {
             (Some(prev), cur, next) => match (prev, cur) {
                 (prev, cur) if cur > prev =>
@@ -381,8 +372,24 @@ fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) 
             },
             _ => "",
         },
-        title,
         width = (cur_level.saturating_sub(1) * 2) as usize
+    )
+}
+
+fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) -> String {
+    let (
+        key,
+        Value {
+            progress: _,
+            name: title,
+        },
+    ) = entry;
+    let cur_level = key.level();
+
+    format!(
+        "{} {} ",
+        level_prefix(prev_level, cur_level, next_level),
+        title,
     )
 }
 
