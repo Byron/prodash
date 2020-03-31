@@ -329,6 +329,46 @@ pub struct Key(
     ),
 );
 
+/// Determines if a sibling is above or below in the given level of hierarchy
+#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+pub enum SiblingLocation {
+    Above,
+    Below,
+    AboveAndBelow,
+    NotFound,
+}
+
+impl SiblingLocation {
+    fn merge(self, other: SiblingLocation) -> SiblingLocation {
+        use SiblingLocation::*;
+        match (self, other) {
+            (any, NotFound) => any,
+            (NotFound, any) => any,
+            (Above, Below) => AboveAndBelow,
+            (Below, Above) => AboveAndBelow,
+            (AboveAndBelow, _) => AboveAndBelow,
+            (_, AboveAndBelow) => AboveAndBelow,
+            (Above, Above) => Above,
+            (Below, Below) => Below,
+        }
+    }
+}
+
+impl Default for SiblingLocation {
+    fn default() -> Self {
+        SiblingLocation::NotFound
+    }
+}
+
+/// A type providing information about what's above and below `Tree` items.
+#[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+pub struct Adjecency(
+    pub SiblingLocation,
+    pub SiblingLocation,
+    pub SiblingLocation,
+    pub SiblingLocation,
+);
+
 impl Key {
     fn add_child(self, child_id: ItemId) -> Key {
         Key(match self {
@@ -343,6 +383,7 @@ impl Key {
         })
     }
 
+    /// The level of hierarchy a node is placed in, i.e. the amount of path components
     pub fn level(&self) -> u8 {
         match self {
             Key((None, None, None, None)) => 0,
@@ -354,6 +395,33 @@ impl Key {
         }
     }
 
+    /// Compute the adjacency map for the key in `sorted` at the given `index`.
+    ///
+    /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
+    /// for the result to be reliable.
+    pub fn adjecency(sorted: &[(Key, Value)], index: usize) -> Adjecency {
+        let key = &sorted[index].0;
+        let key_level = key.level();
+        if key_level == 0 {
+            return Adjecency::default();
+        }
+
+        {
+            let level = key_level;
+            for key_above in sorted[..index].iter().rev() {
+                match level {
+                    0 => break,
+                    _ => unreachable!("Bug: did you add a key level"),
+                }
+            }
+        }
+        if let Some(slice) = sorted.get(index + 1..) {
+            for key_below in slice {}
+        }
+        Adjecency::default()
+    }
+
+    /// The maximum amount of path components we can represent.
     pub const fn max_level() -> u8 {
         4
     }

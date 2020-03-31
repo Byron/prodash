@@ -369,17 +369,17 @@ fn level_prefix(prev_level: Option<u8>, cur: u8, next: u8) -> String {
         match (prev, cur) {
             (prev, cur) if cur > prev =>
                 if next == cur {
-                    "├" // sibling no same level
+                    "├" // sibling same level
                 } else {
-                    "" // top-level item
+                    "└" // top-level item
                 },
             (prev, cur) if cur == prev =>
                 if next == cur {
-                    "├" // sibling no same level
+                    "├" // sibling same level
                 } else {
                     "└" // last child on this level
                 },
-            (prev, cur) if cur < prev => "",
+            (prev, cur) if cur < prev => "└",
             _ => "?",
         },
         width = (cur.saturating_sub(1) * 2) as usize
