@@ -186,24 +186,6 @@ pub fn draw_progress(
             }
             None => state,
         });
-    let max_title_width = entries
-        .iter()
-        .skip(offset as usize)
-        .take(bound.height as usize)
-        .fold(
-            0,
-            |state,
-             (
-                key,
-                Value {
-                    progress,
-                    name: title,
-                },
-            )| match progress {
-                None => state.max(block_width(title) + key.level() as u16 + title_spacing),
-                Some(_) => state,
-            },
-        );
 
     for (
         line,
@@ -228,7 +210,10 @@ pub fn draw_progress(
 
         draw_text_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
-        let progress_rect = rect::offset_x(line_bound, column_line_width);
+        let progress_rect = rect::offset_x(
+            line_bound,
+            (column_line_width + key.level().saturating_sub(1)) as u16,
+        );
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
@@ -272,16 +257,6 @@ pub fn draw_progress(
                 );
             }
             None => {
-                let center_rect = rect::intersect(
-                    Rect {
-                        x: line_bound.x
-                            + column_line_width
-                            + (line_bound.width.saturating_sub(max_title_width as u16)) / 2,
-                        width: max_title_width as u16,
-                        ..line_bound
-                    },
-                    line_bound,
-                );
                 let title_text = format!(
                     " {:‧<prefix_count$} {} ",
                     "",
@@ -289,7 +264,7 @@ pub fn draw_progress(
                     prefix_count = key.level() as usize
                 );
                 draw_text_nowrap(progress_rect, buf, progress_text, None);
-                draw_text_nowrap(center_rect, buf, title_text, None);
+                draw_text_nowrap(progress_rect, buf, title_text, None);
             }
         }
     }
