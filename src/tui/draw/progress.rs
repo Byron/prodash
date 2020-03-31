@@ -224,7 +224,12 @@ pub fn draw_progress(
             line_bound,
             (column_line_width + block_width(&tree_prefix)) as u16,
         );
-        draw_text_nowrap(rect::offset_x(line_bound, column_line_width), buf, tree_prefix, None);
+        draw_text_nowrap(
+            rect::offset_x(line_bound, column_line_width),
+            buf,
+            tree_prefix,
+            None,
+        );
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
@@ -355,29 +360,27 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
     max_prefix_len
 }
 
-fn level_prefix(prev_level: Option<u8>, cur_level: u8, next_level: u8) -> String {
+fn level_prefix(prev_level: Option<u8>, cur: u8, next: u8) -> String {
+    let prev = prev_level.unwrap_or(0);
     format!(
         "{:>width$}",
-        match (prev_level, cur_level, next_level) {
-            (Some(prev), cur, next) => match (prev, cur) {
-                (prev, cur) if cur > prev =>
-                    if next == cur {
-                        "├" // sibling no same level
-                    } else {
-                        "└" // last child on this level
-                    },
-                (prev, cur) if cur == prev =>
-                    if next == cur {
-                        "├" // sibling no same level
-                    } else {
-                        "└" // last child on this level
-                    },
-                (prev, cur) if cur < prev => "",
-                _ => "?",
-            },
-            _ => "",
+        match (prev, cur) {
+            (prev, cur) if cur > prev =>
+                if next == cur {
+                    "├" // sibling no same level
+                } else {
+                    "" // top-level item
+                },
+            (prev, cur) if cur == prev =>
+                if next == cur {
+                    "├" // sibling no same level
+                } else {
+                    "└" // last child on this level
+                },
+            (prev, cur) if cur < prev => "",
+            _ => "?",
         },
-        width = (cur_level.saturating_sub(1) * 2) as usize
+        width = (cur.saturating_sub(1) * 2) as usize
     )
 }
 
@@ -398,7 +401,7 @@ fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) 
     )
 }
 
-pub fn draw_overflow<'a>(
+pub fn draw_overflow(
     entries: &[(Key, Value)],
     buf: &mut Buffer,
     bound: Rect,
