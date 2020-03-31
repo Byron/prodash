@@ -354,41 +354,60 @@ fn draw_progress_bar_fn(
 
 pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
     let mut max_prefix_len = 0;
-    for (line, entry) in entries
+    let mut peekable = entries
         .iter()
         .skip(offset as usize)
         .take(bound.height as usize)
         .enumerate()
-    {
+        .peekable();
+    let mut last_level = None;
+    while let Some((line, entry)) = peekable.next() {
         let line_bound = rect::line_bound(bound, line);
-        let tree_prefix = to_tree_prefix(entry);
+        let tree_prefix = to_tree_prefix(
+            entry,
+            last_level,
+            peekable.peek().map(|e| ((e.1).0).level()).unwrap_or(0),
+        );
+        last_level = Some(entry.0.level());
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
         draw_text_nowrap(line_bound, buf, tree_prefix, None);
     }
     max_prefix_len
 }
 
-fn to_tree_prefix(entry: &(Key, Value)) -> String {
+fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) -> String {
     let (
         key,
         Value {
-            progress,
+            progress: _,
             name: title,
         },
     ) = entry;
+    let cur_level = key.level();
+
     format!(
         "{:>width$} {} ",
-        if key.level() == 1 {
-            "‧"
-        } else {
-            if progress.is_none() {
-                "…"
-            } else {
-                "└"
-            }
+        match (prev_level, cur_level, next_level) {
+            (Some(prev), cur, next) => match (prev, cur) {
+                (prev, cur) if cur > prev =>
+                    if next == cur {
+                        "├" // sibling no same level
+                    } else {
+                        "└" // last child on this level
+                    },
+                (prev, cur) if cur == prev =>
+                    if next == cur {
+                        "├" // sibling no same level
+                    } else {
+                        "└" // last child on this level
+                    },
+                (prev, cur) if cur < prev => "",
+                _ => "?",
+            },
+            _ => "",
         },
-        if progress.is_none() { "" } else { &title },
-        width = key.level() as usize
+        title,
+        width = (cur_level.saturating_sub(1) * 2) as usize
     )
 }
 
