@@ -187,7 +187,14 @@ pub fn draw_progress(
             None => state,
         });
 
-    for (
+    let mut prev_level = None;
+    let mut entries_iter = entries
+        .iter()
+        .skip(offset as usize)
+        .take(bound.height as usize)
+        .enumerate()
+        .peekable();
+    while let Some((
         line,
         (
             key,
@@ -196,11 +203,7 @@ pub fn draw_progress(
                 name: title,
             },
         ),
-    ) in entries
-        .iter()
-        .skip(offset as usize)
-        .take(bound.height as usize)
-        .enumerate()
+    )) = entries_iter.next()
     {
         let line_bound = rect::line_bound(bound, line);
         let progress_text = format!(
@@ -210,10 +213,18 @@ pub fn draw_progress(
 
         draw_text_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
+        let tree_prefix = level_prefix(
+            prev_level,
+            key.level(),
+            entries_iter.peek().map(|e| ((e.1).0).level()).unwrap_or(0),
+        );
+        prev_level = Some(key.level());
+
         let progress_rect = rect::offset_x(
             line_bound,
-            (column_line_width + key.level().saturating_sub(1)) as u16,
+            (column_line_width + block_width(&tree_prefix)) as u16,
         );
+        draw_text_nowrap(rect::offset_x(line_bound, column_line_width), buf, tree_prefix, None);
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
@@ -257,14 +268,8 @@ pub fn draw_progress(
                 );
             }
             None => {
-                let title_text = format!(
-                    " {:‧<prefix_count$} {} ",
-                    "",
-                    title,
-                    prefix_count = key.level() as usize
-                );
                 draw_text_nowrap(progress_rect, buf, progress_text, None);
-                draw_text_nowrap(progress_rect, buf, title_text, None);
+                draw_text_nowrap(progress_rect, buf, format!(" {} ", title), None);
             }
         }
     }
@@ -335,15 +340,15 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
         .take(bound.height as usize)
         .enumerate()
         .peekable();
-    let mut last_level = None;
+    let mut prev_level = None;
     while let Some((line, entry)) = peekable.next() {
         let line_bound = rect::line_bound(bound, line);
         let tree_prefix = to_tree_prefix(
             entry,
-            last_level,
+            prev_level,
             peekable.peek().map(|e| ((e.1).0).level()).unwrap_or(0),
         );
-        last_level = Some(entry.0.level());
+        prev_level = Some(entry.0.level());
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
         draw_text_nowrap(line_bound, buf, tree_prefix, None);
     }
