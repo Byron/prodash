@@ -187,23 +187,24 @@ pub fn draw_progress(
             None => state,
         });
 
-    let mut prev_level = None;
-    let mut entries_iter = entries
+    for (
+        line,
+        (
+            entry_index,
+            (
+                _,
+                Value {
+                    progress,
+                    name: title,
+                },
+            ),
+        ),
+    ) in entries
         .iter()
+        .enumerate()
         .skip(offset as usize)
         .take(bound.height as usize)
         .enumerate()
-        .peekable();
-    while let Some((
-        line,
-        (
-            key,
-            Value {
-                progress,
-                name: title,
-            },
-        ),
-    )) = entries_iter.next()
     {
         let line_bound = rect::line_bound(bound, line);
         let progress_text = format!(
@@ -213,13 +214,7 @@ pub fn draw_progress(
 
         draw_text_with_ellipsis_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
-        let tree_prefix = level_prefix(
-            prev_level,
-            key.level(),
-            entries_iter.peek().map(|e| ((e.1).0).level()).unwrap_or(0),
-        );
-        prev_level = Some(key.level());
-
+        let tree_prefix = level_prefix(entries, entry_index);
         let progress_rect = rect::offset_x(
             line_bound,
             (column_line_width + block_width(&tree_prefix)) as u16,
@@ -341,66 +336,35 @@ fn draw_progress_bar_fn(
 
 pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
     let mut max_prefix_len = 0;
-    let mut peekable = entries
+    for (line, (entry_index, entry)) in entries
         .iter()
+        .enumerate()
         .skip(offset as usize)
         .take(bound.height as usize)
         .enumerate()
-        .peekable();
-    let mut prev_level = None;
-    while let Some((line, entry)) = peekable.next() {
+    {
         let line_bound = rect::line_bound(bound, line);
-        let tree_prefix = to_tree_prefix(
-            entry,
-            prev_level,
-            peekable.peek().map(|e| ((e.1).0).level()).unwrap_or(0),
-        );
-        prev_level = Some(entry.0.level());
+        let tree_prefix = format!("{} {} ", level_prefix(entries, entry_index), entry.1.name);
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
         draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
     }
     max_prefix_len
 }
 
-fn level_prefix(prev_level: Option<u8>, cur: u8, next: u8) -> String {
-    let prev = prev_level.unwrap_or(0);
-    format!(
-        "{:>width$}",
-        match (prev, cur) {
-            (prev, cur) if cur > prev =>
-                if next == cur {
-                    "├" // sibling same level
-                } else {
-                    "└" // top-level item
-                },
-            (prev, cur) if cur == prev =>
-                if next == cur {
-                    "├" // sibling same level
-                } else {
-                    "└" // last child on this level
-                },
-            (prev, cur) if cur < prev => "└",
-            _ => "?",
-        },
-        width = (cur.saturating_sub(1) * 2) as usize
-    )
-}
-
-fn to_tree_prefix(entry: &(Key, Value), prev_level: Option<u8>, next_level: u8) -> String {
-    let (
-        key,
-        Value {
-            progress: _,
-            name: title,
-        },
-    ) = entry;
-    let cur_level = key.level();
-
-    format!(
-        "{} {} ",
-        level_prefix(prev_level, cur_level, next_level),
-        title,
-    )
+fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
+    let adj = Key::adjecency(entries, entry_index);
+    let adj_level = adj.level();
+    let mut buf = String::with_capacity(adj_level as usize);
+    for level in 1..=adj_level {
+        use crate::tree::SiblingLocation::*;
+        buf.push(match adj[level] {
+            NotFound => continue,
+            Above => '└',
+            Below => '┌',
+            AboveAndBelow => '├',
+        })
+    }
+    buf
 }
 
 pub fn draw_overflow(

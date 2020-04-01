@@ -332,7 +332,7 @@ pub struct Key(
 
 /// Determines if a sibling is above or below in the given level of hierarchy
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub enum SiblingLocation {
+pub(crate) enum SiblingLocation {
     Above,
     Below,
     AboveAndBelow,
@@ -363,14 +363,14 @@ impl Default for SiblingLocation {
 
 /// A type providing information about what's above and below `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub struct Adjecency(
+pub(crate) struct Adjacency(
     pub SiblingLocation,
     pub SiblingLocation,
     pub SiblingLocation,
     pub SiblingLocation,
 );
 
-impl Adjecency {
+impl Adjacency {
     pub fn get(&self, level: Level) -> Option<&SiblingLocation> {
         Some(match level {
             1 => &self.0,
@@ -389,15 +389,25 @@ impl Adjecency {
             _ => return None,
         })
     }
+    pub fn level(&self) -> Level {
+        use SiblingLocation::*;
+        match self {
+            Adjacency(NotFound, NotFound, NotFound, NotFound) => 0,
+            Adjacency(_a, NotFound, NotFound, NotFound) => 1,
+            Adjacency(_a, _b, NotFound, NotFound) => 2,
+            Adjacency(_a, _b, _c, NotFound) => 3,
+            Adjacency(_a, _b, _c, _d) => 4,
+        }
+    }
 }
 
-impl Index<Level> for Adjecency {
+impl Index<Level> for Adjacency {
     type Output = SiblingLocation;
     fn index(&self, index: Level) -> &Self::Output {
         self.get(index).expect("adjacency index in bound")
     }
 }
-impl IndexMut<Level> for Adjecency {
+impl IndexMut<Level> for Adjacency {
     fn index_mut(&mut self, index: Level) -> &mut Self::Output {
         self.get_mut(index).expect("adjacency index in bound")
     }
@@ -443,10 +453,10 @@ impl Key {
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
     /// for the result to be reliable.
-    pub fn adjecency(sorted: &[(Key, Value)], index: usize) -> Adjecency {
+    pub(crate) fn adjecency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
         let key = &sorted[index].0;
         let key_level = key.level();
-        let mut adjecency = Adjecency::default();
+        let mut adjecency = Adjacency::default();
         if key_level == 0 {
             return adjecency;
         }
@@ -456,24 +466,39 @@ impl Key {
                 .iter()
                 .map(|(k, _)| k)
                 .rev()
+                .take_while(|k| k.level() == level)
                 .enumerate()
-                .take_while(|(_, k)| k.level() == level)
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
         };
-        // let downward_iter = |from: usize| sorted.get(from..).iter().map(|(k, _)| k).rev().enumerate();
+        let downward_iter = |from: usize, level: Level, id_at_level: ItemId| {
+            sorted.get(from + 1..).and_then(|s| {
+                s.iter()
+                    .map(|(k, _)| k)
+                    .take_while(|k| k.level() == level)
+                    .enumerate()
+                    .find(|(_idx, k)| k[level] == id_at_level)
+                    .map(|(idx, _)| idx)
+            })
+        };
 
         {
             let mut cursor = index;
             for level in (1..key_level).rev() {
-                if let Some(idx) = upward_iter(cursor, level, key[level]) {
+                if let Some(key_index) = upward_iter(cursor, level, key[level]) {
                     adjecency[level].merge(SiblingLocation::Above);
-                    cursor = idx;
+                    cursor = key_index;
                 }
             }
         }
-        if let Some(slice) = sorted.get(index + 1..) {
-            for key_below in slice {}
+        {
+            let mut cursor = index;
+            for level in (1..key_level).rev() {
+                if let Some(key_index) = downward_iter(cursor, level, key[level]) {
+                    adjecency[level].merge(SiblingLocation::Below);
+                    cursor = key_index;
+                }
+            }
         }
         adjecency
     }
