@@ -389,16 +389,6 @@ impl Adjacency {
             _ => return None,
         })
     }
-    pub fn level(&self) -> Level {
-        use SiblingLocation::*;
-        match self {
-            Adjacency(NotFound, NotFound, NotFound, NotFound) => 0,
-            Adjacency(_a, NotFound, NotFound, NotFound) => 1,
-            Adjacency(_a, _b, NotFound, NotFound) => 2,
-            Adjacency(_a, _b, _c, NotFound) => 3,
-            Adjacency(_a, _b, _c, _d) => 4,
-        }
-    }
 }
 
 impl Index<Level> for Adjacency {
@@ -466,7 +456,7 @@ impl Key {
                 .iter()
                 .map(|(k, _)| k)
                 .rev()
-                .take_while(|k| k.level() >= level)
+                .filter(|k| k.level() == level)
                 .enumerate()
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
@@ -475,7 +465,7 @@ impl Key {
             sorted.get(from + 1..).and_then(|s| {
                 s.iter()
                     .map(|(k, _)| k)
-                    .take_while(|k| k.level() >= level)
+                    .filter(|k| k.level() == level)
                     .enumerate()
                     .find(|(_idx, k)| k[level] == id_at_level)
                     .map(|(idx, _)| idx)

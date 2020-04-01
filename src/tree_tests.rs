@@ -50,7 +50,7 @@ mod key_adjacency {
     fn level_2_upwards() {
         assert_eq!(
             Key::adjecency(&root_with_two_children_with_two_children(), 1),
-            Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
+            Adjacency(Above, NotFound, NotFound, NotFound)
         );
         assert_eq!(
             Key::adjecency(&root_with_two_children_with_two_children(), 2),
