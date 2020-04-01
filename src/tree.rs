@@ -469,17 +469,20 @@ impl Key {
             iter: impl Iterator<Item = &'a (Key, Value)>,
             key: &Key,
             key_level: Level,
-            level: Level,
-            id_at_level: ItemId,
+            parent_level: Level,
+            _id_at_level: ItemId,
         ) -> Option<usize> {
             iter.map(|(k, _)| k)
-                .take_while(|other| {
-                    key.shares_parent_with(other, level)
-                })
+                .take_while(|other| key.shares_parent_with(other, parent_level))
                 .enumerate()
                 .find(|(_idx, k)| {
-                    dbg!(k, k.level(), key_level);
-                    k.level() <= key_level})
+                    dbg!(k, k.level(), parent_level, key_level);
+                    if parent_level + 1 == key_level {
+                        k.level() <= key_level
+                    } else {
+                        k.level() == parent_level
+                    }
+                })
                 .map(|(idx, _)| idx)
         };
 
@@ -499,19 +502,23 @@ impl Key {
         };
 
         {
+            dbg!("upward");
             let mut cursor = index;
             for level in (1..key_level).rev() {
+                dbg!(level);
                 if let Some(key_index) = upward_iter(cursor, &key, level, key[level]) {
+                    eprintln!("found up");
                     adjecency[level].merge(SiblingLocation::Above);
                     cursor = key_index;
                 }
             }
         }
-        dbg!("downward");
         {
+            dbg!("downward");
             let mut cursor = index;
             for level in (1..key_level).rev() {
                 if let Some(key_index) = downward_iter(cursor, &key, level, key[level]) {
+                    eprintln!("found down");
                     adjecency[level].merge(SiblingLocation::Below);
                     cursor = key_index;
                 }
