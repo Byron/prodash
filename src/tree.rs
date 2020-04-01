@@ -324,12 +324,10 @@ pub type ProgressStep = u32;
 /// A type identifying a spot in the hierarchy of `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Key(
-    (
-        Option<ItemId>,
-        Option<ItemId>,
-        Option<ItemId>,
-        Option<ItemId>,
-    ),
+    Option<ItemId>,
+    Option<ItemId>,
+    Option<ItemId>,
+    Option<ItemId>,
 );
 
 /// Determines if a sibling is above or below in the given level of hierarchy
@@ -396,50 +394,50 @@ impl Adjecency {
 impl Index<Level> for Adjecency {
     type Output = SiblingLocation;
     fn index(&self, index: Level) -> &Self::Output {
-        self.get(index).expect("index in bound")
+        self.get(index).expect("adjacency index in bound")
     }
 }
 impl IndexMut<Level> for Adjecency {
     fn index_mut(&mut self, index: Level) -> &mut Self::Output {
-        self.get_mut(index).expect("index in bound")
+        self.get_mut(index).expect("adjacency index in bound")
     }
 }
 
 impl Key {
     fn add_child(self, child_id: ItemId) -> Key {
-        Key(match self {
-            Key((None, None, None, None)) => (Some(child_id), None, None, None),
-            Key((a, None, None, None)) => (a, Some(child_id), None, None),
-            Key((a, b, None, None)) => (a, b, Some(child_id), None),
-            Key((a, b, c, None)) => (a, b, c, Some(child_id)),
-            Key((a, b, c, _d)) => {
+        match self {
+            Key(None, None, None, None) => Key(Some(child_id), None, None, None),
+            Key(a, None, None, None) => Key(a, Some(child_id), None, None),
+            Key(a, b, None, None) => Key(a, b, Some(child_id), None),
+            Key(a, b, c, None) => Key(a, b, c, Some(child_id)),
+            Key(a, b, c, _d) => {
                 crate::warn!("Maximum nesting level reached. Adding tasks to current parent");
-                (a, b, c, Some(child_id))
+                Key(a, b, c, Some(child_id))
             }
-        })
+        }
     }
 
     /// The level of hierarchy a node is placed in, i.e. the amount of path components
     pub fn level(&self) -> Level {
         match self {
-            Key((None, None, None, None)) => 0,
-            Key((Some(_), None, None, None)) => 1,
-            Key((Some(_), Some(_), None, None)) => 2,
-            Key((Some(_), Some(_), Some(_), None)) => 3,
-            Key((Some(_), Some(_), Some(_), Some(_))) => 4,
+            Key(None, None, None, None) => 0,
+            Key(Some(_), None, None, None) => 1,
+            Key(Some(_), Some(_), None, None) => 2,
+            Key(Some(_), Some(_), Some(_), None) => 3,
+            Key(Some(_), Some(_), Some(_), Some(_)) => 4,
             _ => unreachable!("This is a bug - Keys follow a certain pattern"),
         }
     }
 
-    // fn get(&self, level: Level) -> Option<&ItemId> {
-    //     match level {
-    //         1 => self.0.as_ref(),
-    //         2 => &self.1.as_ref(),
-    //         3 => &self.2.as_ref(),
-    //         4 => &self.3.as_ref(),
-    //         _ => return None,
-    //     }
-    // }
+    fn get(&self, level: Level) -> Option<&ItemId> {
+        match level {
+            1 => self.0.as_ref(),
+            2 => self.1.as_ref(),
+            3 => self.2.as_ref(),
+            4 => self.3.as_ref(),
+            _ => return None,
+        }
+    }
 
     /// Compute the adjacency map for the key in `sorted` at the given `index`.
     ///
@@ -459,14 +457,16 @@ impl Key {
                 .map(|(k, _)| k)
                 .rev()
                 .enumerate()
-                .find(|(_idx, k)| k.level() == level)
+                .take_while(|(_, k)| k.level() == level)
+                .find(|(_idx, k)| k[level] == id_at_level)
+                .map(|(idx, _)| idx)
         };
         // let downward_iter = |from: usize| sorted.get(from..).iter().map(|(k, _)| k).rev().enumerate();
 
         {
             let mut cursor = index;
-            for level in (1..=key_level).rev() {
-                if let Some((idx, k)) = upward_iter(cursor, level, 2 /*tbd: get as slice*/) {
+            for level in (1..key_level).rev() {
+                if let Some(idx) = upward_iter(cursor, level, key[level]) {
                     adjecency[level].merge(SiblingLocation::Above);
                     cursor = idx;
                 }
@@ -481,6 +481,14 @@ impl Key {
     /// The maximum amount of path components we can represent.
     pub const fn max_level() -> Level {
         4
+    }
+}
+
+impl Index<Level> for Key {
+    type Output = ItemId;
+
+    fn index(&self, index: Level) -> &Self::Output {
+        self.get(index).expect("key index in bound")
     }
 }
 
