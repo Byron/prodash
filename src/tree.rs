@@ -414,7 +414,7 @@ impl IndexMut<Level> for Adjacency {
 }
 
 impl Key {
-    fn add_child(self, child_id: ItemId) -> Key {
+    pub(crate) fn add_child(self, child_id: ItemId) -> Key {
         match self {
             Key(None, None, None, None) => Key(Some(child_id), None, None, None),
             Key(a, None, None, None) => Key(a, Some(child_id), None, None),
@@ -466,7 +466,7 @@ impl Key {
                 .iter()
                 .map(|(k, _)| k)
                 .rev()
-                .take_while(|k| k.level() == level)
+                .take_while(|k| k.level() >= level)
                 .enumerate()
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
@@ -475,7 +475,7 @@ impl Key {
             sorted.get(from + 1..).and_then(|s| {
                 s.iter()
                     .map(|(k, _)| k)
-                    .take_while(|k| k.level() == level)
+                    .take_while(|k| k.level() >= level)
                     .enumerate()
                     .find(|(_idx, k)| k[level] == id_at_level)
                     .map(|(idx, _)| idx)

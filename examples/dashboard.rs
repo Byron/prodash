@@ -91,7 +91,7 @@ fn launch_ambient_gui(
             window_resize_stream(args.animate_terminal_size),
             ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
                 ticks += 1;
-                if ticks % 5 == 0 {
+                if ticks % 2 == 0 {
                     let is_interruptible = interruptible;
                     interruptible = !interruptible;
                     return if is_interruptible {
