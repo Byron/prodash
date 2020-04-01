@@ -31,6 +31,19 @@ mod key_adjacency {
         )
     }
 
+    fn root_with_three_levels() -> Vec<(Key, Value)> {
+        let r = Key::default();
+        let p1 = r.add_child(1);
+        let p2 = p1.add_child(2);
+        to_kv(
+            &[
+                p1,
+                p2.clone(),
+                p2.add_child(1)
+            ][..],
+        )
+    }
+
     #[test]
     fn root_level_upwards() {
         assert_eq!(
@@ -47,7 +60,11 @@ mod key_adjacency {
     }
 
     #[test]
-    fn level_2_upwards() {
+    fn level_2_bidirectional() {
+        assert_eq!(
+            Key::adjecency(&root_with_two_children_with_two_children(), 0),
+            Adjacency(NotFound, NotFound, NotFound, NotFound)
+        );
         assert_eq!(
             Key::adjecency(&root_with_two_children_with_two_children(), 1),
             Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
@@ -55,6 +72,22 @@ mod key_adjacency {
         assert_eq!(
             Key::adjecency(&root_with_two_children_with_two_children(), 2),
             Adjacency(Above, NotFound, NotFound, NotFound)
+        );
+    }
+
+    #[test]
+    fn level_3_bidirectional() {
+        assert_eq!(
+            Key::adjecency(&root_with_three_levels(), 0),
+            Adjacency(NotFound, NotFound, NotFound, NotFound)
+        );
+        assert_eq!(
+            Key::adjecency(&root_with_three_levels(), 1),
+            Adjacency(Above, NotFound, NotFound, NotFound)
+        );
+        assert_eq!(
+            Key::adjecency(&root_with_three_levels(), 2),
+            Adjacency(NotFound, Above, NotFound, NotFound)
         );
     }
 }
