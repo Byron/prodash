@@ -352,7 +352,7 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
 }
 
 fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
-    let adj = Key::adjecency(entries, entry_index);
+    let adj = Key::adjacency(entries, entry_index);
     let key = entries[entry_index].0;
     let max_level_to_check = key.level().saturating_sub(1);
     let mut buf = String::with_capacity(max_level_to_check as usize);

@@ -35,59 +35,122 @@ mod key_adjacency {
         let r = Key::default();
         let p1 = r.add_child(1);
         let p2 = p1.add_child(2);
+        to_kv(&[p1, p2.clone(), p2.add_child(1)][..])
+    }
+
+    fn root_with_three_levels_two_siblings_on_level_2() -> Vec<(Key, Value)> {
+        let r = Key::default();
+        let p1 = r.add_child(1);
+        let p11 = p1.add_child(1);
+        let p12 = p1.add_child(2);
         to_kv(
             &[
                 p1,
-                p2.clone(),
-                p2.add_child(1)
+                p11.clone(),
+                p11.add_child(1),
+                p12.clone(),
+                p12.add_child(1),
             ][..],
         )
     }
 
     #[test]
-    fn root_level_upwards() {
+    fn root_level() {
         assert_eq!(
-            Key::adjecency(&root_with_two_children(), 1),
+            Key::adjacency(&root_with_two_children(), 0),
             Adjacency::default()
-        )
-    }
-    #[test]
-    fn root_level_downwards() {
-        assert_eq!(
-            Key::adjecency(&root_with_two_children(), 0),
-            Adjacency::default()
-        )
-    }
-
-    #[test]
-    fn level_2_bidirectional() {
-        assert_eq!(
-            Key::adjecency(&root_with_two_children_with_two_children(), 0),
-            Adjacency(NotFound, NotFound, NotFound, NotFound)
         );
         assert_eq!(
-            Key::adjecency(&root_with_two_children_with_two_children(), 1),
-            Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
-        );
-        assert_eq!(
-            Key::adjecency(&root_with_two_children_with_two_children(), 2),
-            Adjacency(Above, NotFound, NotFound, NotFound)
+            Key::adjacency(&root_with_two_children(), 1),
+            Adjacency::default()
         );
     }
 
     #[test]
-    fn level_3_bidirectional() {
+    fn level_2_two_siblings() {
+        let entries = root_with_two_children_with_two_children();
         assert_eq!(
-            Key::adjecency(&root_with_three_levels(), 0),
+            Key::adjacency(&entries, 0),
             Adjacency(NotFound, NotFound, NotFound, NotFound)
         );
+        {
+            assert_eq!(
+                Key::adjacency(&entries, 1),
+                Adjacency(Above, NotFound, NotFound, NotFound)
+            );
+            assert_eq!(
+                Key::adjacency(&entries, 2),
+                Adjacency(Above, NotFound, NotFound, NotFound)
+            );
+        }
         assert_eq!(
-            Key::adjecency(&root_with_three_levels(), 1),
-            Adjacency(Above, NotFound, NotFound, NotFound)
+            Key::adjacency(&entries, 3),
+            Adjacency(NotFound, NotFound, NotFound, NotFound)
         );
+        {
+            assert_eq!(
+                Key::adjacency(&entries, 4),
+                Adjacency(Above, NotFound, NotFound, NotFound)
+            );
+            assert_eq!(
+                Key::adjacency(&entries, 5),
+                Adjacency(Above, NotFound, NotFound, NotFound)
+            );
+        }
+    }
+
+    #[test]
+    fn level_3_single_sibling() {
+        let entries = root_with_three_levels();
         assert_eq!(
-            Key::adjecency(&root_with_three_levels(), 2),
-            Adjacency(NotFound, Above, NotFound, NotFound)
+            Key::adjacency(&entries, 0),
+            Adjacency(NotFound, NotFound, NotFound, NotFound)
         );
+        {
+            assert_eq!(
+                Key::adjacency(&entries, 1),
+                Adjacency(Above, NotFound, NotFound, NotFound)
+            );
+            {
+                assert_eq!(
+                    Key::adjacency(&entries, 2),
+                    Adjacency(NotFound, Above, NotFound, NotFound)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn level_3_two_siblings() {
+        let entries = root_with_three_levels_two_siblings_on_level_2();
+        {
+            assert_eq!(
+                Key::adjacency(&entries, 0),
+                Adjacency(NotFound, NotFound, NotFound, NotFound)
+            );
+            {
+                assert_eq!(
+                    Key::adjacency(&entries, 1),
+                    Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
+                );
+                {
+                    assert_eq!(
+                        Key::adjacency(&entries, 2),
+                        Adjacency(AboveAndBelow, Above, NotFound, NotFound)
+                    );
+                }
+
+                assert_eq!(
+                    Key::adjacency(&entries, 3),
+                    Adjacency(Above, NotFound, NotFound, NotFound)
+                );
+                {
+                    assert_eq!(
+                        Key::adjacency(&entries, 4),
+                        Adjacency(NotFound, Above, NotFound, NotFound)
+                    );
+                }
+            }
+        }
     }
 }

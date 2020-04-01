@@ -442,9 +442,9 @@ impl Key {
     fn shares_parent_with(&self, other: &Key, up_to: Level) -> bool {
         for level in 1..=up_to {
             if let (Some(lhs), Some(rhs)) = (self.get(level), other.get(level)) {
-               if lhs != rhs {
+                if lhs != rhs {
                     return false;
-               }
+                }
             } else {
                 return false;
             }
@@ -456,32 +456,46 @@ impl Key {
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
     /// for the result to be reliable.
-    pub(crate) fn adjecency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
+    pub(crate) fn adjacency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
         let key = &sorted[index].0;
         let key_level = key.level();
         let mut adjecency = Adjacency::default();
         if key_level == 0 {
             return adjecency;
         }
+        dbg!(key);
 
-        fn search<'a>(iter: impl Iterator<Item=&'a (Key, Value)>, key: &Key, key_level: Level, level: Level, id_at_level: ItemId) -> Option<usize> {
-            iter
-                .map(|(k, _)| k)
-                .take_while(|other| other.level() <= key_level && key.shares_parent_with(other, level))
+        fn search<'a>(
+            iter: impl Iterator<Item = &'a (Key, Value)>,
+            key: &Key,
+            key_level: Level,
+            level: Level,
+            id_at_level: ItemId,
+        ) -> Option<usize> {
+            iter.map(|(k, _)| k)
+                .take_while(|other| {
+                    key.shares_parent_with(other, level)
+                })
                 .enumerate()
-                .find(|(_idx, k)| k[level] == id_at_level)
+                .find(|(_idx, k)| {
+                    dbg!(k, k.level(), key_level);
+                    k.level() <= key_level})
                 .map(|(idx, _)| idx)
         };
 
         let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
-            search(sorted[..from]
-                .iter()
-                .rev(), key, key_level, level, id_at_level)
+            search(
+                sorted[..from].iter().rev(),
+                key,
+                key_level,
+                level,
+                id_at_level,
+            )
         };
         let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
-            sorted.get(from + 1..).and_then(|s| {
-                search(s.iter(), key, key_level, level, id_at_level)
-            })
+            sorted
+                .get(from + 1..)
+                .and_then(|s| search(s.iter(), key, key_level, level, id_at_level))
         };
 
         {
@@ -493,6 +507,7 @@ impl Key {
                 }
             }
         }
+        dbg!("downward");
         {
             let mut cursor = index;
             for level in (1..key_level).rev() {
