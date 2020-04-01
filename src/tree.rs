@@ -1,6 +1,7 @@
 use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
+use std::ops::{Index, IndexMut};
 use std::{sync::Arc, time::SystemTime};
 
 /// The top-level of the progress tree.
@@ -315,6 +316,8 @@ impl Item {
 }
 
 type ItemId = u16; // NOTE: This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level
+pub type Level = u8; // a level in the hierarchy of key components
+
 /// The amount of steps a progress can make
 pub type ProgressStep = u32;
 
@@ -339,9 +342,9 @@ pub enum SiblingLocation {
 }
 
 impl SiblingLocation {
-    fn merge(self, other: SiblingLocation) -> SiblingLocation {
+    fn merge(&mut self, other: SiblingLocation) {
         use SiblingLocation::*;
-        match (self, other) {
+        *self = match (*self, other) {
             (any, NotFound) => any,
             (NotFound, any) => any,
             (Above, Below) => AboveAndBelow,
@@ -350,7 +353,7 @@ impl SiblingLocation {
             (_, AboveAndBelow) => AboveAndBelow,
             (Above, Above) => Above,
             (Below, Below) => Below,
-        }
+        };
     }
 }
 
@@ -369,6 +372,39 @@ pub struct Adjecency(
     pub SiblingLocation,
 );
 
+impl Adjecency {
+    pub fn get(&self, level: Level) -> Option<&SiblingLocation> {
+        Some(match level {
+            1 => &self.0,
+            2 => &self.1,
+            3 => &self.2,
+            4 => &self.3,
+            _ => return None,
+        })
+    }
+    pub fn get_mut(&mut self, level: Level) -> Option<&mut SiblingLocation> {
+        Some(match level {
+            1 => &mut self.0,
+            2 => &mut self.1,
+            3 => &mut self.2,
+            4 => &mut self.3,
+            _ => return None,
+        })
+    }
+}
+
+impl Index<Level> for Adjecency {
+    type Output = SiblingLocation;
+    fn index(&self, index: Level) -> &Self::Output {
+        self.get(index).expect("index in bound")
+    }
+}
+impl IndexMut<Level> for Adjecency {
+    fn index_mut(&mut self, index: Level) -> &mut Self::Output {
+        self.get_mut(index).expect("index in bound")
+    }
+}
+
 impl Key {
     fn add_child(self, child_id: ItemId) -> Key {
         Key(match self {
@@ -384,7 +420,7 @@ impl Key {
     }
 
     /// The level of hierarchy a node is placed in, i.e. the amount of path components
-    pub fn level(&self) -> u8 {
+    pub fn level(&self) -> Level {
         match self {
             Key((None, None, None, None)) => 0,
             Key((Some(_), None, None, None)) => 1,
@@ -395,6 +431,16 @@ impl Key {
         }
     }
 
+    // fn get(&self, level: Level) -> Option<&ItemId> {
+    //     match level {
+    //         1 => self.0.as_ref(),
+    //         2 => &self.1.as_ref(),
+    //         3 => &self.2.as_ref(),
+    //         4 => &self.3.as_ref(),
+    //         _ => return None,
+    //     }
+    // }
+
     /// Compute the adjacency map for the key in `sorted` at the given `index`.
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
@@ -402,27 +448,38 @@ impl Key {
     pub fn adjecency(sorted: &[(Key, Value)], index: usize) -> Adjecency {
         let key = &sorted[index].0;
         let key_level = key.level();
+        let mut adjecency = Adjecency::default();
         if key_level == 0 {
-            return Adjecency::default();
+            return adjecency;
         }
 
+        let upward_iter = |from: usize, level: Level, id_at_level: ItemId| {
+            sorted[..from]
+                .iter()
+                .map(|(k, _)| k)
+                .rev()
+                .enumerate()
+                .find(|(_idx, k)| k.level() == level)
+        };
+        // let downward_iter = |from: usize| sorted.get(from..).iter().map(|(k, _)| k).rev().enumerate();
+
         {
-            let level = key_level;
-            for key_above in sorted[..index].iter().rev() {
-                match level {
-                    0 => break,
-                    _ => unreachable!("Bug: did you add a key level"),
+            let mut cursor = index;
+            for level in (1..=key_level).rev() {
+                if let Some((idx, k)) = upward_iter(cursor, level, 2 /*tbd: get as slice*/) {
+                    adjecency[level].merge(SiblingLocation::Above);
+                    cursor = idx;
                 }
             }
         }
         if let Some(slice) = sorted.get(index + 1..) {
             for key_below in slice {}
         }
-        Adjecency::default()
+        adjecency
     }
 
     /// The maximum amount of path components we can represent.
-    pub const fn max_level() -> u8 {
+    pub const fn max_level() -> Level {
         4
     }
 }
