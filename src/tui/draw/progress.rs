@@ -360,19 +360,22 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
         use crate::tree::SiblingLocation::*;
         buf.push(if level == max_level_to_check {
             match adj[level] {
-                NotFound => continue,
+                NotFound => ' ',
                 Above => '└',
                 Below => '┌',
                 AboveAndBelow => '├',
             }
         } else {
             match adj[level] {
-                NotFound => continue,
+                NotFound => ' ',
                 Above => '└',
                 Below => '┌',
                 AboveAndBelow => '│',
             }
         })
+    }
+    if !buf.is_empty() {
+        buf.insert(0, ' ');
     }
     buf
 }

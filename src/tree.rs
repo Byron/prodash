@@ -439,6 +439,19 @@ impl Key {
         }
     }
 
+    fn shares_parent_with(&self, other: &Key, up_to: Level) -> bool {
+        for level in 1..up_to {
+            if let (Some(lhs), Some(rhs)) = (self.get(level), other.get(level)) {
+               if lhs != rhs {
+                    return false;
+               }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /// Compute the adjacency map for the key in `sorted` at the given `index`.
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
@@ -451,20 +464,22 @@ impl Key {
             return adjecency;
         }
 
-        let upward_iter = |from: usize, level: Level, id_at_level: ItemId| {
+        let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
             sorted[..from]
                 .iter()
                 .map(|(k, _)| k)
                 .rev()
+                .take_while(|other| key.shares_parent_with(other, level))
                 .filter(|k| k.level() == level)
                 .enumerate()
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
         };
-        let downward_iter = |from: usize, level: Level, id_at_level: ItemId| {
+        let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
             sorted.get(from + 1..).and_then(|s| {
                 s.iter()
                     .map(|(k, _)| k)
+                    .take_while(|other| key.shares_parent_with(other, level))
                     .filter(|k| k.level() == level)
                     .enumerate()
                     .find(|(_idx, k)| k[level] == id_at_level)
@@ -475,7 +490,7 @@ impl Key {
         {
             let mut cursor = index;
             for level in (1..key_level).rev() {
-                if let Some(key_index) = upward_iter(cursor, level, key[level]) {
+                if let Some(key_index) = upward_iter(cursor, &key, level, key[level]) {
                     adjecency[level].merge(SiblingLocation::Above);
                     cursor = key_index;
                 }
@@ -484,7 +499,7 @@ impl Key {
         {
             let mut cursor = index;
             for level in (1..key_level).rev() {
-                if let Some(key_index) = downward_iter(cursor, level, key[level]) {
+                if let Some(key_index) = downward_iter(cursor, &key, level, key[level]) {
                     adjecency[level].merge(SiblingLocation::Below);
                     cursor = key_index;
                 }
