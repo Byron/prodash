@@ -440,7 +440,7 @@ impl Key {
     }
 
     fn shares_parent_with(&self, other: &Key, up_to: Level) -> bool {
-        for level in 1..up_to {
+        for level in 1..=up_to {
             if let (Some(lhs), Some(rhs)) = (self.get(level), other.get(level)) {
                if lhs != rhs {
                     return false;
@@ -470,7 +470,6 @@ impl Key {
                 .map(|(k, _)| k)
                 .rev()
                 .take_while(|other| key.shares_parent_with(other, level))
-                .filter(|k| k.level() == level)
                 .enumerate()
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
@@ -480,7 +479,6 @@ impl Key {
                 s.iter()
                     .map(|(k, _)| k)
                     .take_while(|other| key.shares_parent_with(other, level))
-                    .filter(|k| k.level() == level)
                     .enumerate()
                     .find(|(_idx, k)| k[level] == id_at_level)
                     .map(|(idx, _)| idx)
