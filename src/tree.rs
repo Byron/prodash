@@ -464,24 +464,23 @@ impl Key {
             return adjecency;
         }
 
-        let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
-            sorted[..from]
-                .iter()
+        fn search<'a>(iter: impl Iterator<Item=&'a (Key, Value)>, key: &Key, level: Level, id_at_level: ItemId) -> Option<usize> {
+            iter
                 .map(|(k, _)| k)
-                .rev()
                 .take_while(|other| key.shares_parent_with(other, level))
                 .enumerate()
                 .find(|(_idx, k)| k[level] == id_at_level)
                 .map(|(idx, _)| idx)
         };
+
+        let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
+            search(sorted[..from]
+                .iter()
+                .rev(), key, level, id_at_level)
+        };
         let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
             sorted.get(from + 1..).and_then(|s| {
-                s.iter()
-                    .map(|(k, _)| k)
-                    .take_while(|other| key.shares_parent_with(other, level))
-                    .enumerate()
-                    .find(|(_idx, k)| k[level] == id_at_level)
-                    .map(|(idx, _)| idx)
+                search(s.iter(), key, level, id_at_level)
             })
         };
 
