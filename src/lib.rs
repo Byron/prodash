@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.4.1 - Enable localtime support by default
+
 ## v3.4.0 - Even nicer tree rendering, along with screen space savings
 
 ## v3.3.0 - Much nicer task tree visualization
