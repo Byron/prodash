@@ -477,7 +477,9 @@ impl Key {
             _id_at_level: ItemId,
         ) -> Option<usize> {
             iter.map(|(k, _)| k)
-                .take_while(|other| key.shares_parent_with(other, current_level.saturating_sub(1)))
+                .take_while(|other| {
+                    dbg!(other, current_level.saturating_sub(1));
+                    key.shares_parent_with(other, current_level.saturating_sub(1))})
                 .enumerate()
                 .find(|(_idx, k)| {
                     dbg!(k, k.level(), current_level, key_level);
@@ -514,10 +516,10 @@ impl Key {
                     adjecency[level].merge(Above); // the root or any other sibling on level one
                     continue;
                 }
-                if let Some(key_index) = upward_iter(cursor, &key, level, key[level]) {
-                    eprintln!("found up");
+                if let Some(key_offset) = upward_iter(cursor, &key, level, key[level]) {
+                    cursor = index.saturating_sub(key_offset + 1);
+                    eprintln!("found up: {}", cursor);
                     adjecency[level].merge(Above);
-                    cursor = key_index;
                 }
             }
         }
@@ -525,10 +527,10 @@ impl Key {
             dbg!("downward");
             let mut cursor = index;
             for level in (1..=key_level).rev() {
-                if let Some(key_index) = downward_iter(cursor, &key, level, key[level]) {
-                    eprintln!("found down");
+                if let Some(key_offset) = downward_iter(cursor, &key, level, key[level]) {
+                    cursor = index + key_offset + 1;
+                    eprintln!("found down: {}", cursor);
                     adjecency[level].merge(Below);
-                    cursor = key_index;
                 }
             }
         }
