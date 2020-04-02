@@ -13,7 +13,7 @@ readme = "README.md"
 doctest = true
 
 [features]
-default = ["tui-renderer", "log-renderer"]
+default = ["tui-renderer", "log-renderer", "localtime"]
 tui-renderer = ["tui", "tui-react", "termion", "futures-timer", "futures", "unicode-segmentation", "unicode-width", "humantime" ]
 log-renderer = ["log"]
 localtime = ["time"]
