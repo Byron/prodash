@@ -166,10 +166,9 @@ mod key_adjacency {
             ),
         );
         entries.sort_by_key(|v| v.0);
-        dbg!(&entries);
         assert_eq!(
             Key::adjacency(&entries, 0),
-            Adjacency(NotFound, NotFound, NotFound, NotFound),
+            Adjacency(AboveAndBelow, NotFound, NotFound, NotFound),
         );
         assert_eq!(
             Key::adjacency(&entries, 1),

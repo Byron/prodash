@@ -371,7 +371,7 @@ pub(crate) struct Adjacency(
 );
 
 impl Adjacency {
-    fn level(&self) -> Level {
+    pub(crate) fn level(&self) -> Level {
         use SiblingLocation::*;
         match self {
             Adjacency(NotFound, NotFound, NotFound, NotFound) => 0,
@@ -379,7 +379,6 @@ impl Adjacency {
             Adjacency(_a, _b, NotFound, NotFound) => 2,
             Adjacency(_a, _b, _c, NotFound) => 3,
             Adjacency(_a, _b, _c, _d) => 4,
-            _ => unreachable!("Adjecencies have a certain structure"),
         }
     }
     pub fn get(&self, level: Level) -> Option<&SiblingLocation> {
@@ -536,18 +535,14 @@ impl Key {
                 }
             }
         }
-        if adjecency.level() != key_level {
-            adjecency = Adjacency::default();
-        } else {
-            for level in 1..key_level {
-                if key_level == 1 && index + 1 == sorted.len() {
-                    continue;
-                }
-                adjecency[level] = match adjecency[level] {
-                    Above | Below | NotFound => NotFound,
-                    AboveAndBelow => AboveAndBelow,
-                };
+        for level in 1..key_level {
+            if key_level == 1 && index + 1 == sorted.len() {
+                continue;
             }
+            adjecency[level] = match adjecency[level] {
+                Above | Below | NotFound => NotFound,
+                AboveAndBelow => AboveAndBelow,
+            };
         }
         adjecency
     }
