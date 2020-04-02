@@ -136,7 +136,7 @@ mod key_adjacency {
                 {
                     assert_eq!(
                         Key::adjacency(&entries, 2),
-                        Adjacency(NotFound, NotFound, Above, NotFound)
+                        Adjacency(NotFound, AboveAndBelow, Above, NotFound)
                     );
                 }
 

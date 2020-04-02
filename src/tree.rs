@@ -517,7 +517,7 @@ impl Key {
                     continue;
                 }
                 if let Some(key_offset) = upward_iter(cursor, &key, level, key[level]) {
-                    cursor = index.saturating_sub(key_offset + 1);
+                    cursor = index.saturating_sub(key_offset);
                     eprintln!("found up: {}", cursor);
                     adjecency[level].merge(Above);
                 }
@@ -528,7 +528,7 @@ impl Key {
             let mut cursor = index;
             for level in (1..=key_level).rev() {
                 if let Some(key_offset) = downward_iter(cursor, &key, level, key[level]) {
-                    cursor = index + key_offset + 1;
+                    cursor = index + key_offset;
                     eprintln!("found down: {}", cursor);
                     adjecency[level].merge(Below);
                 }
