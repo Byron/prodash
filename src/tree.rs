@@ -439,8 +439,11 @@ impl Key {
         }
     }
 
-    fn shares_parent_with(&self, other: &Key, up_to: Level) -> bool {
-        for level in 1..=up_to {
+    fn shares_parent_with(&self, other: &Key, key_at_level: Level) -> bool {
+        if key_at_level < 1 {
+            return true;
+        }
+        for level in 1..=key_at_level {
             if let (Some(lhs), Some(rhs)) = (self.get(level), other.get(level)) {
                 if lhs != rhs {
                     return false;
@@ -457,6 +460,7 @@ impl Key {
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
     /// for the result to be reliable.
     pub(crate) fn adjacency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
+        use SiblingLocation::*;
         let key = &sorted[index].0;
         let key_level = key.level();
         let mut adjecency = Adjacency::default();
@@ -469,18 +473,18 @@ impl Key {
             iter: impl Iterator<Item = &'a (Key, Value)>,
             key: &Key,
             key_level: Level,
-            parent_level: Level,
+            current_level: Level,
             _id_at_level: ItemId,
         ) -> Option<usize> {
             iter.map(|(k, _)| k)
-                .take_while(|other| key.shares_parent_with(other, parent_level))
+                .take_while(|other| key.shares_parent_with(other, current_level.saturating_sub(1)))
                 .enumerate()
                 .find(|(_idx, k)| {
-                    dbg!(k, k.level(), parent_level, key_level);
-                    if parent_level + 1 == key_level {
-                        k.level() <= key_level
+                    dbg!(k, k.level(), current_level, key_level);
+                    if current_level == key_level {
+                        k.level() == key_level || k.level() + 1 == key_level
                     } else {
-                        k.level() == parent_level
+                        k.level() == current_level
                     }
                 })
                 .map(|(idx, _)| idx)
@@ -504,11 +508,15 @@ impl Key {
         {
             dbg!("upward");
             let mut cursor = index;
-            for level in (1..key_level).rev() {
+            for level in (1..=key_level).rev() {
                 dbg!(level);
+                if level == 1 {
+                    adjecency[level].merge(Above); // the root or any other sibling on level one
+                    continue;
+                }
                 if let Some(key_index) = upward_iter(cursor, &key, level, key[level]) {
                     eprintln!("found up");
-                    adjecency[level].merge(SiblingLocation::Above);
+                    adjecency[level].merge(Above);
                     cursor = key_index;
                 }
             }
@@ -516,13 +524,22 @@ impl Key {
         {
             dbg!("downward");
             let mut cursor = index;
-            for level in (1..key_level).rev() {
+            for level in (1..=key_level).rev() {
                 if let Some(key_index) = downward_iter(cursor, &key, level, key[level]) {
                     eprintln!("found down");
-                    adjecency[level].merge(SiblingLocation::Below);
+                    adjecency[level].merge(Below);
                     cursor = key_index;
                 }
             }
+        }
+        for level in 1..key_level {
+            if key_level == 1 && index + 1 == sorted.len() {
+                continue;
+            }
+            adjecency[level] = match adjecency[level] {
+                Above|Below|NotFound => NotFound,
+                AboveAndBelow => AboveAndBelow,
+            };
         }
         adjecency
     }
