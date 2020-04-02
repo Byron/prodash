@@ -95,7 +95,7 @@ pub fn pane(
             .saturating_sub(bound.height.saturating_add(*offset) as usize);
         let messages_skipped = (*offset).min(messages.len() as u16);
         draw_text_with_ellipsis_nowrap(
-            rect::offset_x(overflow_bound, 2),
+            rect::offset_x(overflow_bound, 1),
             buf,
             format!("… {} skipped and {} more", messages_skipped, messages_below),
             None,

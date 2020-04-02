@@ -39,7 +39,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
         return;
     }
 
-    let initial_column_width = bound.width / 2;
+    let initial_column_width = bound.width / 3;
     let desired_max_tree_draw_width = *state
         .next_tree_column_width
         .as_ref()
@@ -318,7 +318,9 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
         .take(bound.height as usize)
         .enumerate()
     {
-        let line_bound = rect::line_bound(bound, line);
+        let mut line_bound = rect::line_bound(bound, line);
+        line_bound.x -= 1;
+        line_bound.width -= 1;
         let tree_prefix = format!("{} {} ", level_prefix(entries, entry_index), entry.1.name);
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
         draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
@@ -334,28 +336,44 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
     let mut buf = String::with_capacity(key_level as usize);
     for level in 1..=key_level {
         use crate::tree::SiblingLocation::*;
-        buf.push(' ');
-        buf.push(if level == key_level {
-            match adj[level] {
-                NotFound => {
-                    if adj_level == key_level {
-                        ' '
-                    } else {
-                        '·'
-                    }
-                }
-                Above => '└',
-                Below => '┌',
-                AboveAndBelow => '├',
-            }
+        if level != 1 {
+            buf.push(' ');
+        }
+        if level == 1 && level == key_level {
+            buf.push(match adj[level] {
+                AboveAndBelow | Above => '├',
+                NotFound | Below => '│',
+            });
         } else {
-            match adj[level] {
-                NotFound => ' ',
-                Above => '└',
-                Below => '┌',
-                AboveAndBelow => '│',
-            }
-        })
+            let c = if level == key_level {
+                match adj[level] {
+                    NotFound => {
+                        if adj_level == key_level {
+                            ' '
+                        } else {
+                            '·'
+                        }
+                    }
+                    Above => '└',
+                    Below => '┌',
+                    AboveAndBelow => '├',
+                }
+            } else {
+                match adj[level] {
+                    NotFound => {
+                        if level == 1 {
+                            '│'
+                        } else {
+                            ' '
+                        }
+                    }
+                    Above => '└',
+                    Below => '┌',
+                    AboveAndBelow => '│',
+                }
+            };
+            buf.push(c)
+        }
     }
     buf
 }
