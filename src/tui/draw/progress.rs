@@ -354,11 +354,11 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
 fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
     let adj = Key::adjacency(entries, entry_index);
     let key = entries[entry_index].0;
-    let max_level_to_check = key.level().saturating_sub(1);
-    let mut buf = String::with_capacity(max_level_to_check as usize);
-    for level in 1..=max_level_to_check {
+    let key_level = key.level();
+    let mut buf = String::with_capacity(key_level as usize);
+    for level in 1..=key_level {
         use crate::tree::SiblingLocation::*;
-        buf.push(if level == max_level_to_check {
+        buf.push(if level == key_level {
             match adj[level] {
                 NotFound => ' ',
                 Above => '└',

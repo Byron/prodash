@@ -379,7 +379,7 @@ impl Adjacency {
             Adjacency(_a, _b, NotFound, NotFound) => 2,
             Adjacency(_a, _b, _c, NotFound) => 3,
             Adjacency(_a, _b, _c, _d) => 4,
-            _ => unreachable!("Adjecencies have a certain structure")
+            _ => unreachable!("Adjecencies have a certain structure"),
         }
     }
     pub fn get(&self, level: Level) -> Option<&SiblingLocation> {
@@ -478,7 +478,6 @@ impl Key {
         if key_level == 0 {
             return adjecency;
         }
-        dbg!(key);
 
         fn search<'a>(
             iter: impl Iterator<Item = &'a (Key, Value)>,
@@ -488,13 +487,9 @@ impl Key {
             _id_at_level: ItemId,
         ) -> Option<usize> {
             iter.map(|(k, _)| k)
-                .take_while(|other| {
-                    dbg!(other, current_level.saturating_sub(1));
-                    key.shares_parent_with(other, current_level.saturating_sub(1))
-                })
+                .take_while(|other| key.shares_parent_with(other, current_level.saturating_sub(1)))
                 .enumerate()
                 .find(|(_idx, k)| {
-                    dbg!(k, k.level(), current_level, key_level);
                     if current_level == key_level {
                         k.level() == key_level || k.level() + 1 == key_level
                     } else {
@@ -520,28 +515,23 @@ impl Key {
         };
 
         {
-            dbg!("upward");
             let mut cursor = index;
             for level in (1..=key_level).rev() {
-                dbg!(level);
                 if level == 1 {
                     adjecency[level].merge(Above); // the root or any other sibling on level one
                     continue;
                 }
                 if let Some(key_offset) = upward_iter(cursor, &key, level, key[level]) {
                     cursor = index.saturating_sub(key_offset);
-                    eprintln!("found up: {}", cursor);
                     adjecency[level].merge(Above);
                 }
             }
         }
         {
-            dbg!("downward");
             let mut cursor = index;
             for level in (1..=key_level).rev() {
                 if let Some(key_offset) = downward_iter(cursor, &key, level, key[level]) {
                     cursor = index + key_offset;
-                    eprintln!("found down: {}", cursor);
                     adjecency[level].merge(Below);
                 }
             }
