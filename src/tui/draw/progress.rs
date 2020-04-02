@@ -59,17 +59,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
 
     {
         let progress_area = rect::offset_x(bound, desired_max_tree_draw_width);
-        draw_progress(
-            entries,
-            buf,
-            progress_area,
-            if desired_max_tree_draw_width == 0 {
-                false
-            } else {
-                true
-            },
-            state.task_offset,
-        );
+        draw_progress(entries, buf, progress_area, state.task_offset);
     }
 
     if needs_overflow_line {
@@ -163,15 +153,8 @@ impl<'a> fmt::Display for ProgressFormat<'a> {
     }
 }
 
-pub fn draw_progress(
-    entries: &[(Key, Value)],
-    buf: &mut Buffer,
-    bound: Rect,
-    draw_column_line: bool,
-    offset: u16,
-) {
+pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
-    let column_line_width = if draw_column_line { 1 } else { 0 };
     let max_progress_label_width = entries
         .iter()
         .skip(offset as usize)
@@ -215,16 +198,8 @@ pub fn draw_progress(
         draw_text_with_ellipsis_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
         let tree_prefix = level_prefix(entries, entry_index);
-        let progress_rect = rect::offset_x(
-            line_bound,
-            (column_line_width + block_width(&tree_prefix)) as u16,
-        );
-        draw_text_with_ellipsis_nowrap(
-            rect::offset_x(line_bound, column_line_width),
-            buf,
-            tree_prefix,
-            None,
-        );
+        let progress_rect = rect::offset_x(line_bound, block_width(&tree_prefix) as u16);
+        draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
         match progress.map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
