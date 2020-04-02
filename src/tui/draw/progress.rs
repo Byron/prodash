@@ -332,23 +332,24 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
     let adj = Key::adjacency(entries, entry_index);
     let key = entries[entry_index].0;
     let key_level = key.level();
-    let adj_level = adj.level();
+    let is_orphan = adj.level() != key_level;
     let mut buf = String::with_capacity(key_level as usize);
     for level in 1..=key_level {
         use crate::tree::SiblingLocation::*;
+        let is_child_level = level == key_level;
         if level != 1 {
             buf.push(' ');
         }
-        if level == 1 && level == key_level {
+        if level == 1 && is_child_level {
             buf.push(match adj[level] {
                 AboveAndBelow | Above => '├',
                 NotFound | Below => '│',
             });
         } else {
-            let c = if level == key_level {
+            let c = if is_child_level {
                 match adj[level] {
                     NotFound => {
-                        if adj_level == key_level {
+                        if is_orphan {
                             ' '
                         } else {
                             '·'
@@ -364,7 +365,11 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
                         if level == 1 {
                             '│'
                         } else {
-                            ' '
+                            if is_orphan {
+                                '·'
+                            } else {
+                                ' '
+                            }
                         }
                     }
                     Above => '└',
