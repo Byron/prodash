@@ -56,12 +56,13 @@ mod key_adjacency {
 
     #[test]
     fn root_level() {
+        let entries = root_with_two_children();
         assert_eq!(
-            Key::adjacency(&root_with_two_children(), 0),
+            Key::adjacency(&entries, 0),
             Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
         );
         assert_eq!(
-            Key::adjacency(&root_with_two_children(), 1),
+            Key::adjacency(&entries, 1),
             Adjacency(Above, NotFound, NotFound, NotFound)
         );
     }
@@ -152,5 +153,31 @@ mod key_adjacency {
                 }
             }
         }
+    }
+
+    #[test]
+    fn orphaned_child_node() {
+        let mut entries = root_with_two_children();
+        entries.insert(
+            1,
+            (
+                Key::default().add_child(0).add_child(0).add_child(1),
+                Value::default(),
+            ),
+        );
+        entries.sort_by_key(|v| v.0);
+        dbg!(&entries);
+        assert_eq!(
+            Key::adjacency(&entries, 0),
+            Adjacency(NotFound, NotFound, NotFound, NotFound),
+        );
+        assert_eq!(
+            Key::adjacency(&entries, 1),
+            Adjacency(AboveAndBelow, NotFound, NotFound, NotFound)
+        );
+        assert_eq!(
+            Key::adjacency(&entries, 2),
+            Adjacency(Above, NotFound, NotFound, NotFound)
+        );
     }
 }
