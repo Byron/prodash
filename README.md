@@ -4,7 +4,7 @@
 
 It's easy to integrate thanks to a pragmatic API, and comes with a terminal user interface by default.
 
-[![asciicast](https://asciinema.org/a/301838.svg)](https://asciinema.org/a/301838)
+[![asciicast](https://asciinema.org/a/315956.svg)](https://asciinema.org/a/315956)
 
 ## How to use…
 
