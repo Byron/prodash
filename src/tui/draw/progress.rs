@@ -153,6 +153,17 @@ impl<'a> fmt::Display for ProgressFormat<'a> {
     }
 }
 
+fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
+    entries
+        .get(index + 1)
+        .and_then(|(other_key, other_val)| {
+            entries
+                .get(index)
+                .map(|(cur_key, _)| cur_key.shares_parent_with(other_key, cur_key.level()) && other_val.progress.is_some())
+        })
+        .unwrap_or(false)
+}
+
 pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
     let max_progress_label_width = entries
@@ -192,7 +203,14 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
         let line_bound = rect::line_bound(bound, line);
         let progress_text = format!(
             " {progress}",
-            progress = ProgressFormat(progress, bound.width.saturating_sub(title_spacing))
+            progress = ProgressFormat(
+                progress,
+                if has_child(entries, entry_index) {
+                    bound.width.saturating_sub(title_spacing)
+                } else {
+                    0
+                }
+            )
         );
 
         draw_text_with_ellipsis_nowrap(line_bound, buf, VERTICAL_LINE, None);

@@ -449,7 +449,7 @@ impl Key {
         }
     }
 
-    fn shares_parent_with(&self, other: &Key, parent_level: Level) -> bool {
+    pub(crate) fn shares_parent_with(&self, other: &Key, parent_level: Level) -> bool {
         if parent_level < 1 {
             return true;
         }
