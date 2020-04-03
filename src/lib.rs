@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.5.0 - Cleaner visuals for hierarchical progress items, these won't show lines if there are no direct children with progress
+
 ## v3.4.1 - Enable localtime support by default
 
 ## v3.4.0 - Even nicer tree rendering, along with screen space savings
