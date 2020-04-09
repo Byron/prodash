@@ -1,7 +1,7 @@
 use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
-use std::ops::{Index, IndexMut};
+use std::ops::{Deref, Index, IndexMut};
 use std::{sync::Arc, time::SystemTime};
 
 /// The top-level of the progress tree.
@@ -57,6 +57,20 @@ impl Root {
     pub fn copy_messages(&self, out: &mut Vec<Message>) {
         self.inner.lock().messages.lock().copy_into(out);
     }
+
+    /// Duplicate all content and return it.
+    ///
+    /// This is an expensive operation, whereas `clone()` is not as it is shallow.
+    pub fn deep_clone(&self) -> Root {
+        Root {
+            inner: Arc::new(Mutex::new(self.inner.lock().deep_clone())),
+        }
+    }
+
+    /// Compare all content in this root and the given one to see if they are the same.
+    pub fn deep_eq(&self, other: &Root) -> bool {
+        self.inner.lock().deep_eq(other.inner.lock().deref())
+    }
 }
 
 /// The severity of a message
@@ -73,7 +87,7 @@ pub enum MessageLevel {
 /// A message to be stored along with the progress tree.
 ///
 /// It is created by [`Tree::message(…)`](./struct.Item.html#method.message).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Message {
     /// The time at which the message was sent.
     pub time: SystemTime,
@@ -85,7 +99,7 @@ pub struct Message {
     pub message: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub(crate) struct MessageRingBuffer {
     buf: Vec<Message>,
     cursor: usize,
@@ -312,6 +326,29 @@ impl Item {
     /// Create a message providing additional information about the progress thus far.
     pub fn info(&mut self, message: impl Into<String> + std::fmt::Display) {
         self.message(MessageLevel::Info, message)
+    }
+
+    fn deep_clone(&self) -> Item {
+        Item {
+            key: self.key.clone(),
+            highest_child_id: self.highest_child_id,
+            tree: Arc::new(self.tree.deref().clone()),
+            messages: Arc::new(Mutex::new(self.messages.lock().clone())),
+        }
+    }
+
+    fn deep_eq(&self, other: &Item) -> bool {
+        if !(*self.messages.lock() == *other.messages.lock()) {
+            return false;
+        }
+
+        // This is racy, but it's OK
+        for (lhs, rhs) in self.tree.iter().zip(other.tree.iter()) {
+            if lhs.key() != rhs.key() || lhs.value() != rhs.value() {
+                return false;
+            }
+        }
+        true
     }
 }
 
