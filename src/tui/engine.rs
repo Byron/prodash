@@ -207,7 +207,9 @@ pub fn render_with_input(
                     .unwrap_or(terminal_window_size);
                 let buf = terminal.current_buffer_mut();
                 progress.sorted_snapshot(&mut entries);
-                progress.copy_messages(&mut messages);
+                if !state.hide_messages {
+                    progress.copy_messages(&mut messages);
+                }
 
                 draw::all(
                     &mut state,
