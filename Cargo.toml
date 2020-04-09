@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "3.5.1"
+version = "3.6.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -28,7 +28,7 @@ log = { version = "0.4.8", optional = true }
 
 # tui-renderer
 tui = { version = "0.8.0", optional = true }
-tui-react = { version = "0.2.2", optional = true }
+tui-react = { version = "0.3.0", optional = true }
 termion = { version = "1.5.5", optional = true }
 futures-timer = { version = "3.0.1", optional = true }
 futures = { version = "0.3.4", optional = true }

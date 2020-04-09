@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.6.0 - A TUI option to only redraw if the progress actually changed. Useful if the change rate is lower than the frames per second.
+
 ## v3.5.1 - Don't copy messages if the message pane is hidden, saving time
 
 ## v3.5.0 - Cleaner visuals for hierarchical progress items, these won't show lines if there are no direct children with progress
