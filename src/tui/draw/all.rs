@@ -13,7 +13,7 @@ use tui::{
     widgets::{Block, Borders, Widget},
 };
 
-#[derive(Default)]
+#[derive(Default, Clone, Eq, PartialEq)]
 pub struct State {
     pub title: String,
     pub task_offset: u16,

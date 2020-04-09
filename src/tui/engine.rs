@@ -51,7 +51,7 @@ impl Default for TuiOptions {
 }
 
 /// A line as used in [`Event::SetInformation`](./enum.Event.html#variant.SetInformation)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Line {
     /// Set a title with the given text
     Title(String),
@@ -157,6 +157,7 @@ pub fn render_with_input(
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
         let mut previous_root = None::<Root>;
+        let mut previous_state = None::<draw::State>;
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {
@@ -207,13 +208,20 @@ pub fn render_with_input(
                 }
             }
             if !skip_redraw && redraw_only_on_state_change {
-                previous_root = match previous_root.take() {
-                    Some(prev) if prev.deep_eq(&progress) => {
-                        skip_redraw = true;
-                        Some(prev)
-                    }
-                    None | Some(_) => Some(progress.deep_clone()),
+                let (new_prev_state, state_changed) = match previous_state.take() {
+                    Some(prev) if prev == state => (Some(prev), false),
+                    None | Some(_) => (Some(state.clone()), true),
                 };
+                previous_state = new_prev_state;
+                if !state_changed {
+                    previous_root = match previous_root.take() {
+                        Some(prev) if prev.deep_eq(&progress) => {
+                            skip_redraw = true;
+                            Some(prev)
+                        }
+                        None | Some(_) => Some(progress.deep_clone()),
+                    };
+                }
             }
             if !skip_redraw {
                 tick += 1;
