@@ -13,4 +13,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: tests
       run: make tests
+    - name: benchmarks
+      run: make bench
 

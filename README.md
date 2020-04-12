@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/Byron/prodash.svg?branch=master)](https://travis-ci.org/Byron/prodash)
+![Rust](https://github.com/Byron/prodash/workflows/Rust/badge.svg)
+[![Crates.io](https://img.shields.io/crates/v/prodash.svg)](https://crates.io/crates/prodash)
 
 **prodash** is a dashboard for displaying progress of concurrent applications.
 
