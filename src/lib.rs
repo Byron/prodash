@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.6.2 - More horizontally precise progress bars; progress bars are now have lines between them vertically
+
 ## v3.6.1 - Properly respond to state changes even when 'redraw_only_on_state_change' is enabled
 
 ## v3.6.0 - A TUI option to only redraw if the progress actually changed. Useful if the change rate is lower than the frames per second.
