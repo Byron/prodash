@@ -316,12 +316,39 @@ fn draw_progress_bar_fn(
     if bound.width == 0 {
         return (Rect::default(), Style::default());
     }
-    let fractional_progress_rect = Rect {
-        width: ((bound.width as f32 * fraction).ceil() as u16).min(bound.width),
+    let mut fractional_progress_rect = Rect {
+        width: ((bound.width as f32 * fraction).floor() as u16).min(bound.width),
         ..bound
     };
     let color = style(fraction);
-    tui_react::fill_background(fractional_progress_rect, buf, color);
+    for y in fractional_progress_rect.top()..fractional_progress_rect.bottom() {
+        for x in fractional_progress_rect.left()..fractional_progress_rect.right() {
+            let cell = buf.get_mut(x, y);
+            cell.set_fg(color);
+            cell.set_symbol(tui::symbols::block::FULL);
+        }
+    }
+    if fractional_progress_rect.width < bound.width {
+        static BLOCK_SECTIONS: [&str; 9] = [
+            " ",
+            tui::symbols::block::ONE_EIGHTH,
+            tui::symbols::block::ONE_QUARTER,
+            tui::symbols::block::THREE_EIGHTHS,
+            tui::symbols::block::HALF,
+            tui::symbols::block::FIVE_EIGHTHS,
+            tui::symbols::block::THREE_QUARTERS,
+            tui::symbols::block::SEVEN_EIGHTHS,
+            tui::symbols::block::FULL,
+        ];
+        // Get the index based on how filled the remaining part is
+        let index = (((bound.width as f32 * fraction) - fractional_progress_rect.width as f32)
+            * 8f32)
+            .round() as usize;
+        let cell = buf.get_mut(fractional_progress_rect.right(), bound.y);
+        cell.set_symbol(BLOCK_SECTIONS[index]);
+        cell.style.fg = color;
+        fractional_progress_rect.width += 1;
+    }
     (
         fractional_progress_rect,
         Style::default().bg(color).fg(Color::Black),
