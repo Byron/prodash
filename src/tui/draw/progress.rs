@@ -341,9 +341,10 @@ fn draw_progress_bar_fn(
             tui::symbols::block::FULL,
         ];
         // Get the index based on how filled the remaining part is
-        let index = (((bound.width as f32 * fraction) - fractional_progress_rect.width as f32)
+        let index = ((((bound.width as f32 * fraction) - fractional_progress_rect.width as f32)
             * 8f32)
-            .round() as usize;
+            .round() as usize)
+            % BLOCK_SECTIONS.len();
         let cell = buf.get_mut(fractional_progress_rect.right(), bound.y);
         cell.set_symbol(BLOCK_SECTIONS[index]);
         cell.style.fg = color;
