@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v3.6.3 - Fix out-of-bounds access (and panic) due to new and more precise progress bars
+
 ## v3.6.2 - More horizontally precise progress bars; progress bars are now have lines between them vertically
 
 ## v3.6.1 - Properly respond to state changes even when 'redraw_only_on_state_change' is enabled
