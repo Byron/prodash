@@ -1,6 +1,6 @@
 use crate::{tree::Root, tui::draw, tui::ticker};
 
-use futures::{channel::mpsc, SinkExt, StreamExt};
+use futures_util::StreamExt;
 use std::{
     io::{self, Write},
     time::Duration,
@@ -112,7 +112,7 @@ pub enum Event {
 pub fn render_with_input(
     progress: Root,
     options: TuiOptions,
-    events: impl futures::Stream<Item = Event> + Send,
+    events: impl futures_core::Stream<Item = Event> + Send,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
     let TuiOptions {
         title,
@@ -130,13 +130,13 @@ pub fn render_with_input(
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
-    let (mut key_send, key_receive) = mpsc::channel::<Key>(1);
+    let (key_send, key_receive) = piper::chan::<Key>(1);
 
     // This brings blocking key-handling into the async world
     std::thread::spawn(move || -> Result<(), io::Error> {
         for key in io::stdin().keys() {
             let key = key?;
-            smol::block_on(key_send.send(key)).ok();
+            smol::block_on(key_send.send(key));
         }
         Ok(())
     });
@@ -150,7 +150,7 @@ pub fn render_with_input(
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());
         let mut messages = Vec::with_capacity(progress.messages_capacity());
-        let mut events = futures::stream::select_all(vec![
+        let mut events = futures_util::stream::select_all(vec![
             ticker(duration_per_frame).map(|_| Event::Tick).boxed(),
             key_receive.map(|key| Event::Input(key)).boxed(),
             events.boxed(),
@@ -266,5 +266,5 @@ pub fn render(
     progress: Root,
     config: TuiOptions,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
-    return render_with_input(progress, config, futures::stream::pending());
+    return render_with_input(progress, config, futures_util::stream::pending());
 }

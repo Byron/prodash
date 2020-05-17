@@ -17,7 +17,7 @@ async fn work_forever(args: arg::Options) -> Result {
     let changing_names = args.changing_names;
 
     let mut gui_handle = if args.no_tui {
-        let never_ending = smol::Task::spawn(futures::future::pending::<()>());
+        let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
         Some(launch_ambient_gui(progress.clone(), args).unwrap().boxed())
@@ -41,7 +41,7 @@ async fn work_forever(args: arg::Options) -> Result {
             .boxed_local()
         });
 
-        match futures::future::select(
+        match futures_util::future::select(
             join_all(std::iter::once(local_work).chain(pooled_work)),
             gui_handle.take().expect("gui handle"),
         )
@@ -77,7 +77,7 @@ fn launch_ambient_gui(
             redraw_only_on_state_change: true,
             ..tui::TuiOptions::default()
         },
-        futures::stream::select(
+        futures_util::stream::select(
             window_resize_stream(args.animate_terminal_size),
             ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
                 ticks += 1;
@@ -249,11 +249,11 @@ fn generate_statistics() -> Vec<Line> {
     lines
 }
 
-fn window_resize_stream(animate: bool) -> impl futures::Stream<Item = Event> {
+fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event> {
     let mut offset_xy = (0u16, 0u16);
     let mut direction = Direction::Shrink;
     if !animate {
-        return futures::stream::pending().boxed();
+        return futures_util::stream::pending().boxed();
     }
 
     ticker(Duration::from_millis(100))
@@ -339,12 +339,9 @@ mod arg {
     }
 }
 
-use futures::{future::join_all, future::Either, FutureExt, StreamExt};
+use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
 use prodash::{
-    tree::{
-        Item,
-        Key
-    },
+    tree::{Item, Key},
     tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
