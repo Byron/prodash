@@ -9,10 +9,10 @@ use tui::{
 };
 
 pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {
-    let mut block = Block::default()
+    let block = Block::default()
         .title("Information")
         .borders(Borders::TOP | Borders::BOTTOM);
-    block.draw(bound, buf);
+    block.render(bound, buf);
 
     let help_text = " ⨯ = [ | ▢ = { ";
     draw_text_with_ellipsis_nowrap(

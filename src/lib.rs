@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.0.2 - Upgrade to latest TUI and TUI-react crates
+
 ## v4.0.1 - Reduce theoretical direct dependencies by not using 'futures' crate directly
 
 ## v4.0.0 - Switch from futures executor to smol

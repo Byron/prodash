@@ -21,8 +21,8 @@ pub fn pane(
     offset: &mut u16,
     buf: &mut Buffer,
 ) {
-    let mut block = Block::default().title("Messages").borders(Borders::TOP);
-    block.draw(bound, buf);
+    let block = Block::default().title("Messages").borders(Borders::TOP);
+    block.render(bound, buf);
     let help_text = " ⨯ = `| ▢ = ~ ";
     draw_text_with_ellipsis_nowrap(
         rect::snap_to_right(bound, block_width(help_text)),

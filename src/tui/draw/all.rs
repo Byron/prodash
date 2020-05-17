@@ -46,8 +46,8 @@ pub(crate) fn all(
         },
         state.maximize_info,
     );
-    let mut window = Block::default().title(&state.title).borders(Borders::ALL);
-    window.draw(bound, buf);
+    let window = Block::default().title(&state.title).borders(Borders::ALL);
+    window.render(bound, buf);
     if bound.width < 4 || bound.height < 4 {
         return;
     }
