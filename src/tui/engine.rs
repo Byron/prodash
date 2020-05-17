@@ -1,8 +1,10 @@
 use crate::{tree::Root, tui::draw, tui::ticker};
 
 use futures::{channel::mpsc, SinkExt, StreamExt};
-use std::io::Write;
-use std::{io, time::Duration};
+use std::{
+    io::{self, Write},
+    time::Duration,
+};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{backend::TermionBackend, layout::Rect};
 use tui_react::Terminal;
@@ -134,7 +136,7 @@ pub fn render_with_input(
     std::thread::spawn(move || -> Result<(), io::Error> {
         for key in io::stdin().keys() {
             let key = key?;
-            futures::executor::block_on(key_send.send(key)).ok();
+            smol::block_on(key_send.send(key)).ok();
         }
         Ok(())
     });

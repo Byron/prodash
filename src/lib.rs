@@ -33,6 +33,15 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.0.0 - Switch from futures executor to smol
+
+This actually simplifies some parts of the implementation, while fixing issues along futures not being dropped while they
+were on a thread pool. Now, for the example, no threadpool is used anymore.
+
+**Note** that this also means that in order for each frame to be drawn, one would have to invoke `smol::run` in one thread to
+activate the reactor which processes the timeout/ticker. Alternatively, one would send `Tick` events through a channel to trigger
+a redraw manually.
+
 ## v3.6.3 - Fix out-of-bounds access (and panic) due to new and more precise progress bars
 
 ## v3.6.2 - More horizontally precise progress bars; progress bars are now have lines between them vertically

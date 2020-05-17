@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "3.6.3"
+version = "4.0.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -14,7 +14,7 @@ doctest = true
 
 [features]
 default = ["tui-renderer", "log-renderer", "localtime"]
-tui-renderer = ["tui", "tui-react", "termion", "futures-timer", "futures", "unicode-segmentation", "unicode-width", "humantime" ]
+tui-renderer = ["tui", "tui-react", "termion", "smol", "futures", "unicode-segmentation", "unicode-width", "humantime" ]
 log-renderer = ["log"]
 localtime = ["time"]
 
@@ -29,8 +29,8 @@ log = { version = "0.4.8", optional = true }
 # tui-renderer
 tui = { version = "0.8.0", optional = true }
 tui-react = { version = "0.3.0", optional = true }
+smol = { version = "0.1.5", optional = true }
 termion = { version = "1.5.5", optional = true }
-futures-timer = { version = "3.0.1", optional = true }
 futures = { version = "0.3.4", optional = true }
 unicode-segmentation = { version = "1.6.0", optional = true }
 humantime = { version = "2.0.0", optional = true }
@@ -40,8 +40,7 @@ unicode-width = { version = "0.1.7", optional = true }
 time = { version = "0.2.9", optional = true, features = ["std"], default-features = false }
 
 [dev-dependencies]
-futures = { version = "0.3.4", features = ["thread-pool"] }
-futures-timer = "3.0.1"
+futures = { version = "0.3.4" }
 rand = "0.7.3"
 env_logger = { version = "0.7.1", default-features = false, features = ["termcolor", "atty", "humantime"] }
 criterion = "0.3.1"

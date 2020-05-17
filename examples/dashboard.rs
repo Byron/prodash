@@ -3,15 +3,10 @@ fn main() -> Result {
     env_logger::init();
 
     let args: arg::Options = argh::from_env();
-    // Use spawn as well to simulate Send futures
-    let pool = ThreadPool::builder()
-        .pool_size(1)
-        .create()
-        .expect("pool creation to work (io-error is not Send");
-    block_on(work_forever(pool, args))
+    smol::run(work_forever(args))
 }
 
-async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Options) -> Result {
+async fn work_forever(args: arg::Options) -> Result {
     let progress = prodash::TreeOptions {
         message_buffer_capacity: args.message_scrollback_buffer_size,
         ..prodash::TreeOptions::default()
@@ -21,38 +16,33 @@ async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Opti
     let speed = args.speed_multitplier;
     let changing_names = args.changing_names;
 
-    let (mut gui_handle, abort_gui) = if args.no_tui {
-        let (never_ending, abort_handle) =
-            futures::future::abortable(futures::future::pending::<()>());
-        (Some(never_ending.map(|_| ()).boxed()), abort_handle)
+    let mut gui_handle = if args.no_tui {
+        let never_ending = smol::Task::spawn(futures::future::pending::<()>());
+        Some(never_ending.boxed())
     } else {
-        let (gui_handle, abort_handle) = launch_ambient_gui(&pool, progress.clone(), args).unwrap();
-        let gui_handle = Some(gui_handle.boxed());
-        (gui_handle, abort_handle)
+        Some(launch_ambient_gui(progress.clone(), args).unwrap().boxed())
     };
 
     loop {
         let local_work = new_chunk_of_work(
             NestingLevel(thread_rng().gen_range(0, Key::max_level())),
             progress.clone(),
-            pool.clone(),
             speed,
             changing_names,
-        );
+        )
+        .boxed_local();
         let pooled_work = (0..thread_rng().gen_range(6, 16usize)).map(|_| {
-            pool.spawn_with_handle(new_chunk_of_work(
+            smol::Task::spawn(new_chunk_of_work(
                 NestingLevel(thread_rng().gen_range(0, Key::max_level())),
                 progress.clone(),
-                pool.clone(),
                 speed,
                 changing_names,
             ))
-            .expect("spawning to work - SpawnError cannot be ")
             .boxed_local()
         });
 
         match futures::future::select(
-            join_all(std::iter::once(local_work.boxed_local()).chain(pooled_work)),
+            join_all(std::iter::once(local_work).chain(pooled_work)),
             gui_handle.take().expect("gui handle"),
         )
         .await
@@ -65,18 +55,17 @@ async fn work_forever(pool: impl Spawn + Clone + Send + 'static, args: arg::Opti
         }
     }
 
-    abort_gui.abort();
     if let Some(gui) = gui_handle {
+        // gui.cancel();
         gui.await;
     }
     Ok(())
 }
 
 fn launch_ambient_gui(
-    pool: &dyn Spawn,
     progress: Tree,
     args: arg::Options,
-) -> std::result::Result<(impl Future<Output = ()>, AbortHandle), std::io::Error> {
+) -> std::result::Result<smol::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = tui::render_with_input(
@@ -109,11 +98,8 @@ fn launch_ambient_gui(
             }),
         ),
     )?;
-    let (render_fut, abort_handle) = abortable(render_fut);
-    let handle = pool
-        .spawn_with_handle(render_fut)
-        .expect("GUI to be spawned");
-    Ok((handle.map(|_| ()), abort_handle))
+    let handle = smol::Task::spawn(render_fut.map(|_| ()));
+    Ok(handle)
 }
 
 async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
@@ -157,7 +143,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
         if thread_rng().gen_bool(if changing_names { 0.5 } else { 0.01 }) {
             progress.set_name(WORK_NAMES.choose(&mut thread_rng()).unwrap().to_string());
         }
-        Delay::new(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
+        smol::Timer::after(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
     }
     if thread_rng().gen_bool(0.95) {
         progress.done(*DONE_MESSAGES.choose(&mut thread_rng()).unwrap());
@@ -169,7 +155,6 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
 async fn new_chunk_of_work(
     max: NestingLevel,
     tree: Tree,
-    pool: impl Spawn,
     speed: f32,
     changing_names: bool,
 ) -> Result {
@@ -182,20 +167,18 @@ async fn new_chunk_of_work(
         // one-off ambient tasks
         let num_tasks = max_level as usize * 2;
         for id in 0..num_tasks {
-            let handle = pool
-                .spawn_with_handle(work_item(
-                    level_progress.add_child(format!(
-                        "{} {}",
-                        WORK_NAMES.choose(&mut thread_rng()).unwrap(),
-                        id + 1
-                    )),
-                    speed,
-                    changing_names,
-                ))
-                .expect("spawn to work");
+            let handle = smol::Task::spawn(work_item(
+                level_progress.add_child(format!(
+                    "{} {}",
+                    WORK_NAMES.choose(&mut thread_rng()).unwrap(),
+                    id + 1
+                )),
+                speed,
+                changing_names,
+            ));
             handles.push(handle);
 
-            Delay::new(Duration::from_millis(
+            smol::Timer::after(Duration::from_millis(
                 (SPAWN_DELAY_MS as f32 / speed) as u64,
             ))
             .await;
@@ -356,17 +339,12 @@ mod arg {
     }
 }
 
-use futures::{
-    executor::{block_on, ThreadPool},
-    future::{abortable, join_all},
-    future::{AbortHandle, Either},
-    task::{Spawn, SpawnExt},
-    Future, FutureExt, StreamExt,
-};
-use futures_timer::Delay;
+use futures::{future::join_all, future::Either, FutureExt, StreamExt};
 use prodash::{
-    tree::Item,
-    tree::Key,
+    tree::{
+        Item,
+        Key
+    },
     tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
