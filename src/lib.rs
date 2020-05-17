@@ -33,6 +33,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.0.1 - Reduce theoretical direct dependencies by not using 'futures' crate directly
+
 ## v4.0.0 - Switch from futures executor to smol
 
 This actually simplifies some parts of the implementation, while fixing issues along futures not being dropped while they
