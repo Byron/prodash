@@ -1,9 +1,11 @@
 use crate::{
     tree::{Message, MessageLevel},
-    tui::draw::time::{format_time_for_messages, DATE_TIME_HMS},
-    tui::utils::{
-        block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE,
-    },
+    tui::{
+        draw::time::{format_time_for_messages, DATE_TIME_HMS},
+        utils::{
+            block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE,
+        }
+    }
 };
 use std::time::SystemTime;
 use tui::{

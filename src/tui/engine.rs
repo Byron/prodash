@@ -130,13 +130,13 @@ pub fn render_with_input(
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
-    let (key_send, key_receive) = piper::chan::<Key>(1);
+    let (key_send, key_receive) = async_channel::bounded::<Key>(1);
 
     // This brings blocking key-handling into the async world
     std::thread::spawn(move || -> Result<(), io::Error> {
         for key in io::stdin().keys() {
             let key = key?;
-            smol::block_on(key_send.send(key));
+            smol::block_on(key_send.send(key)).ok();
         }
         Ok(())
     });
