@@ -289,7 +289,8 @@ impl Item {
     ///
     /// Use this to provide additional,human-readable information about the progress
     /// made, including indicating success or failure.
-    pub fn message(&mut self, level: MessageLevel, message: impl Into<String> + std::fmt::Display) {
+    pub fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+        let message: String = message.into();
         self.messages.lock().push_overwrite(
             level,
             {
@@ -314,17 +315,17 @@ impl Item {
     }
 
     /// Create a message indicating the task is done
-    pub fn done(&mut self, message: impl Into<String> + std::fmt::Display) {
+    pub fn done(&mut self, message: impl Into<String>) {
         self.message(MessageLevel::Success, message)
     }
 
     /// Create a message indicating the task failed
-    pub fn fail(&mut self, message: impl Into<String> + std::fmt::Display) {
+    pub fn fail(&mut self, message: impl Into<String>) {
         self.message(MessageLevel::Failure, message)
     }
 
     /// Create a message providing additional information about the progress thus far.
-    pub fn info(&mut self, message: impl Into<String> + std::fmt::Display) {
+    pub fn info(&mut self, message: impl Into<String>) {
         self.message(MessageLevel::Info, message)
     }
 

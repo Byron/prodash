@@ -35,6 +35,8 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.0.4 - Simplify `message()` trait bounds
+
 ## v4.0.3 - Remove piper in favor of futures-channel (which was included anyway)
 
 ## v4.0.2 - Upgrade to latest TUI and TUI-react crates
