@@ -16,11 +16,13 @@ The **terminal user interface** seems to be the least transparent part, but can 
 
 By default, a TUI is provided to visualize all state. Have a look at [the example provided in the tui module](./tui/index.html).
 
+**Please note** that it is behind the `tui-renderer` feature toggle, which is enabled by default.
+
 # Logging
 
 If the feature `log-renderer` is enabled (default), most calls to `progress` will also be logged.
 That way, even without a terminal user interface, there will be progress messages.
-Please note that logging to stdout should not be performed with this feature enabled and a terminal user interface, as this will
+Please note that logging to stdout should not be performed with this feature enabled and a terminal user interface is shown, as this will
 seriously interfere with the TUI.
 
 # A demo application
