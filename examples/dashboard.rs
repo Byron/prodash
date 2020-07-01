@@ -336,6 +336,10 @@ mod arg {
         /// Defaults to 1.0. A valud of 0.5 halves the speed.
         #[argh(option, short = 's', default = "1.0")]
         pub speed_multitplier: f32,
+
+        /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
+        #[argh(switch)]
+        pub stop_if_empty_progress: bool,
     }
 }
 

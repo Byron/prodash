@@ -38,6 +38,12 @@ pub struct TuiOptions {
     ///
     /// This is particularly useful if most of the time, the actual change rate is lower than the refresh rate. Drawing is expensive.
     pub redraw_only_on_state_change: bool,
+
+    /// If true (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
+    ///
+    /// Please note that you should add at least one item to the `prodash::Tree` before launching the application or else
+    /// risk a race causing the TUI to sometimes not come up at all.
+    pub stop_if_empty_progress: bool,
 }
 
 impl Default for TuiOptions {
@@ -48,6 +54,7 @@ impl Default for TuiOptions {
             recompute_column_width_every_nth_frame: None,
             window_size: None,
             redraw_only_on_state_change: false,
+            stop_if_empty_progress: false,
         }
     }
 }
@@ -120,6 +127,7 @@ pub fn render_with_input(
         window_size,
         recompute_column_width_every_nth_frame,
         redraw_only_on_state_change,
+        stop_if_empty_progress,
     } = options;
     let mut terminal = {
         let stdout = io::stdout().into_raw_mode()?;
@@ -227,13 +235,17 @@ pub fn render_with_input(
             }
             if !skip_redraw {
                 tick += 1;
+
+                progress.sorted_snapshot(&mut entries);
+                if stop_if_empty_progress && entries.is_empty() {
+                    break;
+                }
                 let terminal_window_size = terminal.pre_render().expect("pre-render to work");
                 let window_size = state
                     .user_provided_window_size
                     .or(window_size)
                     .unwrap_or(terminal_window_size);
                 let buf = terminal.current_buffer_mut();
-                progress.sorted_snapshot(&mut entries);
                 if !state.hide_messages {
                     progress.copy_messages(&mut messages);
                 }
