@@ -35,6 +35,13 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.1.0 - Allow the TUI to automatically stop if there is no progress to display
+
+This way, it's easier to use `prodash::tui` for visualizing finite tasks, which originally it wasn't intended for.
+
+Previously, in order to achieve the same, one would have to initialize the TUI with an event stream and send the Event
+for shutting down once the task at hand is complete.
+
 ## v4.0.5 - Fix delayed reset of the terminal
 
 Previously even after the future was dropped, it seemed like the terminal wasn't reset and the user was required
