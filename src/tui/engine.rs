@@ -256,6 +256,7 @@ pub fn render_with_input(
             }
         }
         // Make sure the terminal responds right away when this future stops, to reset back to the 'non-alternate' buffer
+        drop(terminal);
         io::stdout().flush().ok();
     };
     Ok(render_fut)

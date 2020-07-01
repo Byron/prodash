@@ -35,6 +35,15 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v4.0.5 - Fix delayed reset of the terminal
+
+Previously even after the future was dropped, it seemed like the terminal wasn't reset and the user was required
+to explicitly flush stdout to make the changes appear. This is due to the flushing previously happening too early,
+that is, before the `terminal` was dropped which emits the respective terminal escape codes at this time.
+
+Now the terminal instance is dropped explicitly right before emitting a flush.
+One might argue that the flush should happen in the terminal instance itself, but fixing that is out of scope.
+
 ## v4.0.4 - Simplify `message()` trait bounds
 
 ## v4.0.3 - Remove piper in favor of futures-channel (which was included anyway)
