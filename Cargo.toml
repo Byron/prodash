@@ -18,7 +18,7 @@ path = "examples/dashboard.rs"
 required-features = ["with-crossterm", "tui-renderer", "localtime"]
 
 [features]
-default = ["tui-renderer", "log-renderer", "localtime"]
+default = ["tui-renderer", "with-crossterm", "log-renderer", "localtime"]
 tui-renderer = ["tui",
                 "tui-react",
                 "futures-channel",

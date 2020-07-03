@@ -26,13 +26,14 @@ This crate comes with various cargo features to tailor it to your needs.
 * **tui-renderer** _(default)_
   * Provide a terminal user interface visualizing every detail of the current progress state.
   * Requires one of these additional feature flags to be set to be functional
-    * **with-termion**
-      * Use the `termion` crate as terminal backend 
-      * It has less dependencies but works only on `unix` systems
-    * **with-crossterm**
+    * **with-crossterm** _(default)_
       * Use the `crossterm` crate as terminal backend
       * Works everywhere natively, but has more dependencies
       * You can set additional features like this `cargo build --features with-crossterm,crossterm/event-stream`
+    * **with-termion**
+      * Use the `termion` crate as terminal backend 
+      * It has less dependencies but works only on `unix` systems
+      * to get this, disable default features and chose at least `tui-renderer` and `with-termion`.
 
 ## Features
 
