@@ -13,6 +13,27 @@ Be sure to read the documentation at https://docs.rs/prodash, it contains variou
 
 Or run the demo application like so `cd prodash && cargo run --example dashboard`.
 
+## Feature Toggles
+
+This crate comes with various cargo features to tailor it to your needs.
+
+* **local-time** _(default)_
+  * If set, timestamps in the message pane of the `tui-renderer` will be using the local time, not UTC
+  * Has no effect without the `tui-renderer`
+* **log-renderer** _(default)_
+  * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
+    `tree::Item::message(…)` and friends.
+* **tui-renderer** _(default)_
+  * Provide a terminal user interface visualizing every detail of the current progress state.
+  * Requires one of these additional feature flags to be set to be functional
+    * **with-termion**
+      * Use the `termion` crate as terminal backend 
+      * It has less dependencies but works only on `unix` systems
+    * **with-crossterm**
+      * Use the `crossterm` crate as terminal backend
+      * Works everywhere natively, but has more dependencies
+      * You can set additional features like this `cargo build --features with-crossterm,crossterm/event-stream`
+
 ## Features
 
 * fast insertions and updates for transparent progress tracking of highly concurrent programs
