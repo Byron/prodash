@@ -163,7 +163,7 @@ pub mod input {
                 Null => Key::Null,
                 Esc => Key::Esc,
                 Char(c) => match value.modifiers {
-                    KeyModifiers::SHIFT => Key::Char(c),
+                    KeyModifiers::NONE | KeyModifiers::SHIFT => Key::Char(c),
                     KeyModifiers::CONTROL => Key::Ctrl(c),
                     KeyModifiers::ALT => Key::Alt(c),
                     _ => return Err(value),
@@ -268,7 +268,9 @@ mod _impl {
 
     pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
         let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
-        // This brings blocking key-handling into the async world
+        // NOTE: Even though crossterm has support for async event streams, it will use MIO in this
+        // case and pull in even more things that we simply don't need for that. A thread and blocking
+        // IO will do just fine.
         std::thread::spawn(move || -> Result<(), io::Error> {
             loop {
                 let event = crossterm::event::read().map_err(into_io_error)?;
@@ -277,7 +279,7 @@ mod _impl {
                         let key: Result<Key, _> = key.try_into();
                         if let Ok(key) = key {
                             smol::block_on(key_send.send(key)).ok();
-                        }
+                        };
                     }
                     _ => continue,
                 };
