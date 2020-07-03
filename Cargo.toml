@@ -31,7 +31,7 @@ tui-renderer = ["tui",
 log-renderer = ["log"]
 localtime = ["time"]
 with-termion = ["termion", "tui/termion"]
-with-crossterm = ["termion", "tui/termion"]
+with-crossterm = ["crossterm", "tui/crossterm"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]

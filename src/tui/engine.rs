@@ -211,6 +211,72 @@ mod _impl {
     }
 }
 
+#[cfg(all(feature = "crossterm", not(feature = "termion")))]
+mod _impl {
+    use crate::tui::input::Key;
+    use crossterm::terminal::disable_raw_mode;
+    use crossterm::{
+        execute,
+        terminal::{enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    };
+    use futures_util::SinkExt;
+    use std::io;
+    use tui::backend::CrosstermBackend;
+    use tui_react::Terminal;
+
+    pub struct AlternateScreen<T: io::Write> {
+        inner: T,
+    }
+
+    fn into_io_error(err: crossterm::ErrorKind) -> io::Error {
+        if let crossterm::ErrorKind::IoError(err) = err {
+            return err;
+        }
+        unimplemented!("we cannot currently handle non-io errors reported by crossterm")
+    }
+
+    impl<T: io::Write> AlternateScreen<T> {
+        fn new(mut write: T) -> Result<AlternateScreen<T>, io::Error> {
+            enable_raw_mode().map_err(into_io_error)?;
+            execute!(write, EnterAlternateScreen).map_err(into_io_error)?;
+            Ok(AlternateScreen { inner: write })
+        }
+    }
+
+    impl<T: io::Write> io::Write for AlternateScreen<T> {
+        fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+            self.inner.write(buf)
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            self.inner.flush()
+        }
+    }
+
+    impl<T: io::Write> Drop for AlternateScreen<T> {
+        fn drop(&mut self) {
+            disable_raw_mode().ok();
+            execute!(self.inner, LeaveAlternateScreen).ok();
+        }
+    }
+
+    pub fn new_terminal(
+    ) -> Result<Terminal<CrosstermBackend<AlternateScreen<io::Stdout>>>, io::Error> {
+        let backend = CrosstermBackend::new(AlternateScreen::new(io::stdout())?);
+        Ok(Terminal::new(backend)?)
+    }
+
+    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
+        // This brings blocking key-handling into the async world
+        std::thread::spawn(move || -> Result<(), io::Error> {
+            unimplemented!("todo: key processing");
+            Ok(())
+        });
+        key_receive
+    }
+}
+
 #[cfg(not(any(feature = "termion", feature = "crossterm")))]
 mod _impl {
     use crate::tui::engine::input::Key;
