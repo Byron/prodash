@@ -86,8 +86,6 @@ pub(crate) enum InterruptDrawInfo {
 }
 
 pub mod input {
-    use crossterm::event::KeyEvent;
-
     /// A set of possible key presses, equivalent to the one in `termion@1.5.5::event::Key`
     #[derive(Debug, Clone, Copy)]
     pub enum Key {
@@ -144,7 +142,7 @@ pub mod input {
     impl std::convert::TryFrom<crossterm::event::KeyEvent> for Key {
         type Error = crossterm::event::KeyEvent;
 
-        fn try_from(value: KeyEvent) -> Result<Self, Self::Error> {
+        fn try_from(value: crossterm::event::KeyEvent) -> Result<Self, Self::Error> {
             use crossterm::event::{KeyCode::*, KeyModifiers};
             Ok(match value.code {
                 Backspace => Key::Backspace,
