@@ -35,6 +35,16 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v5.0.0 - Support for windows by using Crossbeam by default
+
+A first low-effort move to the latest version should be to set the dependency to
+`default-features = false, features = ["tui-renderer", "with-termion", "localtime", "log-renderer"]`
+to get the same configuration as before.
+
+To try crossbeam, use `with-crossbeam` instead of `with-termion`.
+
+If you have been using the event stream to send your own keys, swap `termion::event::Key` with `prodash::tui::input::Key`.
+
 ## v4.1.0 - Allow the TUI to automatically stop if there is no progress to display
 
 This way, it's easier to use `prodash::tui` for visualizing finite tasks, which originally it wasn't intended for.
