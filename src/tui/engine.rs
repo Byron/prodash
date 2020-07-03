@@ -1,13 +1,11 @@
 use crate::{tree::Root, tui::draw, tui::ticker};
 
-use futures_util::{stream, SinkExt, StreamExt};
+use futures_util::{stream, StreamExt};
 use std::{
     io::{self, Write},
     time::Duration,
 };
-use termion::{event::Key, input::TermRead, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{backend::TermionBackend, layout::Rect};
-use tui_react::Terminal;
+use tui::layout::Rect;
 
 /// Configure the terminal user interface
 #[derive(Clone)]
@@ -87,6 +85,101 @@ pub(crate) enum InterruptDrawInfo {
     Deferred(bool),
 }
 
+pub mod input {
+    /// A set of possible key presses, equivalent to the one in `termion@1.5.5::event::Key`
+    #[derive(Debug, Clone, Copy)]
+    pub enum Key {
+        Backspace,
+        Left,
+        Right,
+        Up,
+        Down,
+        Home,
+        End,
+        PageUp,
+        PageDown,
+        BackTab,
+        Delete,
+        Insert,
+        F(u8),
+        Char(char),
+        Alt(char),
+        Ctrl(char),
+        Null,
+        Esc,
+    }
+
+    #[cfg(feature = "termion")]
+    impl std::convert::TryFrom<termion::event::Key> for Key {
+        type Error = termion::event::Key;
+
+        fn try_from(value: termion::event::Key) -> Result<Self, Self::Error> {
+            use termion::event::Key::*;
+            Ok(match value {
+                Backspace => Key::Backspace,
+                Left => Key::Left,
+                Right => Key::Right,
+                Up => Key::Up,
+                Down => Key::Down,
+                Home => Key::Home,
+                End => Key::End,
+                PageUp => Key::PageUp,
+                PageDown => Key::PageDown,
+                BackTab => Key::BackTab,
+                Delete => Key::Delete,
+                Insert => Key::Insert,
+                F(c) => Key::F(c),
+                Char(c) => Key::Char(c),
+                Alt(c) => Key::Alt(c),
+                Ctrl(c) => Key::Ctrl(c),
+                Null => Key::Null,
+                Esc => Key::Esc,
+                _ => return Err(value),
+            })
+        }
+    }
+}
+
+use input::Key;
+
+#[cfg(feature = "termion")]
+mod _impl {
+    use crate::tui::input::Key;
+    use futures_util::SinkExt;
+    use std::{convert::TryInto, io};
+    use termion::{
+        input::TermRead,
+        raw::{IntoRawMode, RawTerminal},
+        screen::AlternateScreen,
+    };
+    use tui::backend::TermionBackend;
+    use tui_react::Terminal;
+
+    pub fn new_terminal(
+    ) -> Result<Terminal<TermionBackend<AlternateScreen<RawTerminal<io::Stdout>>>>, io::Error> {
+        let stdout = io::stdout().into_raw_mode()?;
+        let backend = TermionBackend::new(AlternateScreen::from(stdout));
+        Ok(Terminal::new(backend)?)
+    }
+
+    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
+        // This brings blocking key-handling into the async world
+        std::thread::spawn(move || -> Result<(), io::Error> {
+            for key in io::stdin().keys() {
+                let key: Result<Key, _> = key?.try_into();
+                if let Ok(key) = key {
+                    smol::block_on(key_send.send(key)).ok();
+                }
+            }
+            Ok(())
+        });
+        key_receive
+    }
+}
+
+use _impl::{key_input_stream, new_terminal};
+
 /// An event to be sent in the [`tui::render_with_input(…events)`](./fn.render_with_input.html) stream.
 ///
 /// This way, the TUI can be instructed to draw frames or change the information to be displayed.
@@ -129,25 +222,11 @@ pub fn render_with_input(
         redraw_only_on_state_change,
         stop_if_empty_progress,
     } = options;
-    let mut terminal = {
-        let stdout = io::stdout().into_raw_mode()?;
-        let stdout = AlternateScreen::from(stdout);
-        let backend = TermionBackend::new(stdout);
-        Terminal::new(backend)?
-    };
+    let mut terminal = new_terminal()?;
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
-    let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
-
-    // This brings blocking key-handling into the async world
-    std::thread::spawn(move || -> Result<(), io::Error> {
-        for key in io::stdin().keys() {
-            let key = key?;
-            smol::block_on(key_send.send(key)).ok();
-        }
-        Ok(())
-    });
+    let key_receive = key_input_stream();
 
     let render_fut = async move {
         let mut state = draw::State {

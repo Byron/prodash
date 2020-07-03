@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "4.1.0"
+version = "5.0.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -14,7 +14,16 @@ doctest = true
 
 [features]
 default = ["tui-renderer", "log-renderer", "localtime"]
-tui-renderer = ["tui", "tui-react", "termion", "futures-channel", "smol", "futures-util", "futures-core", "unicode-segmentation", "unicode-width", "humantime" ]
+tui-renderer = ["tui",
+                "tui-react",
+                "termion",
+                "futures-channel",
+                "smol",
+                "futures-util",
+                "futures-core",
+                "unicode-segmentation",
+                "unicode-width",
+                "humantime"]
 log-renderer = ["log"]
 localtime = ["time"]
 
@@ -40,6 +49,7 @@ futures-channel = { version = "0.3.5", optional = true }
 
 # localtime support for tui-renderer
 time = { version = "0.2.9", optional = true, features = ["std"], default-features = false }
+crossterm = { version = "0.17.5", optional = true }
 
 [dev-dependencies]
 rand = "0.7.3"
