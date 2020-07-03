@@ -10,7 +10,7 @@ feature-check: ## build features in commmon combination to be sure it all stays 
 	cargo check --no-default-features
 	cargo check --features with-crossterm
 	cargo check --features with-termion
-	cargo check
+	if cargo check; then false; fi # should fail as we are missing a backend choice
 
 unit-test: ## Run all unit tests
 	cargo test --examples

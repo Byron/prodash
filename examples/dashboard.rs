@@ -258,7 +258,7 @@ fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event
 
     ticker(Duration::from_millis(100))
         .map(move |_| {
-            let (width, height) = termion::terminal_size().unwrap_or((30, 30));
+            let (width, height) = crossterm::terminal::size().unwrap_or((30, 30));
             let (ref mut ofs_x, ref mut ofs_y) = offset_xy;
             let min_size = 2;
             match direction {
