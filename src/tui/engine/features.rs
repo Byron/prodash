@@ -181,7 +181,7 @@ pub mod _impl {
     use tui_react::Terminal;
 
     pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
-        unimplemented!("use either the 'termion' or the 'crossterm' feature");
+        compile_error!("use either the 'termion' or the 'crossterm' feature")
     }
 
     pub fn new_terminal() -> Result<Terminal<TestBackend>, io::Error> {
