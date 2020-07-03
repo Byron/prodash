@@ -214,12 +214,12 @@ mod _impl {
 #[cfg(all(feature = "crossterm", not(feature = "termion")))]
 mod _impl {
     use crate::tui::input::Key;
-    use crossterm::terminal::disable_raw_mode;
     use crossterm::{
         execute,
-        terminal::{enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     };
     use futures_util::SinkExt;
+    use std::convert::TryInto;
     use std::io;
     use tui::backend::CrosstermBackend;
     use tui_react::Terminal;
@@ -270,8 +270,18 @@ mod _impl {
         let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
         // This brings blocking key-handling into the async world
         std::thread::spawn(move || -> Result<(), io::Error> {
-            unimplemented!("todo: key processing");
-            Ok(())
+            loop {
+                let event = crossterm::event::read().map_err(into_io_error)?;
+                match event {
+                    crossterm::event::Event::Key(key) => {
+                        let key: Result<Key, _> = key.try_into();
+                        if let Ok(key) = key {
+                            smol::block_on(key_send.send(key)).ok();
+                        }
+                    }
+                    _ => continue,
+                };
+            }
         });
         key_receive
     }
