@@ -178,6 +178,22 @@ mod _impl {
     }
 }
 
+#[cfg(not(any(feature = "termion", feature = "crossterm")))]
+mod _impl {
+    use crate::tui::engine::input::Key;
+    use std::io;
+    use tui::backend::TestBackend;
+    use tui_react::Terminal;
+
+    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        unimplemented!("use either the 'termion' or the 'crossterm' feature");
+    }
+
+    pub fn new_terminal() -> Result<Terminal<TestBackend>, io::Error> {
+        Terminal::new(TestBackend::new(100, 100))
+    }
+}
+
 use _impl::{key_input_stream, new_terminal};
 
 /// An event to be sent in the [`tui::render_with_input(…events)`](./fn.render_with_input.html) stream.

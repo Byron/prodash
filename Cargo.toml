@@ -16,7 +16,6 @@ doctest = true
 default = ["tui-renderer", "log-renderer", "localtime"]
 tui-renderer = ["tui",
                 "tui-react",
-                "termion",
                 "futures-channel",
                 "smol",
                 "futures-util",
