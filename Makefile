@@ -8,6 +8,8 @@ help:  ## Display this help
 feature-check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features
 	cargo check --no-default-features
+	cargo check --features with-crossterm
+	cargo check --features with-termion
 	cargo check
 
 unit-test: ## Run all unit tests
