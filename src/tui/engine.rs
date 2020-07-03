@@ -145,7 +145,7 @@ pub mod input {
         type Error = crossterm::event::KeyEvent;
 
         fn try_from(value: KeyEvent) -> Result<Self, Self::Error> {
-            use crossterm::event::KeyCode::*;
+            use crossterm::event::{KeyCode::*, KeyModifiers};
             Ok(match value.code {
                 Backspace => Key::Backspace,
                 Enter => Key::Char('\n'),
@@ -164,8 +164,12 @@ pub mod input {
                 F(k) => Key::F(k),
                 Null => Key::Null,
                 Esc => Key::Esc,
-                Char(c) => Key::Char(c),
-                _ => return Err(value),
+                Char(c) => match value.modifiers {
+                    KeyModifiers::SHIFT => Key::Char(c),
+                    KeyModifiers::CONTROL => Key::Ctrl(c),
+                    KeyModifiers::ALT => Key::Alt(c),
+                    _ => return Err(value),
+                },
             })
         }
     }
