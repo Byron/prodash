@@ -108,8 +108,23 @@ pub mod input {
         Null,
         Esc,
     }
+}
 
-    #[cfg(feature = "termion")]
+use input::Key;
+
+#[cfg(feature = "termion")]
+mod _impl {
+    use crate::tui::input::Key;
+    use futures_util::SinkExt;
+    use std::{convert::TryInto, io};
+    use termion::{
+        input::TermRead,
+        raw::{IntoRawMode, RawTerminal},
+        screen::AlternateScreen,
+    };
+    use tui::backend::TermionBackend;
+    use tui_react::Terminal;
+
     impl std::convert::TryFrom<termion::event::Key> for Key {
         type Error = termion::event::Key;
 
@@ -138,55 +153,6 @@ pub mod input {
             })
         }
     }
-    #[cfg(feature = "crossterm")]
-    impl std::convert::TryFrom<crossterm::event::KeyEvent> for Key {
-        type Error = crossterm::event::KeyEvent;
-
-        fn try_from(value: crossterm::event::KeyEvent) -> Result<Self, Self::Error> {
-            use crossterm::event::{KeyCode::*, KeyModifiers};
-            Ok(match value.code {
-                Backspace => Key::Backspace,
-                Enter => Key::Char('\n'),
-                Left => Key::Left,
-                Right => Key::Right,
-                Up => Key::Up,
-                Down => Key::Down,
-                Home => Key::Home,
-                End => Key::End,
-                PageUp => Key::PageUp,
-                PageDown => Key::PageDown,
-                Tab => Key::Char('\t'),
-                BackTab => Key::BackTab,
-                Delete => Key::Delete,
-                Insert => Key::Insert,
-                F(k) => Key::F(k),
-                Null => Key::Null,
-                Esc => Key::Esc,
-                Char(c) => match value.modifiers {
-                    KeyModifiers::NONE | KeyModifiers::SHIFT => Key::Char(c),
-                    KeyModifiers::CONTROL => Key::Ctrl(c),
-                    KeyModifiers::ALT => Key::Alt(c),
-                    _ => return Err(value),
-                },
-            })
-        }
-    }
-}
-
-use input::Key;
-
-#[cfg(feature = "termion")]
-mod _impl {
-    use crate::tui::input::Key;
-    use futures_util::SinkExt;
-    use std::{convert::TryInto, io};
-    use termion::{
-        input::TermRead,
-        raw::{IntoRawMode, RawTerminal},
-        screen::AlternateScreen,
-    };
-    use tui::backend::TermionBackend;
-    use tui_react::Terminal;
 
     pub fn new_terminal(
     ) -> Result<Terminal<TermionBackend<AlternateScreen<RawTerminal<io::Stdout>>>>, io::Error> {
@@ -219,10 +185,42 @@ mod _impl {
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     };
     use futures_util::SinkExt;
-    use std::convert::TryInto;
-    use std::io;
+    use std::{convert::TryInto, io};
     use tui::backend::CrosstermBackend;
     use tui_react::Terminal;
+
+    impl std::convert::TryFrom<crossterm::event::KeyEvent> for Key {
+        type Error = crossterm::event::KeyEvent;
+
+        fn try_from(value: crossterm::event::KeyEvent) -> Result<Self, Self::Error> {
+            use crossterm::event::{KeyCode::*, KeyModifiers};
+            Ok(match value.code {
+                Backspace => Key::Backspace,
+                Enter => Key::Char('\n'),
+                Left => Key::Left,
+                Right => Key::Right,
+                Up => Key::Up,
+                Down => Key::Down,
+                Home => Key::Home,
+                End => Key::End,
+                PageUp => Key::PageUp,
+                PageDown => Key::PageDown,
+                Tab => Key::Char('\t'),
+                BackTab => Key::BackTab,
+                Delete => Key::Delete,
+                Insert => Key::Insert,
+                F(k) => Key::F(k),
+                Null => Key::Null,
+                Esc => Key::Esc,
+                Char(c) => match value.modifiers {
+                    KeyModifiers::NONE | KeyModifiers::SHIFT => Key::Char(c),
+                    KeyModifiers::CONTROL => Key::Ctrl(c),
+                    KeyModifiers::ALT => Key::Alt(c),
+                    _ => return Err(value),
+                },
+            })
+        }
+    }
 
     pub struct AlternateScreen<T: io::Write> {
         inner: T,
