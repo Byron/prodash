@@ -68,3 +68,6 @@ argh = "0.1.3"
 name = "usage"
 path = "benches/usage.rs"
 harness = false
+
+[workspace]
+members = ["crosstermion"]

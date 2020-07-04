@@ -1,5 +1,5 @@
 [package]
-name = "crosstermium"
+name = "crosstermion"
 version = "0.1.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "The unification of crossterm and termium behind a common facade for use with feature flags"
@@ -9,4 +9,9 @@ license = "MIT"
 repository = "https://github.com/Byron/prodash"
 readme = "README.md"
 
+[features]
+default = []
+
 [dependencies]
+crossterm = { version = "0.17.5", optional = true, default-features = false }
+termion = { version = "1.5.5", optional = true, default-features = false }
