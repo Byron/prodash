@@ -23,7 +23,7 @@ pub enum Key {
 
 #[cfg(feature = "crossterm")]
 mod _impl {
-    use crate::input::Key;
+    use super::Key;
 
     impl std::convert::TryFrom<crossterm::event::KeyEvent> for Key {
         type Error = crossterm::event::KeyEvent;
@@ -57,13 +57,36 @@ mod _impl {
             })
         }
     }
+
+    #[cfg(feature = "futures-channel")]
+    pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        use std::{convert::TryInto, io};
+
+        let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
+        // NOTE: Even though crossterm has support for async event streams, it will use MIO in this
+        // case and pull in even more things that we simply don't need for that. A thread and blocking
+        // IO will do just fine.
+        std::thread::spawn(move || -> Result<(), io::Error> {
+            loop {
+                let event = crossterm::event::read().map_err(into_io_error)?;
+                match event {
+                    crossterm::event::Event::Key(key) => {
+                        let key: Result<Key, _> = key.try_into();
+                        if let Ok(key) = key {
+                            smol::block_on(key_send.send(key)).ok();
+                        };
+                    }
+                    _ => continue,
+                };
+            }
+        });
+        key_receive
+    }
 }
 
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
 pub mod _impl {
-    use crate::tui::input::Key;
-    use std::convert::TryInto;
-    use termion::event::Key;
+    use super::Key;
 
     impl std::convert::TryFrom<termion::event::Key> for Key {
         type Error = termion::event::Key;
@@ -92,5 +115,23 @@ pub mod _impl {
                 _ => return Err(value),
             })
         }
+    }
+
+    #[cfg(feature = "futures-channel")]
+    pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        use std::{convert::TryInto, io};
+
+        let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
+        // This brings blocking key-handling into the async world
+        std::thread::spawn(move || -> Result<(), io::Error> {
+            for key in io::stdin().keys() {
+                let key: Result<Key, _> = key?.try_into();
+                if let Ok(key) = key {
+                    smol::block_on(key_send.send(key)).ok();
+                }
+            }
+            Ok(())
+        });
+        key_receive
     }
 }

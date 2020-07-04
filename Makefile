@@ -5,7 +5,7 @@ help:  ## Display this help
 
 ##@ Testing
 
-feature-check: ## build features in commmon combination to be sure it all stays together
+check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features
 	cargo check --no-default-features
 	cargo check --features with-crossterm
@@ -13,11 +13,12 @@ feature-check: ## build features in commmon combination to be sure it all stays 
 	cargo check
 	# should fail as we are missing a backend choice
 	if cargo check --no-default-features --features tui-renderer; then false; fi
+	$(MAKE) -C crosstermion check
 
 unit-test: ## Run all unit tests
 	cargo test --examples
 
-tests: feature-check unit-test ## Run all tests we have
+tests: check unit-test ## Run all tests we have
 
 bench: ## Run criterion based benchmark, works on stable Rust
 	cargo bench
