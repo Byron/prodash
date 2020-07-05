@@ -17,6 +17,11 @@ jobs:
       run: cargo clippy
     - name: tests
       run: make tests
+    - name: "Check (termion)"
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+        args: --no-default-features --features=with-termion,tui-renderer --all --bins --tests --examples
     - name: benchmarks
       run: make bench
 
