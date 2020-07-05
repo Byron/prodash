@@ -6,6 +6,10 @@ mod _impl {
     };
     use std::io;
 
+    /// A utility writer to activate an alternate screen in raw mode on instantiation, and resets to previous settings on drop.
+    ///
+    /// Additionally, it will activate _raw_ mode, which causes user input not to show on screen,
+    /// and gets handled byte by byte.
     pub struct AlternateRawScreen<T: io::Write> {
         inner: T,
     }
@@ -47,10 +51,14 @@ mod _impl {
         }
     }
 
+    /// Utilities for terminal user interface powered by `tui` or `tui-react`.
+    ///
+    /// Requires the `tui-react` and `tui-crossterm-backend` features set.
     #[cfg(all(feature = "tui-crossterm-backend", feature = "tui-react"))]
     pub mod tui {
         use tui::backend::CrosstermBackend;
 
+        /// Returns a new Terminal instance with a suitable backend.
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui_react::Terminal<CrosstermBackend<W>>, std::io::Error> {

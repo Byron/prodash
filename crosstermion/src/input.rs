@@ -25,6 +25,7 @@ pub enum Key {
 mod _impl {
     use super::Key;
 
+    /// Convert from `crossterm::event::KeyEvent`
     impl std::convert::TryFrom<crossterm::event::KeyEvent> for Key {
         type Error = crossterm::event::KeyEvent;
 
@@ -58,8 +59,11 @@ mod _impl {
         }
     }
 
+    /// Return a stream of user input events.
+    ///
+    /// Requires feature `futures-channel`
     #[cfg(feature = "futures-channel")]
-    pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
 
@@ -89,6 +93,7 @@ mod _impl {
 mod _impl {
     use super::Key;
 
+    /// Convert from `termion::event::Key`
     impl std::convert::TryFrom<termion::event::Key> for Key {
         type Error = termion::event::Key;
 
@@ -118,8 +123,11 @@ mod _impl {
         }
     }
 
+    /// Return a stream of user input events.
+    ///
+    /// Requires feature `futures-channel`
     #[cfg(feature = "futures-channel")]
-    pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
         use termion::input::TermRead;
