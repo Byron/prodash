@@ -60,6 +60,14 @@ mod _impl {
 
     #[cfg(feature = "futures-channel")]
     pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        fn into_io_error(err: crossterm::ErrorKind) -> io::Error {
+            if let crossterm::ErrorKind::IoError(err) = err {
+                return err;
+            }
+            unimplemented!("we cannot currently handle non-io errors reported by crossterm")
+        }
+
+        use futures_util::SinkExt;
         use std::{convert::TryInto, io};
 
         let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
@@ -119,7 +127,9 @@ pub mod _impl {
 
     #[cfg(feature = "futures-channel")]
     pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
+        use futures_util::SinkExt;
         use std::{convert::TryInto, io};
+        use termion::input::TermRead;
 
         let (mut key_send, key_receive) = futures_channel::mpsc::channel::<Key>(1);
         // This brings blocking key-handling into the async world
@@ -135,3 +145,5 @@ pub mod _impl {
         key_receive
     }
 }
+
+pub use _impl::*;
