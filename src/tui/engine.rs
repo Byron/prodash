@@ -86,7 +86,7 @@ pub(crate) enum InterruptDrawInfo {
 }
 
 use crosstermion::{
-    input::{input_stream, Key},
+    input::{key_input_stream, Key},
     terminal::{tui::new_terminal, AlternateRawScreen},
 };
 
@@ -136,7 +136,7 @@ pub fn render_with_input(
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
-    let key_receive = input_stream();
+    let key_receive = key_input_stream();
 
     let render_fut = async move {
         let mut state = draw::State {
