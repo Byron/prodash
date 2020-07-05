@@ -11,8 +11,6 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features with-crossterm
 	cargo check --features with-termion
 	cargo check
-	# should fail as we are missing a backend choice
-	if cargo check --no-default-features --features tui-renderer; then false; fi
 	$(MAKE) -C crosstermion check
 
 unit-test: ## Run all unit tests

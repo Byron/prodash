@@ -35,26 +35,26 @@ mod _impl {
         }
     }
 
-    #[cfg(all(feature = "tui/crossterm", not(feature = "tui-react")))]
+    #[cfg(all(feature = "tui-crossterm-backend", not(feature = "tui-react")))]
     pub mod tui {
         use tui::backend::CrosstermBackend;
 
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui::Terminal<CrosstermBackend<W>>, std::io::Error> {
-            let backend = CrosstermBackend::new(W);
+            let backend = CrosstermBackend::new(write);
             Ok(tui::Terminal::new(backend)?)
         }
     }
 
-    #[cfg(all(feature = "tui/crossterm", feature = "tui-react"))]
+    #[cfg(all(feature = "tui-crossterm-backend", feature = "tui-react"))]
     pub mod tui {
         use tui::backend::CrosstermBackend;
 
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui_react::Terminal<CrosstermBackend<W>>, std::io::Error> {
-            let backend = CrosstermBackend::new(W);
+            let backend = CrosstermBackend::new(write);
             Ok(tui_react::Terminal::new(backend)?)
         }
     }
@@ -89,18 +89,19 @@ mod _impl {
         }
     }
 
-    #[cfg(all(feature = "tui/termion", not(feature = "tui-react")))]
+    #[cfg(all(feature = "tui-termion-backend", not(feature = "tui-react")))]
     pub mod tui {
         use tui::backend::TermionBackend;
 
         pub fn new_terminal<W: std::io::Write>(
+            write: W,
         ) -> Result<tui::Terminal<TermionBackend<W>>, std::io::Error> {
-            let backend = TermionBackend::new(W);
+            let backend = TermionBackend::new(write);
             Ok(tui::Terminal::new(backend)?)
         }
     }
 
-    #[cfg(all(feature = "tui/termion", feature = "tui-react"))]
+    #[cfg(all(feature = "tui-termion-backend", feature = "tui-react"))]
     pub mod tui {
         use tui::backend::TermionBackend;
 

@@ -86,7 +86,7 @@ mod _impl {
 }
 
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
-pub mod _impl {
+mod _impl {
     use super::Key;
 
     impl std::convert::TryFrom<termion::event::Key> for Key {

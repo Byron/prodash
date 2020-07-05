@@ -85,35 +85,10 @@ pub(crate) enum InterruptDrawInfo {
     Deferred(bool),
 }
 
-pub mod input {
-    /// A set of possible key presses, equivalent to the one in `termion@1.5.5::event::Key`
-    #[derive(Debug, Clone, Copy)]
-    pub enum Key {
-        Backspace,
-        Left,
-        Right,
-        Up,
-        Down,
-        Home,
-        End,
-        PageUp,
-        PageDown,
-        BackTab,
-        Delete,
-        Insert,
-        F(u8),
-        Char(char),
-        Alt(char),
-        Ctrl(char),
-        Null,
-        Esc,
-    }
-}
-
-use input::Key;
-mod features;
-
-use features::_impl::{key_input_stream, new_terminal};
+use crosstermion::{
+    input::{input_stream, Key},
+    terminal::{tui::new_terminal, AlternateRawScreen},
+};
 
 /// An event to be sent in the [`tui::render_with_input(…events)`](./fn.render_with_input.html) stream.
 ///
@@ -157,11 +132,11 @@ pub fn render_with_input(
         redraw_only_on_state_change,
         stop_if_empty_progress,
     } = options;
-    let mut terminal = new_terminal()?;
+    let mut terminal = new_terminal(AlternateRawScreen::try_from(io::stdout())?)?;
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
-    let key_receive = key_input_stream();
+    let key_receive = input_stream();
 
     let render_fut = async move {
         let mut state = draw::State {
