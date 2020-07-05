@@ -13,6 +13,8 @@ readme = "README.md"
 default = []
 async = ["futures-channel", "futures-util", "futures-executor"]
 
+crossterm-async = ["crossterm/event-stream"]
+
 tui-termion = ["tui", "tui-termion-backend", "termion"]
 tui-react-termion = ["tui-react", "tui", "tui-termion-backend", "termion"]
 

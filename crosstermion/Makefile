@@ -10,6 +10,8 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features crossterm
 	cargo check --features termion
 	cargo check --features crossterm,async
+	cargo check --features crossterm,async,crossterm-async
+	cargo check --features async,crossterm-async
 	cargo check --features termion,async
 	cargo check --features crossterm,tui
 	cargo check --features termion,tui

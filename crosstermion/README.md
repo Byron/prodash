@@ -17,9 +17,16 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
     * **crossterm**
       * provides `Key` conversion support from `crossbeam::event::KeyEvent` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
+      * **async**
+        * Provides async key input via a futures `Stream`, by spawning a thead
+        * **crossterm-async**
+           * adds native async capabilites to crossterm, which works without spawning an extra thread thanks to `mio`.
+           * also activates `crossterm` dependency
     * **termion**
       * provides `Key` conversion support from `termion::event::Key` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
+      * **async**
+        * Provides async key input via a futures `Stream`, by spawning a thead
 * _mutually exclusive_
     * _using tui_ _(mutually exclusive)_
         * **tui-crossterm** 
@@ -31,7 +38,4 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
         * **tui-react-termion**
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
-* **async**
-   * needs `crossterm` or `termion` features
-   * Provides key input via a futures `Stream`
 
