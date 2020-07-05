@@ -51,14 +51,10 @@ mod _impl {
         }
     }
 
-    /// Utilities for terminal user interface powered by `tui` or `tui-react`.
-    ///
-    /// Requires the `tui-react` and `tui-crossterm-backend` features set.
     #[cfg(all(feature = "tui-crossterm-backend", feature = "tui-react"))]
     pub mod tui {
         use tui::backend::CrosstermBackend;
 
-        /// Returns a new Terminal instance with a suitable backend.
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui_react::Terminal<CrosstermBackend<W>>, std::io::Error> {
@@ -109,10 +105,14 @@ mod _impl {
         }
     }
 
+    /// Utilities for terminal user interface powered by `tui` or `tui-react`.
+    ///
+    /// Requires the `tui-react` and `tui-crossterm-backend` features set.
     #[cfg(all(feature = "tui-termion-backend", feature = "tui-react"))]
     pub mod tui {
         use tui::backend::TermionBackend;
 
+        /// Returns a new Terminal instance with a suitable backend.
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui_react::Terminal<TermionBackend<W>>, std::io::Error> {
