@@ -146,4 +146,5 @@ pub mod _impl {
     }
 }
 
+#[cfg(any(feature = "termion", feature = "crossterm"))]
 pub use _impl::*;
