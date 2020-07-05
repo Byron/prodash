@@ -11,8 +11,8 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features termion
 	cargo check --features crossterm,tui
 	cargo check --features termion,tui
-	cargo check --features crossterm,tui,tui-react
-	cargo check --features termion,tui,tui-react
+	cargo check --features crossterm,tui,tui/termion,tui-react
+	cargo check --features termion,tui,tui/crossterm,tui-react
 	cargo check --all-features
 
 
