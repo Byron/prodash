@@ -11,13 +11,17 @@ readme = "README.md"
 
 [features]
 default = []
-tui-termion-backend = ["tui/termion"]
-tui-crossterm-backend = ["tui/crossterm"]
+async = ["futures-channel", "futures-util", "smol"]
+
 tui-termion = ["tui", "tui-termion-backend", "termion"]
 tui-react-termion = ["tui-react", "tui", "tui-termion-backend", "termion"]
+
 tui-crossterm = ["tui", "tui-crossterm-backend", "crossterm"]
 tui-react-crossterm = ["tui-react", "tui", "tui-crossterm-backend", "crossterm"]
-async = ["futures-channel", "futures-util", "smol"]
+
+tui-termion-backend = ["tui/termion"] # redirect is needed to allow us to #[cfg(feature = "…")] against it. You can't see featuers of crates
+tui-crossterm-backend = ["tui/crossterm"]
+
 
 [dependencies]
 crossterm = { version = "0.17.5", optional = true, default-features = false }
