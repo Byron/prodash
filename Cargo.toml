@@ -15,7 +15,6 @@ doctest = true
 [[example]]
 name = "dashboard"
 path = "examples/dashboard.rs"
-required-features = ["with-crossterm", "tui-renderer", "localtime"]
 
 [features]
 default = ["log-renderer", "localtime"]

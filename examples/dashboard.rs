@@ -1,4 +1,12 @@
 #![deny(unsafe_code)]
+
+#[cfg(not(feature = "tui-renderer"))]
+compile_error!(
+    "The `tui-renderer` feature must be set, along with either `with-crossterm` or `with-termion`"
+);
+#[cfg(not(any(feature = "with-crossterm", feature = "with-termion")))]
+compile_error!("Please set either the 'with-crossterm' or 'with-termion' feature whne using the 'tui-renderer'");
+
 fn main() -> Result {
     env_logger::init();
 
