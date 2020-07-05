@@ -78,12 +78,15 @@ mod _impl {
                     crossterm::event::Event::Key(key) => {
                         let key: Result<Key, _> = key.try_into();
                         if let Ok(key) = key {
-                            futures_executor::block_on(key_send.send(key)).ok();
+                            if futures_executor::block_on(key_send.send(key)).is_err() {
+                                break;
+                            }
                         };
                     }
                     _ => continue,
                 };
             }
+            Ok(())
         });
         key_receive
     }
@@ -138,7 +141,9 @@ mod _impl {
             for key in io::stdin().keys() {
                 let key: Result<Key, _> = key?.try_into();
                 if let Ok(key) = key {
-                    futures_executor::block_on(key_send.send(key)).ok();
+                    if futures_executor::block_on(key_send.send(key)).is_err() {
+                        break;
+                    }
                 }
             }
             Ok(())
