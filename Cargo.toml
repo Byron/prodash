@@ -20,11 +20,11 @@ required-features = ["with-crossterm", "tui-renderer", "localtime"]
 [features]
 default = ["tui-renderer", "with-crossterm", "log-renderer", "localtime"]
 with-termion = ["termion", "crosstermion/tui-react-termion"]
-with-crossterm = ["crossterm", "crosstermion/tui-react-crossterm", "crosstermion/async"]
+with-crossterm = ["crossterm", "crosstermion/tui-react-crossterm"]
 tui-renderer = ["tui",
                 "unicode-segmentation",
                 "unicode-width",
-                "crosstermion/async",
+                "crosstermion/input-async",
                 "tui-react",
                 "futures-util",
                 "futures-core",
