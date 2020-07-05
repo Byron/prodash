@@ -35,6 +35,11 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v6.0.0 - Factor terminal input into the new `crosstermion` crate
+
+Due to this work, the default features changed, which is a breaking change for those who relied on it.
+Now when using the `tui-renderer`, one will also have to specify either the `with-crossbeam` or `with-termion` feature.
+
 ## v5.0.0 - Support for windows by using Crossbeam by default
 
 A first low-effort move to the latest version should be to set the dependency to
