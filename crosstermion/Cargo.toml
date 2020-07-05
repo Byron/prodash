@@ -11,6 +11,10 @@ readme = "README.md"
 
 [features]
 default = []
+tui-termion = ["tui", "tui/termion", "termion"]
+tui-react-termion = ["tui-react", "tui", "tui/termion", "termion"]
+tui-crossterm = ["tui", "tui/crossterm", "crossterm"]
+tui-react-crossterm = ["tui-react", "tui", "tui/crossterm", "crossterm"]
 async = ["futures-channel", "futures-util", "smol"]
 
 [dependencies]
