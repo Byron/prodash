@@ -31,14 +31,14 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
         * **input-async**
           * Spawn a thread and provide input events via a futures Stream
 * _mutually exclusive_
-    * _using tui_ _(mutually exclusive)_
-        * **tui-crossterm** 
-          * combines `tui` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+    * _using `tui_` _(mutually exclusive)_
         * **tui-termion**
           * combines `tui` with `termion` and provides a `tui::Terminal` with `termion` backend
-    * _using tui-react_ _(mutually exclusive)_
-        * **tui-react-crossterm**
-          * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+        * **tui-crossterm** 
+          * combines `tui` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+    * _using `tui-react`_ _(mutually exclusive)_
         * **tui-react-termion**
+          * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+        * **tui-react-crossterm**
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
 

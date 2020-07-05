@@ -85,6 +85,9 @@ pub(crate) enum InterruptDrawInfo {
     Deferred(bool),
 }
 
+#[cfg(not(any(feature = "with-crossterm", feature = "with-termion")))]
+compile_error!("Please set either the 'with-crossterm' or 'with-termion' feature whne using the 'tui-renderer'");
+
 use crosstermion::{
     input::{key_input_stream, Key},
     terminal::{tui::new_terminal, AlternateRawScreen},

@@ -21,7 +21,12 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: check
-        args: --no-default-features --features=with-termion,tui-renderer --all --bins --tests --examples
+        args: --features=with-termion --all --bins --tests --examples
+    - name: "Check (crossterm)"
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+        args: --features=with-crossterm --all --bins --tests --examples
     - name: benchmarks
       run: make bench
 

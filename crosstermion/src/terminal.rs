@@ -1,4 +1,4 @@
-#[cfg(feature = "crossterm")]
+#[cfg(all(feature = "crossterm", not(feature = "termion")))]
 mod _impl {
     use crossterm::{
         execute,
@@ -68,7 +68,7 @@ mod _impl {
     }
 }
 
-#[cfg(all(feature = "termion", not(feature = "crossterm")))]
+#[cfg(feature = "termion")]
 mod _impl {
     use std::io;
     pub use termion::screen::AlternateScreen;

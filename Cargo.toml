@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "5.0.0"
+version = "6.0.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -18,7 +18,7 @@ path = "examples/dashboard.rs"
 required-features = ["with-crossterm", "tui-renderer", "localtime"]
 
 [features]
-default = ["tui-renderer", "with-crossterm", "log-renderer", "localtime"]
+default = ["log-renderer", "localtime"]
 with-termion = ["crosstermion/tui-react-termion"]
 with-crossterm = ["crosstermion/tui-react-crossterm"]
 tui-renderer = ["tui",
