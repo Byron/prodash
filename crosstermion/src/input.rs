@@ -87,6 +87,31 @@ mod _impl {
         key_receive
     }
 
+    #[cfg(all(feature = "input-thread-flume", not(feature = "input-thread")))]
+    pub fn key_input_channel() -> flume::Receiver<Key> {
+        use std::convert::TryInto;
+
+        let (key_send, key_receive) = flume::bounded::<Key>(0);
+        std::thread::spawn(move || -> Result<(), std::io::Error> {
+            loop {
+                let event = crossterm::event::read().map_err(crate::crossterm::into_io_error)?;
+                match event {
+                    crossterm::event::Event::Key(key) => {
+                        let key: Result<Key, _> = key.try_into();
+                        if let Ok(key) = key {
+                            if key_send.send(key).is_err() {
+                                break;
+                            }
+                        };
+                    }
+                    _ => continue,
+                };
+            }
+            Ok(())
+        });
+        key_receive
+    }
+
     /// Return a stream of key input Events
     ///
     /// Requires the `input-async` feature.
@@ -170,6 +195,26 @@ mod _impl {
         use termion::input::TermRead;
 
         let (key_send, key_receive) = crossbeam_channel::bounded::<Key>(1);
+        std::thread::spawn(move || -> Result<(), io::Error> {
+            for key in io::stdin().keys() {
+                let key: Result<Key, _> = key?.try_into();
+                if let Ok(key) = key {
+                    if key_send.send(key).is_err() {
+                        break;
+                    }
+                }
+            }
+            Ok(())
+        });
+        key_receive
+    }
+
+    #[cfg(all(feature = "input-thread-flume", not(feature = "input-thread")))]
+    pub fn key_input_channel() -> flume::Receiver<Key> {
+        use std::{convert::TryInto, io};
+        use termion::input::TermRead;
+
+        let (key_send, key_receive) = flume::bounded::<Key>(1);
         std::thread::spawn(move || -> Result<(), io::Error> {
             for key in io::stdin().keys() {
                 let key: Result<Key, _> = key?.try_into();
