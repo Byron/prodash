@@ -2,30 +2,23 @@
 mod _impl {
     use crossterm::{
         execute,
-        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+        terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
     };
     use std::io;
 
-    pub struct AlternateScreen<T: io::Write> {
+    pub struct AlternateRawScreen<T: io::Write> {
         inner: T,
     }
 
-    fn into_io_error(err: crossterm::ErrorKind) -> io::Error {
-        if let crossterm::ErrorKind::IoError(err) = err {
-            return err;
-        }
-        unimplemented!("we cannot currently handle non-io errors reported by crossterm")
-    }
-
-    impl<T: io::Write> AlternateScreen<T> {
-        pub fn new(mut write: T) -> Result<AlternateScreen<T>, io::Error> {
-            enable_raw_mode().map_err(into_io_error)?;
-            execute!(write, EnterAlternateScreen).map_err(into_io_error)?;
-            Ok(AlternateScreen { inner: write })
+    impl<T: io::Write> AlternateRawScreen<T> {
+        pub fn try_from(mut write: T) -> Result<Self, io::Error> {
+            terminal::enable_raw_mode().map_err(crate::crossterm::into_io_error)?;
+            execute!(write, EnterAlternateScreen).map_err(crate::crossterm::into_io_error)?;
+            Ok(AlternateRawScreen { inner: write })
         }
     }
 
-    impl<T: io::Write> io::Write for AlternateScreen<T> {
+    impl<T: io::Write> io::Write for AlternateRawScreen<T> {
         fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
             self.inner.write(buf)
         }
@@ -35,9 +28,9 @@ mod _impl {
         }
     }
 
-    impl<T: io::Write> Drop for AlternateScreen<T> {
+    impl<T: io::Write> Drop for AlternateRawScreen<T> {
         fn drop(&mut self) {
-            disable_raw_mode().ok();
+            terminal::disable_raw_mode().ok();
             execute!(self.inner, LeaveAlternateScreen).ok();
         }
     }
@@ -69,7 +62,32 @@ mod _impl {
 
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
 mod _impl {
+    use std::io;
     pub use termion::screen::AlternateScreen;
+
+    pub struct AlternateRawScreen<T: io::Write> {
+        inner: termion::screen::AlternateScreen<T>,
+    }
+
+    impl<T: io::Write> AlternateRawScreen<termion::raw::RawTerminal<T>> {
+        pub fn try_from(write: T) -> Result<Self, io::Error> {
+            use termion::raw::IntoRawMode;
+            let write = write.into_raw_mode()?;
+            Ok(AlternateRawScreen {
+                inner: termion::screen::AlternateScreen::from(write),
+            })
+        }
+    }
+
+    impl<T: io::Write> io::Write for AlternateRawScreen<T> {
+        fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+            self.inner.write(buf)
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            self.inner.flush()
+        }
+    }
 
     #[cfg(all(feature = "tui/termion", not(feature = "tui-react")))]
     pub mod tui {
@@ -89,7 +107,7 @@ mod _impl {
         pub fn new_terminal<W: std::io::Write>(
             write: W,
         ) -> Result<tui_react::Terminal<TermionBackend<W>>, std::io::Error> {
-            let backend = TermionBackend::new(W);
+            let backend = TermionBackend::new(write);
             Ok(tui_react::Terminal::new(backend)?)
         }
     }

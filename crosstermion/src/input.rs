@@ -60,13 +60,6 @@ mod _impl {
 
     #[cfg(feature = "futures-channel")]
     pub fn input_stream() -> futures_channel::mpsc::Receiver<Key> {
-        fn into_io_error(err: crossterm::ErrorKind) -> io::Error {
-            if let crossterm::ErrorKind::IoError(err) = err {
-                return err;
-            }
-            unimplemented!("we cannot currently handle non-io errors reported by crossterm")
-        }
-
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
 
@@ -76,7 +69,7 @@ mod _impl {
         // IO will do just fine.
         std::thread::spawn(move || -> Result<(), io::Error> {
             loop {
-                let event = crossterm::event::read().map_err(into_io_error)?;
+                let event = crossterm::event::read().map_err(crate::crossterm::into_io_error)?;
                 match event {
                     crossterm::event::Event::Key(key) => {
                         let key: Result<Key, _> = key.try_into();
