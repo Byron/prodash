@@ -63,7 +63,7 @@ mod _impl {
     ///
     /// Requires feature `futures-channel`
     #[cfg(feature = "futures-channel")]
-    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
+    pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = Key> {
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
 
@@ -130,7 +130,7 @@ mod _impl {
     ///
     /// Requires feature `futures-channel`
     #[cfg(feature = "futures-channel")]
-    pub fn key_input_stream() -> futures_channel::mpsc::Receiver<Key> {
+    pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = Key> {
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
         use termion::input::TermRead;
