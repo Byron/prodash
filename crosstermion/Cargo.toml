@@ -13,7 +13,7 @@ readme = "README.md"
 default = []
 
 input-async = ["futures-channel", "futures-util", "futures-executor", "crossterm/event-stream"]
-input-threaded = ["crossbeam-channel"]
+input-thread = ["crossbeam-channel"]
 
 tui-termion = ["tui", "tui-termion-backend", "termion"]
 tui-react-termion = ["tui-react", "tui", "tui-termion-backend", "termion"]

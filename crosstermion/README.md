@@ -17,7 +17,7 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
     * **crossterm**
       * provides `Key` conversion support from `crossbeam::event::KeyEvent` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
-      * _mutually exclusive_
+      * _additive_
         * **input-thread**
           * Adds input handling by spawning a thread providing input via `crossbeam` channels (which can be selected on)
         * **input-async**
@@ -25,7 +25,7 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
     * **termion**
       * provides `Key` conversion support from `termion::event::Key` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
-      * _mutually exclusive_
+      * _additive_
         * **input-thread**
           * Adds input handling by spawning a thread providing input via crossbeam channels (which can be selected on)
         * **input-async**

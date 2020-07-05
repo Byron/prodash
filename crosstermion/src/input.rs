@@ -61,9 +61,9 @@ mod _impl {
 
     /// Return a receiver of user input events to avoid blocking the main thread.
     ///
-    /// Requires feature `futures-channel`
-    #[cfg(feature = "input-threaded")]
-    pub fn key_input_stream() -> crossbeam_channel::Receiver<Key> {
+    /// Requires feature `input-thread`
+    #[cfg(feature = "input-thread")]
+    pub fn key_input_channel() -> crossbeam_channel::Receiver<Key> {
         use std::convert::TryInto;
 
         let (key_send, key_receive) = crossbeam_channel::bounded::<Key>(0);
@@ -87,7 +87,10 @@ mod _impl {
         key_receive
     }
 
-    #[cfg(all(feature = "input-async", not(feature = "input-threaded")))]
+    /// Return a stream of key input Events
+    ///
+    /// Requires the `input-async` feature.
+    #[cfg(feature = "input-async")]
     pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = Key> {
         use futures_util::StreamExt;
         use std::convert::TryFrom;
@@ -139,7 +142,7 @@ mod _impl {
     /// Return a stream of user input events.
     ///
     /// Requires feature `futures-channel`
-    #[cfg(all(feature = "input-async", not(feature = "input-threaded")))]
+    #[cfg(feature = "input-async")]
     pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = Key> {
         use futures_util::SinkExt;
         use std::{convert::TryInto, io};
@@ -161,8 +164,8 @@ mod _impl {
         key_receive
     }
 
-    #[cfg(feature = "input-threaded")]
-    pub fn key_input_stream() -> crossbeam_channel::Receiver<Key> {
+    #[cfg(feature = "input-thread")]
+    pub fn key_input_channel() -> crossbeam_channel::Receiver<Key> {
         use std::{convert::TryInto, io};
         use termion::input::TermRead;
 
