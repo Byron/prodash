@@ -16,6 +16,18 @@ Currently provided facilities are:
     * Otherwise, using `colored` or `termcolor` will work as expected.
     * As both options are quite highly abstracted, whereas the color and style of `crossterm` and `termion` are not, it would probably
       not be unwise to provide an adapter type similar to `crate::input::Key` in this crate, but for color and styles.
+      
+### How to build with `crossterm` on Windows and `termion` on Unix?
+
+There seems to be no easy way, as `cargo` will always build dependencies even though they are not supposed to be used on your platform.
+This leads to both `termion` and `crossterm` to be built, which is fatal on Windows. Thus one will have to manually select feature toggles
+when creating a release build, i.e. one would have to exclude all functionality that requires TUIs by default, and let the user enable
+the features they require.
+
+The `compile_error!(…)` macro can be useful to inform users if feature selection is required. Alternatively, assure that everything compiles
+even without any selected backend.
+
+Lastly, one can always give in and always compile against `crossterm`.
 
 ### Features
 
