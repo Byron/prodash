@@ -8,6 +8,15 @@ Currently provided facilities are:
 * an `AltenrativeRawTerminal` which marries an alternative screen with raw mode
 * a way to create a `tui` or `tui-react` terminal with either the crossterm or the termion backend.
 
+### But how to do colors and styles?
+
+* **With** `tui`
+    * When using the `tui`, you will have native cross-backend support for colors and styles.
+* **Without** `tui`
+    * Otherwise, using `colored` or `termcolor` will work as expected.
+    * As both options are quite highly abstracted, whereas the color and style of `crossterm` and `termion` are not, it would probably
+      not be unwise to provide an adapter type similar to `crate::input::Key` in this crate, but for color and styles.
+
 ### Features
 
 All features work additively, but in case they are mutually exclusive, for instance
