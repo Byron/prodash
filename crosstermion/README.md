@@ -38,13 +38,16 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
           * Spawn a thread and provide input events via a futures Stream
 * _mutually exclusive_
     * _using `tui_` _(mutually exclusive)_
-        * **tui-termion**
+        * **tui-termion** _implies `termion` feature_
           * combines `tui` with `termion` and provides a `tui::Terminal` with `termion` backend
-        * **tui-crossterm** 
+        * **tui-crossterm**  _implies `crossterm` feature_
           * combines `tui` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
     * _using `tui-react`_ _(mutually exclusive)_
-        * **tui-react-termion**
+        * **tui-react-termion** _implies `termion` feature_
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
-        * **tui-react-crossterm**
+        * **tui-react-crossterm** _implies `crossterm` feature_
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+* **flume-async**
+   * activates 'flume/async'
+   * note that 'flume/select' is always active, as it is just a few lines of code without any additional dependencies
 
