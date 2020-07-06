@@ -1,6 +1,6 @@
 [package]
 name = "crosstermion"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "The unification of crossterm and termion behind a common facade for use with feature flags"
 edition = "2018"

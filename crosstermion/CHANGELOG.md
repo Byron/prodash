@@ -1,3 +1,7 @@
+#### v0.1.4
+
+* Fix precendence of imports in 'terminal' module.
+
 #### v0.1.3
 
 * `Key` type conversions are now always compiled when possible, as they are not mutually exclusive
