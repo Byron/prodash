@@ -1,3 +1,7 @@
+#### v0.1.3
+
+* `Key` type conversions are now always compiled when possible, as they are not mutually exclusive
+
 #### v0.1.2
 
 * Enable `flume/select` by default and allow selecting `flume/async` via the `flume-async` feature.
