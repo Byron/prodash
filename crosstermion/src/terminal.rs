@@ -1,4 +1,4 @@
-#[cfg(all(feature = "crossterm", not(feature = "termion")))]
+#[cfg(feature = "crossterm")]
 mod _impl {
     use crossterm::{
         execute,
@@ -16,8 +16,8 @@ mod _impl {
 
     impl<T: io::Write> AlternateRawScreen<T> {
         pub fn try_from(mut write: T) -> Result<Self, io::Error> {
-            terminal::enable_raw_mode().map_err(crate::crossterm::into_io_error)?;
-            execute!(write, EnterAlternateScreen).map_err(crate::crossterm::into_io_error)?;
+            terminal::enable_raw_mode().map_err(crate::crossterm_utils::into_io_error)?;
+            execute!(write, EnterAlternateScreen).map_err(crate::crossterm_utils::into_io_error)?;
             Ok(AlternateRawScreen { inner: write })
         }
     }
@@ -64,10 +64,10 @@ mod _impl {
     }
 }
 
-#[cfg(feature = "termion")]
+#[cfg(all(feature = "termion", not(feature = "crossterm")))]
 mod _impl {
     use std::io;
-    pub use termion::screen::AlternateScreen;
+    use termion::screen::AlternateScreen;
 
     pub struct AlternateRawScreen<T: io::Write> {
         inner: termion::screen::AlternateScreen<T>,

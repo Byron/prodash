@@ -7,4 +7,4 @@ pub mod input;
 pub mod terminal;
 
 #[cfg(feature = "crossterm")]
-mod crossterm;
+mod crossterm_utils;
