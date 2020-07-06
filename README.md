@@ -23,18 +23,27 @@ This crate comes with various cargo features to tailor it to your needs.
 * **log-renderer** _(default)_
   * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
     `tree::Item::message(…)` and friends.
-* **tui-renderer** _(default)_
-  * Provide a terminal user interface visualizing every detail of the current progress state.
+* **line-renderer**
+  * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
+  * It's like the tui-renderer, but with far less dependencies and less visual fidelity - all it needs is to move
+    the cursor a little while drawing characters and block graphics.
   * Requires one of these additional feature flags to be set to be functional
     ** _(one required, mutually exclusive)_
-       * **with-crossterm**
+       * **line-renderer-crossterm** - use the _crossterm_ backend, useful for working on windows
+       * **line-renderer-termion** - use the _termion_ backend, useful for lean unix-only builds
+* **tui-renderer**
+  * Provide a terminal user interface visualizing every detail of the current progress state. It treats the terminal
+    as a matrix display.
+  * Requires one of these additional feature flags to be set to be functional
+    ** _(one required, mutually exclusive)_
+       * **tui-renderer-crossterm**
          * Use the `crossterm` crate as terminal backend
          * Works everywhere natively, but has more dependencies
-         * You can set additional features like this `cargo build --features with-crossterm,crossterm/event-stream`
-       * **with-termion**
+         * You can set additional features like this `cargo build --features tui-renderer-crossterm,crossterm/event-stream`
+       * **tui-renderer-termion**
          * Use the `termion` crate as terminal backend 
          * It has less dependencies but works only on `unix` systems
-         * to get this, disable default features and chose at least `tui-renderer` and `with-termion`.
+         * to get this, disable default features and chose at least `tui-renderer` and `tui-renderer-termion`.
 
 ## Features
 

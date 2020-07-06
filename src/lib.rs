@@ -35,18 +35,23 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 
 # Changelog
 
+## v7.0.0 - Add new line-renderer, change feature flag names
+
+* **with-crossterm** -> **tui-renderer-crossterm**
+* **with-termion** -> **tui-renderer-termion**
+
 ## v6.0.0 - Factor terminal input into the new `crosstermion` crate
 
 Due to this work, the default features changed, which is a breaking change for those who relied on it.
-Now when using the `tui-renderer`, one will also have to specify either the `with-crossbeam` or `with-termion` feature.
+Now when using the `tui-renderer`, one will also have to specify either the `with-crossbeam` or `tui-renderer-termion` feature.
 
 ## v5.0.0 - Support for windows by using Crossbeam by default
 
 A first low-effort move to the latest version should be to set the dependency to
-`default-features = false, features = ["tui-renderer", "with-termion", "localtime", "log-renderer"]`
+`default-features = false, features = ["tui-renderer", "tui-renderer-termion", "localtime", "log-renderer"]`
 to get the same configuration as before.
 
-To try crossbeam, use `with-crossbeam` instead of `with-termion`.
+To try crossbeam, use `with-crossbeam` instead of `tui-renderer-termion`.
 
 If you have been using the event stream to send your own keys, swap `termion::event::Key` with `prodash::tui::input::Key`.
 

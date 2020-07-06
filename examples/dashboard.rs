@@ -2,10 +2,10 @@
 
 #[cfg(not(feature = "tui-renderer"))]
 compile_error!(
-    "The `tui-renderer` feature must be set, along with either `with-crossterm` or `with-termion`"
+    "The `tui-renderer` feature must be set, along with either `tui-renderer-crossterm` or `tui-renderer-termion`"
 );
-#[cfg(not(any(feature = "with-crossterm", feature = "with-termion")))]
-compile_error!("Please set either the 'with-crossterm' or 'with-termion' feature whne using the 'tui-renderer'");
+#[cfg(not(any(feature = "tui-renderer-crossterm", feature = "tui-renderer-termion")))]
+compile_error!("Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'");
 
 fn main() -> Result {
     env_logger::init();
@@ -266,7 +266,7 @@ fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event
 
     ticker(Duration::from_millis(100))
         .map(move |_| {
-            let (width, height) = crossterm::terminal::size().unwrap_or((30, 30));
+            let (width, height) = crosstermion::crossterm::terminal::size().unwrap_or((30, 30));
             let (ref mut ofs_x, ref mut ofs_y) = offset_xy;
             let min_size = 2;
             match direction {

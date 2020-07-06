@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "6.0.0"
+version = "7.0.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2018"
@@ -15,12 +15,12 @@ doctest = true
 [[example]]
 name = "dashboard"
 path = "examples/dashboard.rs"
-required-features = ["tui-renderer", "with-crossterm"]
+required-features = ["tui-renderer", "tui-renderer-crossterm"]
 
 [features]
 default = ["log-renderer", "localtime"]
-with-termion = ["crosstermion/tui-react-termion"]
-with-crossterm = ["crosstermion/tui-react-crossterm"]
+tui-renderer-termion = ["crosstermion/tui-react-termion"]
+tui-renderer-crossterm = ["crosstermion/tui-react-crossterm"]
 tui-renderer = ["tui",
                 "unicode-segmentation",
                 "unicode-width",
@@ -30,6 +30,9 @@ tui-renderer = ["tui",
                 "futures-core",
                 "smol",
                 "humantime"]
+line-renderer = []
+line-renderer-crossterm = ["crosstermion/crossterm"]
+line-renderer-termion = ["crosstermion/termion"]
 log-renderer = ["log"]
 localtime = ["time"]
 
@@ -61,7 +64,6 @@ all-features = true
 
 [dev-dependencies]
 rand = "0.7.3"
-crossterm = "0.17.5"
 env_logger = { version = "0.7.1", default-features = false, features = ["termcolor", "atty", "humantime"] }
 criterion = { version = "0.3.1", default-features = false }
 argh = "0.1.3"

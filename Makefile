@@ -8,8 +8,10 @@ help:  ## Display this help
 check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features
 	cargo check --no-default-features
-	cargo check --features with-crossterm
-	cargo check --features with-termion
+	cargo check --features tui-renderer,tui-renderer-crossterm
+	cargo check --features tui-renderer,tui-renderer-termion
+	cargo check --features line-renderer,line-renderer-termion
+	cargo check --features line-renderer,line-renderer-crossterm
 	cargo check
 	$(MAKE) -C crosstermion check
 
