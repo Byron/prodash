@@ -67,8 +67,6 @@ mod _impl {
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
 mod _impl {
     use std::io;
-    use termion::screen::AlternateScreen;
-
     pub struct AlternateRawScreen<T: io::Write> {
         inner: termion::screen::AlternateScreen<T>,
     }

@@ -8,3 +8,17 @@ pub mod terminal;
 
 #[cfg(feature = "crossterm")]
 mod crossterm_utils;
+
+// Reexports
+#[cfg(feature = "crossbeam-channel")]
+pub use crossbeam_channel;
+#[cfg(feature = "crossterm")]
+pub use crossterm;
+#[cfg(feature = "flume")]
+pub use flume;
+#[cfg(feature = "termion")]
+pub use termion;
+#[cfg(feature = "tui")]
+pub use tui;
+#[cfg(feature = "tui-react")]
+pub use tui_react;

@@ -22,7 +22,7 @@ tui-react-termion = ["tui-react", "tui", "tui-termion-backend", "termion"]
 tui-crossterm = ["tui", "tui-crossterm-backend", "crossterm"]
 tui-react-crossterm = ["tui-react", "tui", "tui-crossterm-backend", "crossterm"]
 
-tui-termion-backend = ["tui/termion"] # redirect is needed to allow us to #[cfg(feature = "…")] against it. You can't see featuers of crates
+tui-termion-backend = ["tui/termion"] # redirect is needed to allow us to #[cfg(feature = "…")] against it. You can't see features of crates
 tui-crossterm-backend = ["tui/crossterm"]
 
 flume-async = ["flume/async"]
