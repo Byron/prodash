@@ -15,9 +15,9 @@
 * // Configure the gui, provide it with a handle to the ever-changing tree
 * let render_fut = prodash::tui::render(
 *     root.clone(),
-*     prodash::tui::TuiOptions {
+*     prodash::tui::Options {
 *         title: "minimal example".into(),
-*         ..prodash::tui::TuiOptions::default()
+*         ..prodash::tui::Options::default()
 *     }
 * )?;
 * // As it runs forever, we want a way to stop it.

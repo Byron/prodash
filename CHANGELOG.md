@@ -1,7 +1,11 @@
 ## v7.0.0 - Add new line-renderer, change feature flag names
 
-* **with-crossterm** -> **tui-renderer-crossterm**
-* **with-termion** -> **tui-renderer-termion**
+* **`tui` module**
+    * **TuiOptions** -> **Options**
+    * `render_with_input` now takes the Write stream as argument, instead of defaulting to `std::io::stdout()`
+* **Feature Flags**
+    * **with-crossterm** -> **tui-renderer-crossterm**
+    * **with-termion** -> **tui-renderer-termion**
 
 ## v6.0.0 - Factor terminal input into the new `crosstermion` crate
 

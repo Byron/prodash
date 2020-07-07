@@ -77,13 +77,14 @@ fn launch_ambient_gui(
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = tui::render_with_input(
+        std::io::stdout(),
         progress,
-        tui::TuiOptions {
+        tui::Options {
             title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
             frames_per_second: args.fps,
             recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
             redraw_only_on_state_change: true,
-            ..tui::TuiOptions::default()
+            ..tui::Options::default()
         },
         futures_util::stream::select(
             window_resize_stream(args.animate_terminal_size),

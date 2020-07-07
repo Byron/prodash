@@ -9,7 +9,7 @@ use tui::layout::Rect;
 
 /// Configure the terminal user interface
 #[derive(Clone)]
-pub struct TuiOptions {
+pub struct Options {
     /// The initial title to show for the whole window.
     ///
     /// Can be adjusted later by sending `Event::SetTitle(…)`
@@ -44,9 +44,9 @@ pub struct TuiOptions {
     pub stop_if_empty_progress: bool,
 }
 
-impl Default for TuiOptions {
+impl Default for Options {
     fn default() -> Self {
-        TuiOptions {
+        Options {
             title: "Progress Dashboard".into(),
             frames_per_second: 10.0,
             recompute_column_width_every_nth_frame: None,
@@ -123,11 +123,12 @@ pub enum Event {
 ///
 /// Failure may occour if there is no terminal to draw into.
 pub fn render_with_input(
+    out: impl std::io::Write,
     progress: Root,
-    options: TuiOptions,
+    options: Options,
     events: impl futures_core::Stream<Item = Event> + Send,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
-    let TuiOptions {
+    let Options {
         title,
         frames_per_second,
         window_size,
@@ -135,7 +136,7 @@ pub fn render_with_input(
         redraw_only_on_state_change,
         stop_if_empty_progress,
     } = options;
-    let mut terminal = new_terminal(AlternateRawScreen::try_from(io::stdout())?)?;
+    let mut terminal = new_terminal(AlternateRawScreen::try_from(out)?)?;
     terminal.hide_cursor()?;
 
     let duration_per_frame = Duration::from_secs_f32(1.0 / frames_per_second);
@@ -268,8 +269,9 @@ pub fn render_with_input(
 
 /// An easy-to-use version of `render_with_input(…)` that does not allow state manipulation via an event stream.
 pub fn render(
+    out: impl std::io::Write,
     progress: Root,
-    config: TuiOptions,
+    config: Options,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
-    return render_with_input(progress, config, stream::pending());
+    return render_with_input(out, progress, config, stream::pending());
 }
