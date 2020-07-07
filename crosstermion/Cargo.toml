@@ -19,11 +19,11 @@ input-thread-flume = ["flume"]
 tui-termion = ["tui", "tui-termion-backend", "termion"]
 tui-react-termion = ["tui-react", "tui", "tui-termion-backend", "termion"]
 
-tui-crossterm = ["tui", "tui-crossterm-backend", "crossterm"]
-tui-react-crossterm = ["tui-react", "tui", "tui-crossterm-backend", "crossterm"]
+tui-crossterm = ["atty", "tui", "tui-crossterm-backend", "crossterm"]
+tui-react-crossterm = ["atty", "tui-react", "tui", "tui-crossterm-backend", "crossterm"]
 
 tui-termion-backend = ["tui/termion"] # redirect is needed to allow us to #[cfg(feature = "…")] against it. You can't see features of crates
-tui-crossterm-backend = ["tui/crossterm"]
+tui-crossterm-backend = ["atty", "tui/crossterm"]
 
 flume-async = ["flume/async"]
 
@@ -38,6 +38,7 @@ tui = { version = "0.9.5", optional = true, default-features = false }
 tui-react = { version = "0.4.0", optional = true, default-features = false }
 crossbeam-channel = { version = "0.4.2", optional = true, default-features = false }
 flume = { version = "0.7.1", optional = true, default-features = false, features = ["select"]}
+atty = { version = "0.2.14", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
