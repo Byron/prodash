@@ -47,7 +47,7 @@ mod message_buffer {
 
     mod copy_new {
         use crate::tree::tests::message_buffer::assert_messages;
-        use crate::tree::{tests::message_buffer::push, Message, MessageRingBuffer};
+        use crate::tree::{tests::message_buffer::push, Message, MessageCopyState, MessageRingBuffer};
 
         #[test]
         fn without_state() {
@@ -66,6 +66,46 @@ mod message_buffer {
 
             push_and_copy_new(&mut buf, "three", &mut out);
             assert_messages(&out, &["two", "three"]);
+        }
+
+        #[test]
+        fn with_continous_state() {
+            fn push_and_copy_new(
+                buf: &mut MessageRingBuffer,
+                msg: impl Into<String>,
+                out: &mut Vec<Message>,
+                state: Option<MessageCopyState>,
+            ) -> Option<MessageCopyState> {
+                push(buf, msg);
+                Some(buf.copy_new(out, state))
+            }
+            let mut buf = MessageRingBuffer::with_capacity(2);
+            let mut out = Vec::new();
+            let mut state = push_and_copy_new(&mut buf, "one", &mut out, None);
+            assert_eq!(out, buf.buf);
+
+            state = push_and_copy_new(&mut buf, "two", &mut out, state);
+            assert_messages(&out, &["two"]);
+
+            state = push_and_copy_new(&mut buf, "three", &mut out, state);
+            assert_messages(&out, &["three"]);
+
+            state = push_and_copy_new(&mut buf, "four", &mut out, state);
+            assert_messages(&out, &["four"]);
+
+            state = push_and_copy_new(&mut buf, "five", &mut out, state);
+            assert_messages(&out, &["five"]);
+
+            state = push_and_copy_new(&mut buf, "six", &mut out, None);
+            assert_messages(&out, &["five", "six"]);
+
+            state = Some(buf.copy_new(&mut out, state));
+            assert_messages(&out, &[]);
+
+            // push(&mut buf, "seven");
+            // push(&mut buf, "eight");
+            // state = Some(buf.copy_new(&mut out, state));
+            // assert_messages(&out, &["seven", "eight"]);
         }
     }
 }

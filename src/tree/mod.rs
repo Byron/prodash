@@ -143,19 +143,42 @@ impl MessageRingBuffer {
 
     pub fn copy_all(&self, out: &mut Vec<Message>) {
         out.clear();
-        if self.has_capacity() {
-            out.extend_from_slice(self.buf.as_slice());
-        } else {
-            out.extend_from_slice(&self.buf[self.cursor % self.buf.len()..]);
-            if self.cursor != self.buf.len() {
-                out.extend_from_slice(&self.buf[..self.cursor]);
-            }
+        out.extend_from_slice(&self.buf[self.cursor % self.buf.len()..]);
+        if self.cursor != self.buf.len() {
+            out.extend_from_slice(&self.buf[..self.cursor]);
         }
     }
 
     pub fn copy_new(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
+        out.clear();
         match prev {
-            Some(MessageCopyState { .. }) => unimplemented!("message copy with state"),
+            Some(MessageCopyState {
+                mut cursor,
+                mut buf_len,
+            }) => {
+                let new_elements_below_cap = self.buf.len().saturating_sub(buf_len);
+                let cursor_ofs: isize = self.cursor as isize - cursor as isize;
+                match cursor_ofs {
+                    // there was some capacity left without wrapping around
+                    c if c == 0 => {
+                        out.extend_from_slice(&self.buf[self.buf.len() - new_elements_below_cap..]);
+                        buf_len += new_elements_below_cap;
+                    }
+                    // cursor advanced
+                    c if c > 0 => {
+                        out.extend_from_slice(&self.buf[(cursor % self.buf.len())..self.cursor]);
+                        cursor = self.cursor;
+                    }
+                    // cursor wrapped around
+                    c if c < 0 => {
+                        out.extend_from_slice(&self.buf[(cursor % self.buf.len())..]);
+                        out.extend_from_slice(&self.buf[..self.cursor]);
+                        cursor = self.cursor;
+                    }
+                    _ => unreachable!("logic dictates that… yeah, you really shouldn't ever see this!"),
+                }
+                MessageCopyState { cursor, buf_len }
+            }
             None => {
                 self.copy_all(out);
                 MessageCopyState {
