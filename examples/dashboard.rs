@@ -83,7 +83,22 @@ fn launch_ambient_gui(
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = match renderer {
-        "line" => unimplemented!("line"),
+        "line" => smol::Task::blocking(async move {
+            let mut handle = line::render(
+                std::io::stdout(),
+                progress,
+                line::Options {
+                    level_filter: Some(RangeInclusive::new(0, 1)),
+                    initial_delay: Some(Duration::from_secs_f32(1.0)),
+                    frames_per_second: args.fps,
+                    keep_running_if_progress_is_empty: true,
+                    ..line::Options::default()
+                },
+            );
+            handle.detach();
+            handle.join();
+        })
+        .boxed(),
         "tui" => tui::render_with_input(
             std::io::stdout(),
             progress,
@@ -114,7 +129,8 @@ fn launch_ambient_gui(
                     }
                 }),
             ),
-        )?,
+        )?
+        .boxed(),
         _ => panic!("Unknown renderer: '{}'", renderer),
     };
     let handle = smol::Task::spawn(render_fut.map(|_| ()));
@@ -366,11 +382,13 @@ mod arg {
 
 use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
 use prodash::{
+    line,
     tree::{Item, Key},
     tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
 use rand::prelude::*;
+use std::ops::RangeInclusive;
 use std::{error::Error, ops::Add, time::Duration, time::SystemTime};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
