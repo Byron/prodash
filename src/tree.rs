@@ -55,7 +55,17 @@ impl Root {
     /// Copy all messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
     pub fn copy_messages(&self, out: &mut Vec<Message>) {
-        self.inner.lock().messages.lock().copy_into(out);
+        self.inner.lock().messages.lock().copy_all(out);
+    }
+
+    /// Copy only new messages from the internal ring buffer into the given `out`
+    /// vector. Messages are ordered from oldest to newest.
+    pub fn copy_new_messages(
+        &self,
+        out: &mut Vec<Message>,
+        prev: Option<MessageCopyState>,
+    ) -> MessageCopyState {
+        self.inner.lock().messages.lock().copy_new(out, prev)
     }
 
     /// Duplicate all content and return it.
@@ -137,7 +147,7 @@ impl MessageRingBuffer {
         }
     }
 
-    pub fn copy_into(&self, out: &mut Vec<Message>) {
+    pub fn copy_all(&self, out: &mut Vec<Message>) {
         out.clear();
         if self.has_capacity() {
             out.extend_from_slice(self.buf.as_slice());
@@ -148,6 +158,31 @@ impl MessageRingBuffer {
             }
         }
     }
+
+    pub fn copy_new(
+        &self,
+        out: &mut Vec<Message>,
+        prev: Option<MessageCopyState>,
+    ) -> MessageCopyState {
+        match prev {
+            Some(MessageCopyState { .. }) => unimplemented!("message copy with state"),
+            None => {
+                self.copy_all(out);
+                MessageCopyState {
+                    cursor: self.cursor,
+                    buf_len: self.buf.len(),
+                }
+            }
+        }
+    }
+}
+
+/// State used to keep track of what's new since the last time message were copied.
+///
+/// Note that due to the nature of a ring buffer, there is no guarantee that you see all messages.
+pub struct MessageCopyState {
+    cursor: usize,
+    buf_len: usize,
 }
 
 /// A `Tree` represents an element of the progress tree.

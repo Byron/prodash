@@ -24,6 +24,7 @@ pub fn lines(
             "stop as progress is empty",
         ));
     }
+    // progress.copy_messages()
     let level_range = config
         .level_filter
         .clone()

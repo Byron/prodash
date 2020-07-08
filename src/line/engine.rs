@@ -44,6 +44,11 @@ pub struct JoinHandle {
 }
 
 impl JoinHandle {
+    /// `detach()` and `forget()` to remove any effects associated with this handle.
+    pub fn detach(mut self) {
+        self.disconnect();
+        self.forget();
+    }
     /// Remove the handles capability to instruct the render thread to stop.
     pub fn disconnect(&mut self) {
         self.connect.take();
