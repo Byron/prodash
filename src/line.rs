@@ -59,7 +59,7 @@ struct State {
 }
 
 fn draw(
-    out: &mut impl io::Write,
+    _out: &mut impl io::Write,
     progress: &tree::Root,
     state: &mut State,
     config: &Options,

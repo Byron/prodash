@@ -14,7 +14,7 @@ fn main() -> Result {
     smol::run(work_forever(args))
 }
 
-async fn work_forever(args: arg::Options) -> Result {
+async fn work_forever(mut args: arg::Options) -> Result {
     let progress = prodash::TreeOptions {
         message_buffer_capacity: args.message_scrollback_buffer_size,
         ..prodash::TreeOptions::default()
@@ -24,11 +24,16 @@ async fn work_forever(args: arg::Options) -> Result {
     let speed = args.speed_multitplier;
     let changing_names = args.changing_names;
 
-    let mut gui_handle = if args.no_tui {
+    let renderer = args.renderer.take().unwrap_or("tui".into());
+    let mut gui_handle = if renderer == "log" {
         let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
-        Some(launch_ambient_gui(progress.clone(), args).unwrap().boxed())
+        Some(
+            launch_ambient_gui(progress.clone(), &renderer, args)
+                .unwrap()
+                .boxed(),
+        )
     };
 
     loop {
@@ -72,41 +77,46 @@ async fn work_forever(args: arg::Options) -> Result {
 
 fn launch_ambient_gui(
     progress: Tree,
+    renderer: &str,
     args: arg::Options,
 ) -> std::result::Result<smol::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
-    let render_fut = tui::render_with_input(
-        std::io::stdout(),
-        progress,
-        tui::Options {
-            title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
-            frames_per_second: args.fps,
-            recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
-            redraw_only_on_state_change: true,
-            ..tui::Options::default()
-        },
-        futures_util::stream::select(
-            window_resize_stream(args.animate_terminal_size),
-            ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
-                ticks += 1;
-                if ticks % 2 == 0 {
-                    let is_interruptible = interruptible;
-                    interruptible = !interruptible;
-                    return if is_interruptible {
-                        Event::SetInterruptMode(Interrupt::Instantly)
+    let render_fut = match renderer {
+        "line" => unimplemented!("line"),
+        "tui" => tui::render_with_input(
+            std::io::stdout(),
+            progress,
+            tui::Options {
+                title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
+                frames_per_second: args.fps,
+                recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
+                redraw_only_on_state_change: true,
+                ..tui::Options::default()
+            },
+            futures_util::stream::select(
+                window_resize_stream(args.animate_terminal_size),
+                ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
+                    ticks += 1;
+                    if ticks % 2 == 0 {
+                        let is_interruptible = interruptible;
+                        interruptible = !interruptible;
+                        return if is_interruptible {
+                            Event::SetInterruptMode(Interrupt::Instantly)
+                        } else {
+                            Event::SetInterruptMode(Interrupt::Deferred)
+                        };
+                    }
+                    if thread_rng().gen_bool(0.5) {
+                        Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
                     } else {
-                        Event::SetInterruptMode(Interrupt::Deferred)
-                    };
-                }
-                if thread_rng().gen_bool(0.5) {
-                    Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
-                } else {
-                    Event::SetInformation(generate_statistics())
-                }
-            }),
-        ),
-    )?;
+                        Event::SetInformation(generate_statistics())
+                    }
+                }),
+            ),
+        )?,
+        _ => panic!("Unknown renderer: '{}'", renderer),
+    };
     let handle = smol::Task::spawn(render_fut.map(|_| ()));
     Ok(handle)
 }
@@ -310,10 +320,6 @@ mod arg {
     #[derive(FromArgs)]
     /// Reach new heights.
     pub struct Options {
-        /// if set, there will only be logging. Use 'RUST_LOG=info cargo run --example dashboard to see the messages
-        #[argh(switch, short = 'n')]
-        pub no_tui: bool,
-
         /// if set, the terminal window will be animated to assure resizing works as expected.
         #[argh(switch, short = 'a')]
         pub animate_terminal_size: bool,
@@ -349,6 +355,12 @@ mod arg {
         /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
         #[argh(switch)]
         pub stop_if_empty_progress: bool,
+
+        /// set the renderer to use, defaults to "tui", and furthermore allows "line" and "log".
+        ///
+        /// If set ot "log", there will only be logging. Set 'RUST_LOG=info' before running the program to see them.
+        #[argh(option)]
+        pub renderer: Option<String>,
     }
 }
 
