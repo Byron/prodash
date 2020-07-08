@@ -9,16 +9,6 @@ mod message_buffer {
         buf.copy_all(out);
     }
 
-    fn messages(msg: &[&'static str]) -> Vec<Message> {
-        msg.iter()
-            .map(|msg| Message {
-                time: std::time::SystemTime::now(),
-                level: MessageLevel::Info,
-                origin: "test".into(),
-                message: msg.to_string(),
-            })
-            .collect()
-    }
     fn assert_messages(actual: &Vec<Message>, expected: &[&'static str]) {
         let actual: Vec<_> = actual.iter().map(|m| m.message.as_str()).collect();
         assert_eq!(expected, actual.as_slice(), "messages are ordered old to new");
