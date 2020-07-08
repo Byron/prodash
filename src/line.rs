@@ -1,6 +1,12 @@
 use crate::tree;
 use std::{io, ops::RangeInclusive, time::Duration};
 
+#[cfg(all(
+    feature = "line-renderer",
+    not(any(feature = "line-renderer-crossterm", feature = "line-renderer-termion"))
+))]
+compile_error!("Please choose either one of these features: 'line-renderer-crossterm' or 'line-renderer-termion'");
+
 #[derive(Clone)]
 pub struct Options {
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
