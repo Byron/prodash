@@ -1,5 +1,5 @@
 use crate::tree;
-use std::{ops::RangeInclusive, time::Duration};
+use std::{io, ops::RangeInclusive, time::Duration};
 
 #[derive(Clone)]
 pub struct Options {
@@ -26,8 +26,68 @@ pub struct Options {
     pub keep_running_if_progress_is_empty: bool,
 }
 
-pub struct JoinHandle(std::thread::JoinHandle<()>);
+pub struct JoinHandle {
+    inner: Option<std::thread::JoinHandle<io::Result<()>>>,
+    connect: Option<flume::Sender<Event>>,
+}
 
-pub fn render(out: impl std::io::Write, progress: tree::Root, config: Options) -> JoinHandle {
-    unimplemented!("hello")
+impl Drop for JoinHandle {
+    fn drop(&mut self) {
+        if let Some(chan) = self.connect.take() {
+            chan.send(Event::Quit).ok();
+        }
+        self.inner.take().and_then(|h| h.join().ok());
+    }
+}
+
+enum Event {
+    Tick,
+    Quit,
+}
+
+const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 4.0;
+
+#[derive(Default)]
+struct State {
+    tree: Vec<(tree::Key, tree::Value)>,
+}
+
+fn draw(
+    out: &mut impl io::Write,
+    progress: &tree::Root,
+    state: &mut State,
+    config: &Options,
+) -> io::Result<()> {
+    progress.sorted_snapshot(&mut state.tree);
+    if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
+        return Ok(());
+    }
+    unimplemented!("drawing to be done")
+}
+
+pub fn render(
+    mut out: impl io::Write + Send + 'static,
+    progress: tree::Root,
+    config: Options,
+) -> JoinHandle {
+    let (quit_send, quit_recv) = flume::bounded::<Event>(0);
+    let join = std::thread::spawn(move || {
+        let mut state = State::default();
+        if config.frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
+            loop {
+                if let Err(flume::TryRecvError::Disconnected) = quit_recv.try_recv() {
+                    break;
+                }
+                draw(&mut out, &progress, &mut state, &config)?;
+                std::thread::sleep(Duration::from_secs_f32(1.0 / config.frames_per_second));
+            }
+        } else {
+        }
+        Ok(())
+    });
+
+    JoinHandle {
+        inner: Some(join),
+        connect: Some(quit_send),
+    }
 }
