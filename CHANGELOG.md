@@ -1,5 +1,15 @@
 ## v7.0.0 - Add new line-renderer, change feature flag names
 
+### New Features
+
+* **line**
+  * There is a new line renderer as neat trade off between bare logs and full-blown tui.
+  * Activate it with the `line-renderer` + one of `line-renderer-crossterm` or `line-renderer-termion` feature flags.
+* **tui**
+  * **Root* now has the `copy_new_messages(…)` method, copying only messages seen since last time it was called
+
+### Breaking Changes
+
 * **`tui` module**
     * **TuiOptions** -> **Options**
     * `render_with_input` now takes the Write stream as argument, instead of defaulting to `std::io::stdout()`

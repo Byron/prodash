@@ -39,9 +39,6 @@ pub mod tree;
 pub use config::TreeOptions;
 pub use tree::Root as Tree;
 
-#[cfg(test)]
-mod tree_tests;
-
 #[cfg(feature = "tui-renderer")]
 pub mod tui;
 

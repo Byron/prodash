@@ -1,3 +1,54 @@
+mod message_buffer {
+    use crate::tree::{Message, MessageLevel, MessageRingBuffer};
+
+    fn push(buf: &mut MessageRingBuffer, msg: impl Into<String>) {
+        buf.push_overwrite(MessageLevel::Info, "test".into(), msg);
+    }
+
+    fn messages(msg: &[&'static str]) -> Vec<Message> {
+        msg.iter()
+            .map(|msg| Message {
+                time: std::time::SystemTime::now(),
+                level: MessageLevel::Info,
+                origin: "test".into(),
+                message: msg.to_string(),
+            })
+            .collect()
+    }
+    fn assert_messages(actual: &Vec<Message>, expected: &[&'static str]) {
+        let actual: Vec<_> = actual.iter().map(|m| m.message.as_str()).collect();
+        assert_eq!(
+            expected,
+            actual.as_slice(),
+            "messages are ordered old to new"
+        );
+    }
+
+    #[test]
+    fn copy_all() {
+        let mut buf = MessageRingBuffer::with_capacity(2);
+        let mut out = Vec::new();
+        push(&mut buf, "one");
+        buf.copy_all(&mut out);
+        assert_eq!(out, buf.buf);
+
+        push(&mut buf, "two");
+        buf.copy_all(&mut out);
+        assert_eq!(out, buf.buf);
+
+        push(&mut buf, "three");
+        buf.copy_all(&mut out);
+        assert_messages(&out, &["two", "three"]);
+
+        push(&mut buf, "four");
+        buf.copy_all(&mut out);
+        assert_messages(&out, &["three", "four"]);
+
+        push(&mut buf, "five");
+        buf.copy_all(&mut out);
+        assert_messages(&out, &["four", "five"]);
+    }
+}
 mod key_adjacency {
     use crate::tree::SiblingLocation::*;
     use crate::tree::{Adjacency, Key, Value};

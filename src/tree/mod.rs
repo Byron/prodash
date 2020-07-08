@@ -4,6 +4,9 @@ use parking_lot::Mutex;
 use std::ops::{Deref, Index, IndexMut};
 use std::{sync::Arc, time::SystemTime};
 
+#[cfg(test)]
+mod tests;
+
 /// The top-level of the progress tree.
 #[derive(Clone, Debug)]
 pub struct Root {
@@ -153,7 +156,7 @@ impl MessageRingBuffer {
             out.extend_from_slice(self.buf.as_slice());
         } else {
             out.extend_from_slice(&self.buf[self.cursor % self.buf.len()..]);
-            if self.cursor + 1 != self.buf.len() {
+            if self.cursor != self.buf.len() {
                 out.extend_from_slice(&self.buf[..self.cursor]);
             }
         }
