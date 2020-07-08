@@ -89,7 +89,7 @@ fn launch_ambient_gui(
                 progress,
                 line::Options {
                     level_filter: Some(RangeInclusive::new(0, 1)),
-                    initial_delay: Some(Duration::from_secs_f32(1.0)),
+                    initial_delay: args.line_initial_delay.map(|d| Duration::from_secs_f32(d)),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
                     ..line::Options::default()
@@ -367,6 +367,10 @@ mod arg {
         /// Defaults to 1.0. A valud of 0.5 halves the speed.
         #[argh(option, short = 's', default = "1.0")]
         pub speed_multitplier: f32,
+
+        /// for 'line' renderer: Determines the amount of seconds that the progress has to last at least until we see the first progress.
+        #[argh(option)]
+        pub line_initial_delay: Option<f32>,
 
         /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
         #[argh(switch)]

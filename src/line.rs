@@ -78,15 +78,23 @@ struct State {
     tree: Vec<(tree::Key, tree::Value)>,
 }
 
+struct DrawOptions {
+    level_filter: Option<RangeInclusive<tree::Level>>,
+    keep_running_if_progress_is_empty: bool,
+}
+
 fn draw(
     _out: &mut impl io::Write,
     progress: &tree::Root,
     state: &mut State,
-    config: &Options,
+    config: &DrawOptions,
 ) -> io::Result<()> {
     progress.sorted_snapshot(&mut state.tree);
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
-        return Ok(());
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            "stop as progress is empty",
+        ));
     }
     unimplemented!("drawing to be done")
 }
@@ -96,20 +104,57 @@ pub fn render(
     progress: tree::Root,
     config: Options,
 ) -> JoinHandle {
+    let Options {
+        level_filter,
+        initial_delay,
+        frames_per_second,
+        keep_running_if_progress_is_empty,
+    } = config;
+    let config = DrawOptions {
+        keep_running_if_progress_is_empty,
+        level_filter,
+    };
+
     let (quit_send, quit_recv) = flume::bounded::<Event>(0);
-    let join = std::thread::spawn(move || {
+
+    let handle = std::thread::spawn(move || {
+        {
+            let (delay_send, delay_recv) = flume::bounded::<Event>(1);
+            let mut inital_delay = {
+                match initial_delay {
+                    Some(delay) => drop(std::thread::spawn(move || {
+                        std::thread::sleep(delay);
+                        delay_send.send(Event::Tick).ok();
+                        drop(delay_send);
+                    })),
+                    None => drop(delay_send.send(Event::Tick).ok()),
+                };
+                flume::Selector::new()
+                    .recv(&delay_recv, |_| Event::Tick)
+                    .recv(&quit_recv, |res| {
+                        if let Ok(Event::Quit) = res {
+                            Event::Quit
+                        } else {
+                            Event::Tick
+                        }
+                    })
+            };
+            if let Event::Quit = inital_delay.wait() {
+                return Ok(());
+            }
+        }
         let mut state = State::default();
-        if config.frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
+        if frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
             loop {
                 if let Ok(Event::Quit) = quit_recv.try_recv() {
                     break;
                 }
                 draw(&mut out, &progress, &mut state, &config)?;
-                std::thread::sleep(Duration::from_secs_f32(1.0 / config.frames_per_second));
+                std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
             let (tick_send, tick_recv) = flume::bounded::<Event>(0);
-            let secs = 1.0 / config.frames_per_second;
+            let secs = 1.0 / frames_per_second;
             std::thread::spawn(move || loop {
                 if tick_send.send(Event::Tick).is_err() {
                     break;
@@ -134,7 +179,7 @@ pub fn render(
     });
 
     JoinHandle {
-        inner: Some(join),
+        inner: Some(handle),
         connect: Some(quit_send),
     }
 }
