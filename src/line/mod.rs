@@ -7,6 +7,8 @@ use std::{io, ops::RangeInclusive, time::Duration};
 ))]
 compile_error!("Please choose either one of these features: 'line-renderer-crossterm' or 'line-renderer-termion'");
 
+mod draw;
+
 #[derive(Clone)]
 pub struct Options {
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
@@ -86,43 +88,6 @@ enum Event {
 
 const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 6.0;
 
-#[derive(Default)]
-struct State {
-    tree: Vec<(tree::Key, tree::Value)>,
-}
-
-struct DrawOptions {
-    level_filter: Option<RangeInclusive<tree::Level>>,
-    keep_running_if_progress_is_empty: bool,
-}
-
-fn draw(
-    _out: &mut impl io::Write,
-    progress: &tree::Root,
-    state: &mut State,
-    config: &DrawOptions,
-) -> io::Result<()> {
-    progress.sorted_snapshot(&mut state.tree);
-    if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
-        return Err(io::Error::new(
-            io::ErrorKind::Other,
-            "stop as progress is empty",
-        ));
-    }
-    let level_range = config
-        .level_filter
-        .clone()
-        .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
-    for (_key, _progress) in state
-        .tree
-        .iter()
-        .filter(|(k, _)| level_range.contains(&k.level()))
-    {
-        unimplemented!("drawing to be done")
-    }
-    Ok(())
-}
-
 pub fn render(
     mut out: impl io::Write + Send + 'static,
     progress: tree::Root,
@@ -134,7 +99,7 @@ pub fn render(
         frames_per_second,
         keep_running_if_progress_is_empty,
     } = config;
-    let config = DrawOptions {
+    let config = draw::Options {
         keep_running_if_progress_is_empty,
         level_filter,
     };
@@ -167,13 +132,13 @@ pub fn render(
                 return Ok(());
             }
         }
-        let mut state = State::default();
+        let mut state = draw::State::default();
         if frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
             loop {
                 if let Ok(Event::Quit) = quit_recv.try_recv() {
                     break;
                 }
-                draw(&mut out, &progress, &mut state, &config)?;
+                draw::lines(&mut out, &progress, &mut state, &config)?;
                 std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
@@ -196,7 +161,7 @@ pub fn render(
                 })
                 .recv(&tick_recv, |_res| Event::Tick);
             while let Event::Tick = selector.wait() {
-                draw(&mut out, &progress, &mut state, &config)?;
+                draw::lines(&mut out, &progress, &mut state, &config)?;
             }
         }
         Ok(())
