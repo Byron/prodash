@@ -63,11 +63,7 @@ impl Root {
 
     /// Copy only new messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
-    pub fn copy_new_messages(
-        &self,
-        out: &mut Vec<Message>,
-        prev: Option<MessageCopyState>,
-    ) -> MessageCopyState {
+    pub fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
         self.inner.lock().messages.lock().copy_new(out, prev)
     }
 
@@ -130,12 +126,7 @@ impl MessageRingBuffer {
         self.buf.len() < self.buf.capacity()
     }
 
-    pub fn push_overwrite(
-        &mut self,
-        level: MessageLevel,
-        origin: String,
-        message: impl Into<String>,
-    ) {
+    pub fn push_overwrite(&mut self, level: MessageLevel, origin: String, message: impl Into<String>) {
         let msg = Message {
             time: SystemTime::now(),
             level,
@@ -162,11 +153,7 @@ impl MessageRingBuffer {
         }
     }
 
-    pub fn copy_new(
-        &self,
-        out: &mut Vec<Message>,
-        prev: Option<MessageCopyState>,
-    ) -> MessageCopyState {
+    pub fn copy_new(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
         match prev {
             Some(MessageCopyState { .. }) => unimplemented!("message copy with state"),
             None => {
@@ -332,18 +319,12 @@ impl Item {
         self.messages.lock().push_overwrite(
             level,
             {
-                let name = self
-                    .tree
-                    .get(&self.key)
-                    .map(|v| v.name.to_owned())
-                    .unwrap_or_default();
+                let name = self.tree.get(&self.key).map(|v| v.name.to_owned()).unwrap_or_default();
 
                 #[cfg(feature = "log-renderer")]
                 match level {
                     MessageLevel::Failure => crate::warn!("{} → {}", name, message),
-                    MessageLevel::Info | MessageLevel::Success => {
-                        crate::info!("{} → {}", name, message)
-                    }
+                    MessageLevel::Info | MessageLevel::Success => crate::info!("{} → {}", name, message),
                 };
 
                 name
@@ -399,12 +380,7 @@ pub type ProgressStep = u32;
 
 /// A type identifying a spot in the hierarchy of `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub struct Key(
-    Option<ItemId>,
-    Option<ItemId>,
-    Option<ItemId>,
-    Option<ItemId>,
-);
+pub struct Key(Option<ItemId>, Option<ItemId>, Option<ItemId>, Option<ItemId>);
 
 /// Determines if a sibling is above or below in the given level of hierarchy
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
@@ -575,13 +551,7 @@ impl Key {
         };
 
         let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
-            search(
-                sorted[..from].iter().rev(),
-                key,
-                key_level,
-                level,
-                id_at_level,
-            )
+            search(sorted[..from].iter().rev(), key, key_level, level, id_at_level)
         };
         let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: ItemId| {
             sorted
@@ -676,8 +646,7 @@ impl Progress {
     ///
     /// A task half done would return `Some(0.5)`.
     pub fn fraction(&self) -> Option<f32> {
-        self.done_at
-            .map(|done_at| self.step as f32 / done_at as f32)
+        self.done_at.map(|done_at| self.step as f32 / done_at as f32)
     }
 }
 

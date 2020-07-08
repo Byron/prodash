@@ -2,9 +2,7 @@ use crate::{
     tree::{Message, MessageLevel},
     tui::{
         draw::time::{format_time_for_messages, DATE_TIME_HMS},
-        utils::{
-            block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE,
-        },
+        utils::{block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE},
     },
 };
 use std::time::SystemTime;
@@ -16,22 +14,11 @@ use tui::{
 };
 use unicode_width::UnicodeWidthStr;
 
-pub fn pane(
-    messages: &[Message],
-    bound: Rect,
-    overflow_bound: Rect,
-    offset: &mut u16,
-    buf: &mut Buffer,
-) {
+pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mut u16, buf: &mut Buffer) {
     let block = Block::default().title("Messages").borders(Borders::TOP);
     block.render(bound, buf);
     let help_text = " ⨯ = `| ▢ = ~ ";
-    draw_text_with_ellipsis_nowrap(
-        rect::snap_to_right(bound, block_width(help_text)),
-        buf,
-        help_text,
-        None,
-    );
+    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, None);
 
     let bound = block.inner(bound);
     *offset = sanitize_offset(*offset, messages.len(), bound.height);
@@ -40,8 +27,7 @@ pub fn pane(
         .rev()
         .skip(*offset as usize)
         .take(bound.height as usize)
-        .fold(0, |state, message| state.max(block_width(&message.origin)))
-        as u16;
+        .fold(0, |state, message| state.max(block_width(&message.origin))) as u16;
     for (
         line,
         Message {
@@ -58,8 +44,7 @@ pub fn pane(
         .enumerate()
     {
         let line_bound = rect::line_bound(bound, line);
-        let (time_bound, level_bound, origin_bound, message_bound) =
-            compute_bounds(line_bound, max_origin_width);
+        let (time_bound, level_bound, origin_bound, message_bound) = compute_bounds(line_bound, max_origin_width);
         if let Some(time_bound) = time_bound {
             draw_text_with_ellipsis_nowrap(time_bound, buf, format_time_column(time), None);
         }
@@ -70,21 +55,11 @@ pub fn pane(
                 format_level_column(*level),
                 Some(level_to_style(*level)),
             );
-            draw_text_with_ellipsis_nowrap(
-                rect::offset_x(level_bound, LEVEL_TEXT_WIDTH),
-                buf,
-                VERTICAL_LINE,
-                None,
-            );
+            draw_text_with_ellipsis_nowrap(rect::offset_x(level_bound, LEVEL_TEXT_WIDTH), buf, VERTICAL_LINE, None);
         }
         if let Some(origin_bound) = origin_bound {
             draw_text_with_ellipsis_nowrap(origin_bound, buf, origin, None);
-            draw_text_with_ellipsis_nowrap(
-                rect::offset_x(origin_bound, max_origin_width),
-                buf,
-                "→",
-                None,
-            );
+            draw_text_with_ellipsis_nowrap(rect::offset_x(origin_bound, max_origin_width), buf, "→", None);
         }
         draw_text_with_ellipsis_nowrap(message_bound, buf, message, None);
     }
@@ -138,10 +113,7 @@ fn format_time_column(time: &SystemTime) -> String {
     format!("{}{}", format_time_for_messages(*time), VERTICAL_LINE)
 }
 
-fn compute_bounds(
-    line: Rect,
-    max_origin_width: u16,
-) -> (Option<Rect>, Option<Rect>, Option<Rect>, Rect) {
+fn compute_bounds(line: Rect, max_origin_width: u16) -> (Option<Rect>, Option<Rect>, Option<Rect>, Rect) {
     let vertical_line_width = VERTICAL_LINE.width() as u16;
     let mythical_offset_we_should_not_need = 1;
 
@@ -169,10 +141,5 @@ fn compute_bounds(
     if message_bound.width < 30 {
         return (None, None, None, line);
     }
-    (
-        Some(time_bound),
-        Some(level_bound),
-        Some(origin_bound),
-        message_bound,
-    )
+    (Some(time_bound), Some(level_bound), Some(origin_bound), message_bound)
 }

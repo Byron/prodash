@@ -22,9 +22,8 @@ mod utc {
 
     pub fn format_time_for_messages(time: SystemTime) -> String {
         String::from_utf8_lossy(
-            &humantime::format_rfc3339_seconds(time)
-                .to_string()
-                .as_bytes()[DATE_TIME_YMD..DATE_TIME_YMD + DATE_TIME_HMS],
+            &humantime::format_rfc3339_seconds(time).to_string().as_bytes()
+                [DATE_TIME_YMD..DATE_TIME_YMD + DATE_TIME_HMS],
         )
         .into_owned()
     }

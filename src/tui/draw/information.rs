@@ -15,12 +15,7 @@ pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {
     block.render(bound, buf);
 
     let help_text = " ⨯ = [ | ▢ = { ";
-    draw_text_with_ellipsis_nowrap(
-        rect::snap_to_right(bound, block_width(help_text)),
-        buf,
-        help_text,
-        None,
-    );
+    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, None);
 
     let bound = block.inner(bound);
     let bound = Rect {
@@ -56,12 +51,7 @@ pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {
     if let Some(Line::Text(text)) = lines.last() {
         let line = lines.len().saturating_sub(1) + offset;
         if line < bound.height as usize {
-            draw_text_with_ellipsis_nowrap(
-                rect::offset_x(rect::line_bound(bound, line), 1),
-                buf,
-                text,
-                None,
-            );
+            draw_text_with_ellipsis_nowrap(rect::offset_x(rect::line_bound(bound, line), 1), buf, text, None);
         }
     }
 }

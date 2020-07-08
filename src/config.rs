@@ -49,9 +49,7 @@ impl From<TreeOptions> for Tree {
                 highest_child_id: 0,
                 key: Key::default(),
                 tree: Arc::new(DashMap::with_capacity(initial_capacity)),
-                messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(
-                    message_buffer_capacity,
-                ))),
+                messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(message_buffer_capacity))),
             })),
         }
     }

@@ -12,18 +12,15 @@ fn usage(c: &mut Criterion) {
     };
     c.benchmark_group("Tree::add_child")
         .throughput(Throughput::Elements(4))
-        .bench_function(
-            "add children to build a tree of tasks and clear them (in drop)",
-            |b| {
-                let root = small_tree();
-                b.iter(|| {
-                    let mut c = root.add_child("1");
-                    let _one = c.add_child("1");
-                    let _two = c.add_child("2");
-                    let _three = c.add_child("3");
-                });
-            },
-        );
+        .bench_function("add children to build a tree of tasks and clear them (in drop)", |b| {
+            let root = small_tree();
+            b.iter(|| {
+                let mut c = root.add_child("1");
+                let _one = c.add_child("1");
+                let _two = c.add_child("2");
+                let _three = c.add_child("3");
+            });
+        });
     c.benchmark_group("tree::Item::set")
         .throughput(Throughput::Elements(5))
         .bench_function("set tree 5 times", |b| {

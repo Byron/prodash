@@ -85,11 +85,7 @@ enum Event {
 
 const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 6.0;
 
-pub fn render(
-    mut out: impl io::Write + Send + 'static,
-    progress: tree::Root,
-    config: Options,
-) -> JoinHandle {
+pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, config: Options) -> JoinHandle {
     let Options {
         level_filter,
         initial_delay,

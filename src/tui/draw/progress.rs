@@ -3,8 +3,8 @@ use crate::{
     tui::{
         draw::{time::format_now_datetime_seconds, State},
         utils::{
-            block_width, draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, rect,
-            sanitize_offset, GraphemeCountWriter, VERTICAL_LINE,
+            block_width, draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, rect, sanitize_offset,
+            GraphemeCountWriter, VERTICAL_LINE,
         },
         InterruptDrawInfo,
     },
@@ -25,14 +25,13 @@ const MIN_TREE_WIDTH: u16 = 20;
 
 pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
     state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
-    let needs_overflow_line = if entries.len() > bound.height as usize
-        || (state.task_offset).min(entries.len() as u16) > 0
-    {
-        bound.height = bound.height.saturating_sub(1);
-        true
-    } else {
-        false
-    };
+    let needs_overflow_line =
+        if entries.len() > bound.height as usize || (state.task_offset).min(entries.len() as u16) > 0 {
+            bound.height = bound.height.saturating_sub(1);
+            true
+        } else {
+            false
+        };
     state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
 
     if entries.is_empty() {
@@ -40,10 +39,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
     }
 
     let initial_column_width = bound.width / 3;
-    let desired_max_tree_draw_width = *state
-        .next_tree_column_width
-        .as_ref()
-        .unwrap_or(&initial_column_width);
+    let desired_max_tree_draw_width = *state.next_tree_column_width.as_ref().unwrap_or(&initial_column_width);
     {
         if initial_column_width >= MIN_TREE_WIDTH {
             let tree_bound = Rect {
@@ -91,9 +87,7 @@ pub(crate) fn headline(
         |(mut running, mut blocked, mut groups), (_key, Value { progress, .. })| {
             match progress.map(|p| p.state) {
                 Some(ProgressState::Running) => running += 1,
-                Some(ProgressState::Blocked(_, _)) | Some(ProgressState::Halted(_, _)) => {
-                    blocked += 1
-                }
+                Some(ProgressState::Blocked(_, _)) | Some(ProgressState::Halted(_, _)) => blocked += 1,
                 None => groups += 1,
             }
             (running, blocked, groups)
@@ -125,12 +119,7 @@ pub(crate) fn headline(
         num_groups,
         entries.len()
     );
-    draw_text_with_ellipsis_nowrap(
-        rect::snap_to_right(bound, block_width(&text) + 1),
-        buf,
-        text,
-        None,
-    );
+    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, None);
 }
 
 struct ProgressFormat<'a>(&'a Option<Progress>, u16);
@@ -158,8 +147,7 @@ fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
         .get(index + 1)
         .and_then(|(other_key, other_val)| {
             entries.get(index).map(|(cur_key, _)| {
-                cur_key.shares_parent_with(other_key, cur_key.level())
-                    && other_val.progress.is_some()
+                cur_key.shares_parent_with(other_key, cur_key.level()) && other_val.progress.is_some()
             })
         })
         .unwrap_or(false)
@@ -182,19 +170,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
             None => state,
         });
 
-    for (
-        line,
-        (
-            entry_index,
-            (
-                _,
-                Value {
-                    progress,
-                    name: title,
-                },
-            ),
-        ),
-    ) in entries
+    for (line, (entry_index, (_, Value { progress, name: title }))) in entries
         .iter()
         .enumerate()
         .skip(offset as usize)
@@ -223,18 +199,17 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
                 add_block_eta(state, &mut progress_text);
-                let (bound, style) =
-                    draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| match state {
-                        ProgressState::Blocked(_, _) => Color::Red,
-                        ProgressState::Halted(_, _) => Color::LightRed,
-                        ProgressState::Running => {
-                            if fraction >= 0.8 {
-                                Color::Green
-                            } else {
-                                Color::Yellow
-                            }
+                let (bound, style) = draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| match state {
+                    ProgressState::Blocked(_, _) => Color::Red,
+                    ProgressState::Halted(_, _) => Color::LightRed,
+                    ProgressState::Running => {
+                        if fraction >= 0.8 {
+                            Color::Green
+                        } else {
+                            Color::Yellow
                         }
-                    });
+                    }
+                });
                 let style_fn = move |_t: &str, x: u16, _y: u16| {
                     if x < bound.right() {
                         style
@@ -262,9 +237,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                 );
             }
             None => {
-                draw_text_nowrap_fn(progress_rect, buf, progress_text, |_, _, _| {
-                    Style::default()
-                });
+                draw_text_nowrap_fn(progress_rect, buf, progress_text, |_, _, _| Style::default());
                 draw_text_with_ellipsis_nowrap(progress_rect, buf, format!(" {} ", title), None);
             }
         }
@@ -341,19 +314,15 @@ fn draw_progress_bar_fn(
             tui::symbols::block::FULL,
         ];
         // Get the index based on how filled the remaining part is
-        let index = ((((bound.width as f32 * fraction) - fractional_progress_rect.width as f32)
-            * 8f32)
-            .round() as usize)
+        let index = ((((bound.width as f32 * fraction) - fractional_progress_rect.width as f32) * 8f32).round()
+            as usize)
             % BLOCK_SECTIONS.len();
         let cell = buf.get_mut(fractional_progress_rect.right(), bound.y);
         cell.set_symbol(BLOCK_SECTIONS[index]);
         cell.style.fg = color;
         fractional_progress_rect.width += 1;
     }
-    (
-        fractional_progress_rect,
-        Style::default().bg(color).fg(Color::Black),
-    )
+    (fractional_progress_rect, Style::default().bg(color).fg(Color::Black))
 }
 
 pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
@@ -441,21 +410,11 @@ pub fn draw_overflow(
     let (count, mut progress_fraction) = entries
         .iter()
         .take(offset as usize)
-        .chain(
-            entries
-                .iter()
-                .skip((offset + num_entries_on_display) as usize),
-        )
-        .fold(
-            (0usize, 0f32),
-            |(count, progress_fraction), (_key, value)| {
-                let progress = value
-                    .progress
-                    .and_then(|p| p.fraction())
-                    .unwrap_or_default();
-                (count + 1, progress_fraction + progress)
-            },
-        );
+        .chain(entries.iter().skip((offset + num_entries_on_display) as usize))
+        .fold((0usize, 0f32), |(count, progress_fraction), (_key, value)| {
+            let progress = value.progress.and_then(|p| p.fraction()).unwrap_or_default();
+            (count + 1, progress_fraction + progress)
+        });
     progress_fraction /= count as f32;
     let label = format!(
         "{} …{} skipped and {} more",
@@ -465,15 +424,10 @@ pub fn draw_overflow(
             .len()
             .saturating_sub((offset + num_entries_on_display + 1) as usize)
     );
-    let (progress_rect, style) =
-        draw_progress_bar_fn(buf, bound, progress_fraction, |_| Color::Green);
+    let (progress_rect, style) = draw_progress_bar_fn(buf, bound, progress_fraction, |_| Color::Green);
 
     let bg_color = Color::Red;
-    fill_background(
-        rect::offset_x(bound, progress_rect.right() - 1),
-        buf,
-        bg_color,
-    );
+    fill_background(rect::offset_x(bound, progress_rect.right() - 1), buf, bg_color);
     let color_text_according_to_progress = move |_g: &str, x: u16, _y: u16| {
         if x < progress_rect.right() {
             style

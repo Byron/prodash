@@ -5,7 +5,9 @@ compile_error!(
     "The `tui-renderer` feature must be set, along with either `tui-renderer-crossterm` or `tui-renderer-termion`"
 );
 #[cfg(not(any(feature = "tui-renderer-crossterm", feature = "tui-renderer-termion")))]
-compile_error!("Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'");
+compile_error!(
+    "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
+);
 
 fn main() -> Result {
     env_logger::init();
@@ -29,11 +31,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
         let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
-        Some(
-            launch_ambient_gui(progress.clone(), &renderer, args)
-                .unwrap()
-                .boxed(),
-        )
+        Some(launch_ambient_gui(progress.clone(), &renderer, args).unwrap().boxed())
     };
 
     loop {
@@ -187,12 +185,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     }
 }
 
-async fn new_chunk_of_work(
-    max: NestingLevel,
-    tree: Tree,
-    speed: f32,
-    changing_names: bool,
-) -> Result {
+async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_names: bool) -> Result {
     let NestingLevel(max_level) = max;
     let mut progresses = Vec::new();
     let mut level_progress = tree.add_child(format!("level {} of {}", 1, max_level));
@@ -203,20 +196,13 @@ async fn new_chunk_of_work(
         let num_tasks = max_level as usize * 2;
         for id in 0..num_tasks {
             let handle = smol::Task::spawn(work_item(
-                level_progress.add_child(format!(
-                    "{} {}",
-                    WORK_NAMES.choose(&mut thread_rng()).unwrap(),
-                    id + 1
-                )),
+                level_progress.add_child(format!("{} {}", WORK_NAMES.choose(&mut thread_rng()).unwrap(), id + 1)),
                 speed,
                 changing_names,
             ));
             handles.push(handle);
 
-            smol::Timer::after(Duration::from_millis(
-                (SPAWN_DELAY_MS as f32 / speed) as u64,
-            ))
-            .await;
+            smol::Timer::after(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
         }
         if level + 1 != max_level {
             let tmp = level_progress.add_child(format!("Level {}", level + 1));
@@ -250,10 +236,7 @@ fn generate_statistics() -> Vec<Line> {
         Line::Text("锄禾日当午，汗滴禾下土。谁知盘中餐，粒粒皆辛苦。".into()),
         Line::Text("春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少".into()),
         Line::Text("煮豆燃豆萁，豆在釜中泣。本自同根生，相煎何太急".into()),
-        Line::Text(
-            "and this line is without any doubt very very long and it really doesn't want to stop"
-                .into(),
-        ),
+        Line::Text("and this line is without any doubt very very long and it really doesn't want to stop".into()),
     ];
     lines.shuffle(&mut thread_rng());
     lines.insert(0, Line::Title("Hello World".into()));
@@ -276,10 +259,7 @@ fn generate_statistics() -> Vec<Line> {
             "average #dependencies: {} crates",
             thread_rng().gen_range(0usize, 500)
         )),
-        Line::Text(format!(
-            "bloat in code: {} Kb",
-            thread_rng().gen_range(100usize, 5_000)
-        )),
+        Line::Text(format!("bloat in code: {} Kb", thread_rng().gen_range(100usize, 5_000))),
     ]);
     lines
 }
@@ -298,16 +278,12 @@ fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event
             let min_size = 2;
             match direction {
                 Direction::Shrink => {
-                    *ofs_x = ofs_x
-                        .saturating_add((1_f32 * (width as f32 / height as f32)).ceil() as u16);
-                    *ofs_y = ofs_y
-                        .saturating_add((1_f32 * (height as f32 / width as f32)).ceil() as u16);
+                    *ofs_x = ofs_x.saturating_add((1_f32 * (width as f32 / height as f32)).ceil() as u16);
+                    *ofs_y = ofs_y.saturating_add((1_f32 * (height as f32 / width as f32)).ceil() as u16);
                 }
                 Direction::Grow => {
-                    *ofs_x = ofs_x
-                        .saturating_sub((1_f32 * (width as f32 / height as f32)).ceil() as u16);
-                    *ofs_y = ofs_y
-                        .saturating_sub((1_f32 * (height as f32 / width as f32)).ceil() as u16);
+                    *ofs_x = ofs_x.saturating_sub((1_f32 * (width as f32 / height as f32)).ceil() as u16);
+                    *ofs_y = ofs_y.saturating_sub((1_f32 * (height as f32 / width as f32)).ceil() as u16);
                 }
             }
             let bound = tui::tui_export::layout::Rect {
@@ -397,12 +373,7 @@ use std::{error::Error, ops::Add, time::Duration, time::SystemTime};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];
-const REASONS: &[&str] = &[
-    "due to star alignment",
-    "IO takes time",
-    "仪表板演示",
-    "just because",
-];
+const REASONS: &[&str] = &["due to star alignment", "IO takes time", "仪表板演示", "just because"];
 const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 const WORK_NAMES: &[&str] = &[
     "Downloading Crate",

@@ -104,8 +104,7 @@ mod _impl {
         let (key_send, key_receive) = crossbeam_channel::bounded::<super::Key>(0);
         std::thread::spawn(move || -> Result<(), std::io::Error> {
             loop {
-                let event =
-                    crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
+                let event = crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
                 match event {
                     crossterm::event::Event::Key(key) => {
                         let key: Result<super::Key, _> = key.try_into();
@@ -130,8 +129,7 @@ mod _impl {
         let (key_send, key_receive) = flume::bounded::<super::Key>(0);
         std::thread::spawn(move || -> Result<(), std::io::Error> {
             loop {
-                let event =
-                    crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
+                let event = crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
                 match event {
                     crossterm::event::Event::Key(key) => {
                         let key: Result<super::Key, _> = key.try_into();

@@ -86,7 +86,9 @@ pub(crate) enum InterruptDrawInfo {
 }
 
 #[cfg(not(any(feature = "tui-renderer-crossterm", feature = "tui-renderer-termion")))]
-compile_error!("Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'");
+compile_error!(
+    "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
+);
 
 use crosstermion::{
     input::{key_input_stream, Key},
@@ -166,26 +168,18 @@ pub fn render_with_input(
             match event {
                 Event::Tick => {}
                 Event::Input(key) => match key {
-                    Key::Esc | Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('[') => {
-                        match interrupt_mode {
-                            InterruptDrawInfo::Instantly => break,
-                            InterruptDrawInfo::Deferred(_) => {
-                                interrupt_mode = InterruptDrawInfo::Deferred(true)
-                            }
-                        }
-                    }
+                    Key::Esc | Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('[') => match interrupt_mode {
+                        InterruptDrawInfo::Instantly => break,
+                        InterruptDrawInfo::Deferred(_) => interrupt_mode = InterruptDrawInfo::Deferred(true),
+                    },
                     Key::Char('`') => state.hide_messages = !state.hide_messages,
                     Key::Char('~') => state.messages_fullscreen = !state.messages_fullscreen,
                     Key::Char('J') => state.message_offset = state.message_offset.saturating_add(1),
-                    Key::Char('D') => {
-                        state.message_offset = state.message_offset.saturating_add(10)
-                    }
+                    Key::Char('D') => state.message_offset = state.message_offset.saturating_add(10),
                     Key::Char('j') => state.task_offset = state.task_offset.saturating_add(1),
                     Key::Char('d') => state.task_offset = state.task_offset.saturating_add(10),
                     Key::Char('K') => state.message_offset = state.message_offset.saturating_sub(1),
-                    Key::Char('U') => {
-                        state.message_offset = state.message_offset.saturating_sub(10)
-                    }
+                    Key::Char('U') => state.message_offset = state.message_offset.saturating_sub(10),
                     Key::Char('k') => state.task_offset = state.task_offset.saturating_sub(1),
                     Key::Char('u') => state.task_offset = state.task_offset.saturating_sub(10),
                     Key::Char('[') => state.hide_info = !state.hide_info,
@@ -243,18 +237,8 @@ pub fn render_with_input(
                     progress.copy_messages(&mut messages);
                 }
 
-                draw::all(
-                    &mut state,
-                    interrupt_mode,
-                    &entries,
-                    &messages,
-                    window_size,
-                    buf,
-                );
-                if tick == 1
-                    || tick % store_task_size_every == 0
-                    || state.last_tree_column_width.unwrap_or(0) == 0
-                {
+                draw::all(&mut state, interrupt_mode, &entries, &messages, window_size, buf);
+                if tick == 1 || tick % store_task_size_every == 0 || state.last_tree_column_width.unwrap_or(0) == 0 {
                     state.next_tree_column_width = state.last_tree_column_width;
                 }
                 terminal.post_render().expect("post render to work");

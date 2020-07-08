@@ -4,11 +4,7 @@ mod message_buffer {
     fn push(buf: &mut MessageRingBuffer, msg: impl Into<String>) {
         buf.push_overwrite(MessageLevel::Info, "test".into(), msg);
     }
-    fn push_and_copy_all(
-        buf: &mut MessageRingBuffer,
-        msg: impl Into<String>,
-        out: &mut Vec<Message>,
-    ) {
+    fn push_and_copy_all(buf: &mut MessageRingBuffer, msg: impl Into<String>, out: &mut Vec<Message>) {
         push(buf, msg);
         buf.copy_all(out);
     }
@@ -25,11 +21,7 @@ mod message_buffer {
     }
     fn assert_messages(actual: &Vec<Message>, expected: &[&'static str]) {
         let actual: Vec<_> = actual.iter().map(|m| m.message.as_str()).collect();
-        assert_eq!(
-            expected,
-            actual.as_slice(),
-            "messages are ordered old to new"
-        );
+        assert_eq!(expected, actual.as_slice(), "messages are ordered old to new");
     }
 
     #[test]
@@ -59,11 +51,7 @@ mod message_buffer {
 
         #[test]
         fn without_state() {
-            fn push_and_copy_new(
-                buf: &mut MessageRingBuffer,
-                msg: impl Into<String>,
-                out: &mut Vec<Message>,
-            ) {
+            fn push_and_copy_new(buf: &mut MessageRingBuffer, msg: impl Into<String>, out: &mut Vec<Message>) {
                 push(buf, msg);
                 buf.copy_new(out, None);
             }
@@ -87,10 +75,7 @@ mod key_adjacency {
     use crate::tree::{Adjacency, Key, Value};
 
     fn to_kv(keys: &[Key]) -> Vec<(Key, Value)> {
-        let mut v: Vec<_> = keys
-            .iter()
-            .map(|k| (k.to_owned(), Value::default()))
-            .collect();
+        let mut v: Vec<_> = keys.iter().map(|k| (k.to_owned(), Value::default())).collect();
         v.sort_by_key(|v| v.0);
         v
     }
@@ -127,15 +112,7 @@ mod key_adjacency {
         let p1 = r.add_child(1);
         let p11 = p1.add_child(1);
         let p12 = p1.add_child(2);
-        to_kv(
-            &[
-                p1,
-                p11.clone(),
-                p11.add_child(1),
-                p12.clone(),
-                p12.add_child(1),
-            ][..],
-        )
+        to_kv(&[p1, p11.clone(), p11.add_child(1), p12.clone(), p12.add_child(1)][..])
     }
 
     #[test]
@@ -244,10 +221,7 @@ mod key_adjacency {
         let mut entries = root_with_two_children();
         entries.insert(
             1,
-            (
-                Key::default().add_child(0).add_child(0).add_child(1),
-                Value::default(),
-            ),
+            (Key::default().add_child(0).add_child(0).add_child(1), Value::default()),
         );
         entries.sort_by_key(|v| v.0);
         assert_eq!(
