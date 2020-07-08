@@ -4,6 +4,8 @@ use std::{io, ops::RangeInclusive};
 #[derive(Default)]
 pub struct State {
     tree: Vec<(tree::Key, tree::Value)>,
+    messages: Vec<tree::Message>,
+    from_copying: Option<tree::MessageCopyState>,
 }
 
 pub struct Options {
@@ -16,7 +18,7 @@ pub fn lines(_out: &mut impl io::Write, progress: &tree::Root, state: &mut State
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
-    // progress.copy_new_messages()
+    state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
     let level_range = config
         .level_filter
         .clone()

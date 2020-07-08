@@ -83,7 +83,7 @@ mod message_buffer {
             state = push_and_copy_new(&mut buf, "four", &mut out, state);
             assert_messages(&out, &["four"]);
 
-            state = push_and_copy_new(&mut buf, "five", &mut out, state);
+            push_and_copy_new(&mut buf, "five", &mut out, state);
             assert_messages(&out, &["five"]);
 
             state = push_and_copy_new(&mut buf, "six", &mut out, None);
