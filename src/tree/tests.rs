@@ -4,6 +4,14 @@ mod message_buffer {
     fn push(buf: &mut MessageRingBuffer, msg: impl Into<String>) {
         buf.push_overwrite(MessageLevel::Info, "test".into(), msg);
     }
+    fn push_and_copy_all(
+        buf: &mut MessageRingBuffer,
+        msg: impl Into<String>,
+        out: &mut Vec<Message>,
+    ) {
+        push(buf, msg);
+        buf.copy_all(out);
+    }
 
     fn messages(msg: &[&'static str]) -> Vec<Message> {
         msg.iter()
@@ -28,27 +36,52 @@ mod message_buffer {
     fn copy_all() {
         let mut buf = MessageRingBuffer::with_capacity(2);
         let mut out = Vec::new();
-        push(&mut buf, "one");
-        buf.copy_all(&mut out);
+        push_and_copy_all(&mut buf, "one", &mut out);
         assert_eq!(out, buf.buf);
 
-        push(&mut buf, "two");
-        buf.copy_all(&mut out);
+        push_and_copy_all(&mut buf, "two", &mut out);
         assert_eq!(out, buf.buf);
 
-        push(&mut buf, "three");
-        buf.copy_all(&mut out);
+        push_and_copy_all(&mut buf, "three", &mut out);
         assert_messages(&out, &["two", "three"]);
 
-        push(&mut buf, "four");
-        buf.copy_all(&mut out);
+        push_and_copy_all(&mut buf, "four", &mut out);
         assert_messages(&out, &["three", "four"]);
 
-        push(&mut buf, "five");
+        push_and_copy_all(&mut buf, "five", &mut out);
         buf.copy_all(&mut out);
         assert_messages(&out, &["four", "five"]);
     }
+
+    mod copy_new {
+        use crate::tree::tests::message_buffer::assert_messages;
+        use crate::tree::{tests::message_buffer::push, Message, MessageRingBuffer};
+
+        #[test]
+        fn without_state() {
+            fn push_and_copy_new(
+                buf: &mut MessageRingBuffer,
+                msg: impl Into<String>,
+                out: &mut Vec<Message>,
+            ) {
+                push(buf, msg);
+                buf.copy_new(out, None);
+            }
+
+            let mut buf = MessageRingBuffer::with_capacity(2);
+            let mut out = Vec::new();
+            push_and_copy_new(&mut buf, "one", &mut out);
+            assert_eq!(out, buf.buf);
+
+            push_and_copy_new(&mut buf, "two", &mut out);
+            assert_eq!(out, buf.buf);
+
+            push_and_copy_new(&mut buf, "three", &mut out);
+            assert_messages(&out, &["two", "three"]);
+        }
+    }
 }
+
 mod key_adjacency {
     use crate::tree::SiblingLocation::*;
     use crate::tree::{Adjacency, Key, Value};
