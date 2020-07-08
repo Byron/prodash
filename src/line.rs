@@ -32,9 +32,29 @@ pub struct Options {
     pub keep_running_if_progress_is_empty: bool,
 }
 
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            level_filter: None,
+            initial_delay: None,
+            frames_per_second: 4.0,
+            keep_running_if_progress_is_empty: false,
+        }
+    }
+}
+
 pub struct JoinHandle {
     inner: Option<std::thread::JoinHandle<io::Result<()>>>,
     connect: Option<flume::Sender<Event>>,
+}
+
+impl JoinHandle {
+    pub fn detach(&mut self) {
+        self.connect.take();
+    }
+    pub fn join(mut self) {
+        self.inner.take().and_then(|h| h.join().ok());
+    }
 }
 
 impl Drop for JoinHandle {
@@ -81,7 +101,7 @@ pub fn render(
         let mut state = State::default();
         if config.frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
             loop {
-                if let Err(flume::TryRecvError::Disconnected) = quit_recv.try_recv() {
+                if let Ok(Event::Quit) = quit_recv.try_recv() {
                     break;
                 }
                 draw(&mut out, &progress, &mut state, &config)?;
@@ -98,7 +118,13 @@ pub fn render(
             });
 
             let mut selector = flume::Selector::new()
-                .recv(&quit_recv, |_res| Event::Quit)
+                .recv(&quit_recv, |res| {
+                    if let Ok(Event::Quit) = res {
+                        Event::Quit
+                    } else {
+                        Event::Tick
+                    }
+                })
                 .recv(&tick_recv, |_res| Event::Tick);
             while let Event::Tick = selector.wait() {
                 draw(&mut out, &progress, &mut state, &config)?;
