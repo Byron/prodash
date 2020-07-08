@@ -142,7 +142,7 @@ impl MessageRingBuffer {
         if self.has_capacity() {
             out.extend_from_slice(self.buf.as_slice());
         } else {
-            out.extend_from_slice(&self.buf[(self.cursor + 1) % self.buf.len()..]);
+            out.extend_from_slice(&self.buf[self.cursor % self.buf.len()..]);
             if self.cursor + 1 != self.buf.len() {
                 out.extend_from_slice(&self.buf[..self.cursor]);
             }
