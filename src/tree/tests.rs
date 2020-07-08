@@ -92,10 +92,16 @@ mod message_buffer {
             state = Some(buf.copy_new(&mut out, state));
             assert_messages(&out, &[]);
 
-            // push(&mut buf, "seven");
-            // push(&mut buf, "eight");
-            // state = Some(buf.copy_new(&mut out, state));
-            // assert_messages(&out, &["seven", "eight"]);
+            push(&mut buf, "seven");
+            push(&mut buf, "eight");
+            state = Some(buf.copy_new(&mut out, state));
+            assert_messages(&out, &["seven", "eight"]);
+
+            push(&mut buf, "1");
+            push(&mut buf, "2");
+            push(&mut buf, "3");
+            Some(buf.copy_new(&mut out, state));
+            assert_messages(&out, &["2", "3"]);
         }
     }
 }

@@ -112,6 +112,7 @@ pub struct Message {
 pub(crate) struct MessageRingBuffer {
     buf: Vec<Message>,
     cursor: usize,
+    total: usize,
 }
 
 impl MessageRingBuffer {
@@ -119,6 +120,7 @@ impl MessageRingBuffer {
         MessageRingBuffer {
             buf: Vec::with_capacity(capacity),
             cursor: 0,
+            total: 0,
         }
     }
 
@@ -139,6 +141,7 @@ impl MessageRingBuffer {
             self.buf[self.cursor] = msg;
             self.cursor = (self.cursor + 1) % self.buf.len();
         }
+        self.total = self.total.wrapping_add(1);
     }
 
     pub fn copy_all(&self, out: &mut Vec<Message>) {
@@ -152,37 +155,36 @@ impl MessageRingBuffer {
     pub fn copy_new(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
         out.clear();
         match prev {
-            Some(MessageCopyState { cursor, buf_len }) => {
-                let new_elements_below_cap = self.buf.len().saturating_sub(buf_len);
-                let cursor_ofs: isize = self.cursor as isize - cursor as isize;
-                match cursor_ofs {
-                    // there was some capacity left without wrapping around
-                    c if c == 0 => {
-                        out.extend_from_slice(&self.buf[self.buf.len() - new_elements_below_cap..]);
+            Some(MessageCopyState { cursor, buf_len, total }) => {
+                if self.total.saturating_sub(total) >= self.buf.capacity() {
+                    self.copy_all(out);
+                } else {
+                    let new_elements_below_cap = self.buf.len().saturating_sub(buf_len);
+                    let cursor_ofs: isize = self.cursor as isize - cursor as isize;
+                    match cursor_ofs {
+                        // there was some capacity left without wrapping around
+                        c if c == 0 => {
+                            out.extend_from_slice(&self.buf[self.buf.len() - new_elements_below_cap..]);
+                        }
+                        // cursor advanced
+                        c if c > 0 => {
+                            out.extend_from_slice(&self.buf[(cursor % self.buf.len())..self.cursor]);
+                        }
+                        // cursor wrapped around
+                        c if c < 0 => {
+                            out.extend_from_slice(&self.buf[(cursor % self.buf.len())..]);
+                            out.extend_from_slice(&self.buf[..self.cursor]);
+                        }
+                        _ => unreachable!("logic dictates that… yeah, you really shouldn't ever see this!"),
                     }
-                    // cursor advanced
-                    c if c > 0 => {
-                        out.extend_from_slice(&self.buf[(cursor % self.buf.len())..self.cursor]);
-                    }
-                    // cursor wrapped around
-                    c if c < 0 => {
-                        out.extend_from_slice(&self.buf[(cursor % self.buf.len())..]);
-                        out.extend_from_slice(&self.buf[..self.cursor]);
-                    }
-                    _ => unreachable!("logic dictates that… yeah, you really shouldn't ever see this!"),
-                }
-                MessageCopyState {
-                    cursor: self.cursor,
-                    buf_len: self.buf.len(),
-                }
-            }
-            None => {
-                self.copy_all(out);
-                MessageCopyState {
-                    cursor: self.cursor,
-                    buf_len: self.buf.len(),
                 }
             }
+            None => self.copy_all(out),
+        };
+        MessageCopyState {
+            cursor: self.cursor,
+            buf_len: self.buf.len(),
+            total: self.total,
         }
     }
 }
@@ -193,6 +195,7 @@ impl MessageRingBuffer {
 pub struct MessageCopyState {
     cursor: usize,
     buf_len: usize,
+    total: usize,
 }
 
 /// A `Tree` represents an element of the progress tree.
