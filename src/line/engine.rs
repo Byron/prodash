@@ -3,6 +3,17 @@ use std::{io, ops::RangeInclusive, time::Duration};
 
 #[derive(Clone)]
 pub struct Options {
+    /// If true, _(default true)_, we assume the output stream belongs to a terminal.
+    ///
+    /// If false, we won't print any live progress, only log messages.
+    pub output_is_terminal: bool,
+
+    /// If true, _(default: output_is_terminal && crosstermion::should_colorize())_ we will display color.
+    ///
+    /// Please note that you can enforce color even if the output stream is not connected to a terminal by setting
+    /// this field to true.
+    pub colored: bool,
+
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
     ///
     /// This is useful to filter out high-noise lower level progress items in the tree.
@@ -29,6 +40,8 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Options {
+            output_is_terminal: true,
+            colored: true && crosstermion::should_colorize(),
             level_filter: None,
             initial_delay: None,
             frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
@@ -87,12 +100,16 @@ const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 6.0;
 
 pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, config: Options) -> JoinHandle {
     let Options {
+        output_is_terminal,
+        colored,
         level_filter,
         initial_delay,
         frames_per_second,
         keep_running_if_progress_is_empty,
     } = config;
     let config = draw::Options {
+        output_is_terminal,
+        colored,
         keep_running_if_progress_is_empty,
         level_filter,
     };

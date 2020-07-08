@@ -11,6 +11,8 @@ pub struct State {
 pub struct Options {
     pub level_filter: Option<RangeInclusive<tree::Level>>,
     pub keep_running_if_progress_is_empty: bool,
+    pub output_is_terminal: bool,
+    pub colored: bool,
 }
 
 pub fn lines(_out: &mut impl io::Write, progress: &tree::Root, state: &mut State, config: &Options) -> io::Result<()> {
@@ -19,12 +21,14 @@ pub fn lines(_out: &mut impl io::Write, progress: &tree::Root, state: &mut State
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
     state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
-    let level_range = config
-        .level_filter
-        .clone()
-        .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
-    for (_key, _progress) in state.tree.iter().filter(|(k, _)| level_range.contains(&k.level())) {
-        unimplemented!("drawing to be done")
+    if config.output_is_terminal {
+        let level_range = config
+            .level_filter
+            .clone()
+            .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
+        for (_key, _progress) in state.tree.iter().filter(|(k, _)| level_range.contains(&k.level())) {
+            unimplemented!("drawing to be done")
+        }
     }
     Ok(())
 }
