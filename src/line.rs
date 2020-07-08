@@ -37,22 +37,36 @@ impl Default for Options {
         Options {
             level_filter: None,
             initial_delay: None,
-            frames_per_second: 4.0,
+            frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
             keep_running_if_progress_is_empty: false,
         }
     }
 }
 
+/// A handle to the render thread, which when dropped will instruct it to stop showing progress.
 pub struct JoinHandle {
     inner: Option<std::thread::JoinHandle<io::Result<()>>>,
     connect: Option<flume::Sender<Event>>,
 }
 
 impl JoinHandle {
-    pub fn detach(&mut self) {
+    /// Remove the handles capability to instruct the render thread to stop.
+    pub fn disconnect(&mut self) {
         self.connect.take();
     }
-    pub fn join(mut self) {
+    /// Remove the handles capability to `join()` by forgetting the threads handle
+    pub fn forget(&mut self) {
+        self.inner.take();
+    }
+    /// Wait for the thread to shutdown naturally, for example because there is no more progress to display
+    pub fn wait(mut self) {
+        self.inner.take().and_then(|h| h.join().ok());
+    }
+    /// Send the signal to shutdown and wait for the thread to be shutdown.
+    pub fn shutdown_and_wait(mut self) {
+        if let Some(chan) = self.connect.take() {
+            chan.send(Event::Quit).ok();
+        }
         self.inner.take().and_then(|h| h.join().ok());
     }
 }
@@ -62,7 +76,6 @@ impl Drop for JoinHandle {
         if let Some(chan) = self.connect.take() {
             chan.send(Event::Quit).ok();
         }
-        self.inner.take().and_then(|h| h.join().ok());
     }
 }
 
@@ -71,7 +84,7 @@ enum Event {
     Quit,
 }
 
-const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 4.0;
+const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 6.0;
 
 #[derive(Default)]
 struct State {
@@ -96,7 +109,18 @@ fn draw(
             "stop as progress is empty",
         ));
     }
-    unimplemented!("drawing to be done")
+    let level_range = config
+        .level_filter
+        .clone()
+        .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
+    for (_key, _progress) in state
+        .tree
+        .iter()
+        .filter(|(k, _)| level_range.contains(&k.level()))
+    {
+        unimplemented!("drawing to be done")
+    }
+    Ok(())
 }
 
 pub fn render(

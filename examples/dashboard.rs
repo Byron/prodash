@@ -95,8 +95,8 @@ fn launch_ambient_gui(
                     ..line::Options::default()
                 },
             );
-            handle.detach();
-            handle.join();
+            handle.disconnect();
+            handle.wait();
         })
         .boxed(),
         "tui" => tui::render_with_input(
