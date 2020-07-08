@@ -82,6 +82,19 @@ pub fn render(
                 std::thread::sleep(Duration::from_secs_f32(1.0 / config.frames_per_second));
             }
         } else {
+            let (tick_send, tick_recv) = flume::bounded::<Event>(0);
+            std::thread::spawn(move || loop {
+                if tick_send.send(Event::Tick).is_err() {
+                    break;
+                }
+                std::thread::sleep(Duration::from_secs_f32(1.0 / config.frames_per_second));
+            });
+            for _ in tick_recv.into_iter() {
+                if let Ok(_) | Err(flume::TryRecvError::Disconnected) = quit_recv.try_recv() {
+                    break;
+                }
+                draw(&mut out, &progress, &mut state, &config)?;
+            }
         }
         Ok(())
     });
