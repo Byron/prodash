@@ -1,12 +1,14 @@
 use crate::tree;
 use crosstermion::ansi_term::Color;
 use std::{io, ops::RangeInclusive};
+use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
 pub struct State {
     tree: Vec<(tree::Key, tree::Value)>,
     messages: Vec<tree::Message>,
     from_copying: Option<tree::MessageCopyState>,
+    max_message_origin_size: usize,
 }
 
 pub struct Options {
@@ -17,7 +19,7 @@ pub struct Options {
     pub timestamp: bool,
 }
 
-fn messages(out: &mut impl io::Write, messages: &[tree::Message], colored: bool, timestamp: bool) -> io::Result<()> {
+fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestamp: bool) -> io::Result<()> {
     let mut brush = crosstermion::color::Brush::new(colored);
     fn to_color(level: tree::MessageLevel) -> Color {
         use tree::MessageLevel::*;
@@ -32,8 +34,9 @@ fn messages(out: &mut impl io::Write, messages: &[tree::Message], colored: bool,
         level,
         origin,
         message,
-    } in messages
+    } in &state.messages
     {
+        state.max_message_origin_size = state.max_message_origin_size.max(origin.width());
         let color = to_color(*level);
         writeln!(
             out,
@@ -43,15 +46,19 @@ fn messages(out: &mut impl io::Write, messages: &[tree::Message], colored: bool,
                     "{} ",
                     brush
                         .style(color.dimmed().on(Color::Yellow))
-                        .paint(crate::time::format_time_for_messages(*time))
+                        .paint(crate::time::format_time_for_messages(*time)),
                 )
             } else {
                 "".into()
             },
             brush
                 .style(crosstermion::ansi_term::Style::default().dimmed())
-                .paint(origin),
-            brush.style(color.bold()).paint(message)
+                .paint(format!(
+                    "{:>max_size$}",
+                    origin,
+                    max_size = state.max_message_origin_size
+                )),
+            brush.style(color.bold()).paint(message),
         )?;
     }
     Ok(())
@@ -63,7 +70,7 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
     state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
-    messages(out, &state.messages, config.colored, config.timestamp)?;
+    messages(out, state, config.colored, config.timestamp)?;
     if config.output_is_terminal {
         let level_range = config
             .level_filter
