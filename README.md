@@ -19,10 +19,12 @@ This crate comes with various cargo features to tailor it to your needs.
 
 * **local-time** _(default)_
   * If set, timestamps in the message pane of the `tui-renderer` will be using the local time, not UTC
-  * Has no effect without the `tui-renderer`
+  * If set, timestamps of the log messages of the `line-renderer` will be using the local time, not UTC
+  * Has no effect without the `tui-renderer` or `line-renderer` respectively
 * **log-renderer** _(default)_
   * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
     `tree::Item::message(…)` and friends.
+  * May interfere with `tui-renderer` or `line-renderer`
 * **line-renderer**
   * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
   * It's like the tui-renderer, but with far less dependencies and less visual fidelity - all it needs is to move

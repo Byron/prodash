@@ -50,6 +50,9 @@ pub use log::info;
 #[cfg(feature = "log-renderer")]
 pub use log::warn;
 
+#[cfg(any(feature = "humantime", feature = "time"))]
+pub mod time;
+
 #[cfg(not(feature = "log-renderer"))]
 mod log {
     /// Stub

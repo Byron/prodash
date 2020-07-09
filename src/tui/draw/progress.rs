@@ -1,7 +1,8 @@
 use crate::{
+    time::format_now_datetime_seconds,
     tree::{Key, Progress, ProgressState, ProgressStep, Value},
     tui::{
-        draw::{time::format_now_datetime_seconds, State},
+        draw::State,
         utils::{
             block_width, draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, rect, sanitize_offset,
             GraphemeCountWriter, VERTICAL_LINE,

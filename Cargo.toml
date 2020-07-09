@@ -30,7 +30,7 @@ tui-renderer = ["tui",
                 "futures-core",
                 "smol",
                 "humantime"]
-line-renderer = ["flume", "crosstermion/color"]
+line-renderer = ["flume", "crosstermion/color", "humantime"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
 log-renderer = ["log"]
