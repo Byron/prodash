@@ -7,10 +7,10 @@ use unicode_width::UnicodeWidthStr;
 pub struct State {
     tree: Vec<(tree::Key, tree::Value)>,
     messages: Vec<tree::Message>,
-    from_copying: Option<tree::MessageCopyState>,
+    for_next_copy: Option<tree::MessageCopyState>,
     max_message_origin_size: usize,
     /// The amount of blocks per line we have written last time.
-    blocks_per_line: Vec<u16>,
+    blocks_per_line: std::collections::VecDeque<u16>,
     /// Amount of times we drew so far
     ticks: usize,
 }
@@ -33,19 +33,14 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
             Failure => Color::Red,
         }
     }
-    for (
-        tree::Message {
-            time,
-            level,
-            origin,
-            message,
-        },
-        last_drawn_line_length,
-    ) in state
-        .messages
-        .iter()
-        .zip(state.blocks_per_line.iter().chain(std::iter::repeat(&0)))
+    for tree::Message {
+        time,
+        level,
+        origin,
+        message,
+    } in &state.messages
     {
+        let _last_drawn_line_length = state.blocks_per_line.pop_front().unwrap_or(0);
         let message_block_len = origin.width();
         state.max_message_origin_size = state.max_message_origin_size.max(message_block_len);
         let color = to_color(*level);
@@ -81,7 +76,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
-    state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
+    state.for_next_copy = Some(progress.copy_new_messages(&mut state.messages, state.for_next_copy.take()));
     messages(out, state, config.colored, config.timestamp)?;
 
     if config.output_is_terminal {
@@ -123,15 +118,16 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             **blocks_in_last_iteration = current_block_count;
         }
         // overwrite remaining lines that we didn't touch naturally
-        if state.blocks_per_line.len() > lines_to_be_drawn {
-            for blocks_in_last_iteration in &state.blocks_per_line[lines_to_be_drawn..] {
+        let lines_drawn = lines_to_be_drawn;
+        if state.blocks_per_line.len() > lines_drawn {
+            for blocks_in_last_iteration in state.blocks_per_line.iter().skip(lines_drawn) {
                 writeln!(out, "{:>width$}", "", width = *blocks_in_last_iteration as usize)?;
             }
             // Move cursor back to end of the portion we have actually drawn
             crosstermion::execute!(out, crosstermion::cursor::MoveUp(state.blocks_per_line.len() as u16))?;
-            state.blocks_per_line.resize(lines_to_be_drawn, 0);
+            state.blocks_per_line.resize(lines_drawn, 0);
         } else {
-            crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_to_be_drawn as u16))?;
+            crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
         }
     }
     state.ticks += 1;
