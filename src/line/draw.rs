@@ -33,19 +33,25 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
             Failure => Color::Red,
         }
     }
-    for tree::Message {
-        time,
-        level,
-        origin,
-        message,
-    } in &state.messages
+    for (
+        tree::Message {
+            time,
+            level,
+            origin,
+            message,
+        },
+        last_drawn_line_length,
+    ) in state
+        .messages
+        .iter()
+        .zip(state.blocks_per_line.iter().chain(std::iter::repeat(&0)))
     {
         let message_block_len = origin.width();
         state.max_message_origin_size = state.max_message_origin_size.max(message_block_len);
         let color = to_color(*level);
         writeln!(
             out,
-            " {}{} {}",
+            " {}{} {}{:>overdraw_size$}",
             if timestamp {
                 format!(
                     "{} ",
@@ -63,6 +69,8 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
                 fill_size = state.max_message_origin_size - message_block_len,
             )),
             brush.style(color.bold()).paint(message),
+            "",
+            overdraw_size = 0,
         )?;
     }
     Ok(())
@@ -138,4 +146,5 @@ fn format_progress<'a>(key: &tree::Key, progress: &'a tree::Value, ticks: usize,
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
     buf.push(Color::Yellow.paint(format!("{}", ticks)));
     buf.push(Color::Green.on(Color::Red).paint(&progress.name));
+    buf.push(Style::new().paint("long text long text long text long text long text long text long text long text long text long text long text "));
 }
