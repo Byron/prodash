@@ -18,6 +18,9 @@ mod message_buffer {
     fn copy_all() {
         let mut buf = MessageRingBuffer::with_capacity(2);
         let mut out = Vec::new();
+        buf.copy_all(&mut out);
+        assert_eq!(out, buf.buf);
+
         push_and_copy_all(&mut buf, "one", &mut out);
         assert_eq!(out, buf.buf);
 
@@ -48,6 +51,9 @@ mod message_buffer {
 
             let mut buf = MessageRingBuffer::with_capacity(2);
             let mut out = Vec::new();
+            buf.copy_new(&mut out, None);
+            assert_eq!(out, buf.buf);
+
             push_and_copy_new(&mut buf, "one", &mut out);
             assert_eq!(out, buf.buf);
 
