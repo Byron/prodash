@@ -14,6 +14,9 @@ pub struct Options {
     /// this field to true.
     pub colored: bool,
 
+    /// If true, _(default: false)_, a timestamp will be shown before each message.
+    pub timestamp: bool,
+
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
     ///
     /// This is useful to filter out high-noise lower level progress items in the tree.
@@ -42,6 +45,7 @@ impl Default for Options {
         Options {
             output_is_terminal: true,
             colored: true,
+            timestamp: false,
             level_filter: None,
             initial_delay: None,
             frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
@@ -103,6 +107,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     let Options {
         output_is_terminal,
         colored,
+        timestamp,
         level_filter,
         initial_delay,
         frames_per_second,
@@ -111,6 +116,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     let config = draw::Options {
         output_is_terminal,
         colored,
+        timestamp,
         keep_running_if_progress_is_empty,
         level_filter,
     };

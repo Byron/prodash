@@ -14,9 +14,10 @@ pub struct Options {
     pub keep_running_if_progress_is_empty: bool,
     pub output_is_terminal: bool,
     pub colored: bool,
+    pub timestamp: bool,
 }
 
-fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool) -> io::Result<()> {
+fn messages(out: &mut impl io::Write, messages: &[tree::Message], colored: bool, timestamp: bool) -> io::Result<()> {
     let mut brush = crosstermion::color::Brush::new(colored);
     fn to_color(level: tree::MessageLevel) -> Color {
         use tree::MessageLevel::*;
@@ -35,12 +36,21 @@ fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool
     {
         let color = to_color(*level);
         writeln!(
-            _out,
-            " {} {} {}",
+            out,
+            " {}{} {}",
+            if timestamp {
+                format!(
+                    "{} ",
+                    brush
+                        .style(color.dimmed().on(Color::Yellow))
+                        .paint(crate::time::format_time_for_messages(*time))
+                )
+            } else {
+                "".into()
+            },
             brush
-                .style(color.dimmed().on(Color::Yellow))
-                .paint(crate::time::format_time_for_messages(*time)),
-            brush.style(color.dimmed()).paint(origin),
+                .style(crosstermion::ansi_term::Style::default().dimmed())
+                .paint(origin),
             brush.style(color.bold()).paint(message)
         )?;
     }
@@ -53,7 +63,7 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
     state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
-    messages(out, &state.messages, config.colored)?;
+    messages(out, &state.messages, config.colored, config.timestamp)?;
     if config.output_is_terminal {
         let level_range = config
             .level_filter
