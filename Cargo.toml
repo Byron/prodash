@@ -30,7 +30,7 @@ tui-renderer = ["tui",
                 "futures-core",
                 "smol",
                 "humantime"]
-line-renderer = ["flume"]
+line-renderer = ["flume", "ansi_term"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
 log-renderer = ["log"]
@@ -61,6 +61,7 @@ time = { version = "0.2.9", optional = true, features = ["std"], default-feature
 
 # line renderer
 flume = { version = "0.7.1", optional = true, default-features = false, features = ['select'] }
+ansi_term = { version = "0.12.1", optional = true, default-features = false }
 
 [package.metadata.docs.rs]
 all-features = true
