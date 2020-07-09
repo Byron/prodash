@@ -81,8 +81,13 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .level_filter
             .clone()
             .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
-        if state.blocks_per_line.len() < state.tree.len() {
-            state.blocks_per_line.resize(state.tree.len(), 0);
+        let lines_to_be_drawn = state
+            .tree
+            .iter()
+            .filter(|(k, _)| level_range.contains(&k.level()))
+            .count();
+        if state.blocks_per_line.len() < lines_to_be_drawn {
+            state.blocks_per_line.resize(lines_to_be_drawn, 0);
         }
         let mut tokens: Vec<ANSIString<'_>> = Vec::new();
         for ((key, progress), ref mut blocks_in_last_iteration) in state
@@ -110,21 +115,18 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             **blocks_in_last_iteration = current_block_count;
         }
         // overwrite remaining lines that we didn't touch naturally
-        if state.blocks_per_line.len() > state.tree.len() {
-            for blocks_in_last_iteration in &state.blocks_per_line[state.tree.len()..] {
+        if state.blocks_per_line.len() > lines_to_be_drawn {
+            for blocks_in_last_iteration in &state.blocks_per_line[lines_to_be_drawn..] {
                 writeln!(out, "{:>width$}", "", width = *blocks_in_last_iteration as usize)?;
             }
             // Move cursor back to end of the portion we have actually drawn
             crosstermion::execute!(
                 out,
-                crosstermion::cursor::MoveToPreviousLine((state.blocks_per_line.len() as u16).saturating_sub(1))
+                crosstermion::cursor::MoveToPreviousLine(state.blocks_per_line.len() as u16)
             )?;
-            state.blocks_per_line.resize(state.tree.len(), 0);
+            state.blocks_per_line.resize(lines_to_be_drawn, 0);
         } else {
-            crosstermion::execute!(
-                out,
-                crosstermion::cursor::MoveToPreviousLine((state.tree.len() as u16).saturating_sub(1))
-            )?;
+            crosstermion::execute!(out, crosstermion::cursor::MoveToPreviousLine(lines_to_be_drawn as u16))?;
         }
     }
     state.ticks += 1;
