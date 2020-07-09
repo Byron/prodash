@@ -1,6 +1,45 @@
 use std::borrow::Cow;
 use std::ffi::OsStr;
 
+#[cfg(feature = "ansi_term")]
+mod _impl {
+    use ansi_term::{ANSIGenericString, Style};
+
+    pub struct Brush {
+        may_paint: bool,
+        style: Option<Style>,
+    }
+
+    impl Brush {
+        pub fn new(colored: bool) -> Self {
+            Brush {
+                may_paint: colored,
+                style: None,
+            }
+        }
+
+        pub fn style(&mut self, style: Style) -> &mut Self {
+            self.style = Some(style);
+            self
+        }
+
+        #[must_use]
+        pub fn paint<'a, I, S: 'a + ToOwned + ?Sized>(&mut self, input: I) -> ANSIGenericString<'a, S>
+        where
+            I: Into<std::borrow::Cow<'a, S>>,
+            <S as ToOwned>::Owned: std::fmt::Debug,
+        {
+            match (self.may_paint, self.style.take()) {
+                (true, Some(style)) => style.paint(input),
+                (_, Some(_)) | (_, None) => ANSIGenericString::from(input),
+            }
+        }
+    }
+}
+
+#[cfg(feature = "ansi_term")]
+pub use _impl::*;
+
 /// Return true if we should colorize the output, based on [clicolors spec](https://bixense.com/clicolors/) and [no-color spec](https://no-color.org)
 ///
 /// Note that you should also validate that the output stream is actually connected to a terminal, which usually looks like

@@ -13,9 +13,8 @@ Currently provided facilities are:
 * **With** `tui`
     * When using the `tui`, you will have native cross-backend support for colors and styles.
 * **Without** `tui`
-    * Otherwise, using `colored` or `termcolor` will work as expected.
-    * As both options are quite highly abstracted, whereas the color and style of `crossterm` and `termion` are not, it would probably
-      not be unwise to provide an adapter type similar to `crate::input::Key` in this crate, but for color and styles.
+    * Use the **`color`** feature for additional utilities for colors with `ansi_term`.
+    * Otherwise, using `ansi_term`, `colored` or `termcolor` will work as expected.
       
 ### How to build with `crossterm` on Windows and `termion` on Unix?
 
@@ -71,4 +70,7 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
 * **flume-async**
    * activates 'flume/async'
    * note that 'flume/select' is always active, as it is just a few lines of code without any additional dependencies
+* **color**
+   * Add support for `ansi_term` based conditional coloring. The crate is small, to the point and allows zero-copy drawing
+     of bytes and UTF-8 string, while supporting Windows 10 as well.
 

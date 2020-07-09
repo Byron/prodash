@@ -1,5 +1,5 @@
 use crate::tree;
-use ansi_term::Color;
+use crosstermion::ansi_term::Color;
 use std::{io, ops::RangeInclusive};
 
 #[derive(Default)]
@@ -16,43 +16,8 @@ pub struct Options {
     pub colored: bool,
 }
 
-mod utils {
-    use ansi_term::{ANSIGenericString, Style};
-
-    pub struct Brush {
-        may_paint: bool,
-        style: Option<Style>,
-    }
-
-    impl Brush {
-        pub fn new(colored: bool) -> Self {
-            Brush {
-                may_paint: colored,
-                style: None,
-            }
-        }
-
-        pub fn style(&mut self, style: Style) -> &mut Self {
-            self.style = Some(style);
-            self
-        }
-
-        #[must_use]
-        pub fn paint<'a, I, S: 'a + ToOwned + ?Sized>(&mut self, input: I) -> ANSIGenericString<'a, S>
-        where
-            I: Into<std::borrow::Cow<'a, S>>,
-            <S as ToOwned>::Owned: std::fmt::Debug,
-        {
-            match (self.may_paint, self.style.take()) {
-                (true, Some(style)) => style.paint(input),
-                (_, Some(_)) | (_, None) => ANSIGenericString::from(input),
-            }
-        }
-    }
-}
-
 fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool) -> io::Result<()> {
-    let mut brush = utils::Brush::new(colored);
+    let mut brush = crosstermion::color::Brush::new(colored);
     fn to_color(level: tree::MessageLevel) -> Color {
         use tree::MessageLevel::*;
         match level {
@@ -68,11 +33,12 @@ fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool
         message,
     } in messages
     {
+        let color = to_color(*level);
         writeln!(
             _out,
             "{}→{}",
-            brush.style(Color::Yellow.dimmed()).paint(origin),
-            brush.style(to_color(*level).bold()).paint(message)
+            brush.style(color.dimmed()).paint(origin),
+            brush.style(color.bold()).paint(message)
         )?;
     }
     Ok(())
@@ -91,7 +57,7 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
             .clone()
             .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
         for (_key, _progress) in state.tree.iter().filter(|(k, _)| level_range.contains(&k.level())) {
-            unimplemented!("drawing to be done")
+            // unimplemented!("drawing to be done")
         }
     }
     Ok(())

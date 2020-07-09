@@ -23,6 +23,8 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features tui-react-crossterm,input-async
 	cargo check --features tui-termion
 	cargo check --features tui-crossterm
+	cargo check --features flume-async
+	cargo check --features color
 	cargo check --all-features
 
 

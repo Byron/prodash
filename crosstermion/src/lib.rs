@@ -12,6 +12,8 @@ pub mod color;
 mod crossterm_utils;
 
 // Reexports
+#[cfg(feature = "ansi_term")]
+pub use ansi_term;
 #[cfg(feature = "crossbeam-channel")]
 pub use crossbeam_channel;
 #[cfg(feature = "crossterm")]
