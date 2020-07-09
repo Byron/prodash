@@ -11,6 +11,8 @@ pub struct State {
     max_message_origin_size: usize,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: Vec<u16>,
+    /// Amount of times we drew so far
+    ticks: usize,
 }
 
 pub struct Options {
@@ -79,13 +81,6 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .level_filter
             .clone()
             .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
-        if state.blocks_per_line.len() > 0 {
-            // Move the cursor back all the way so we can start overwriting the screen
-            crosstermion::execute!(
-                out,
-                crosstermion::cursor::MoveToPreviousLine(state.blocks_per_line.len() as u16)
-            )?;
-        }
         if state.blocks_per_line.len() < state.tree.len() {
             state.blocks_per_line.resize(state.tree.len(), 0);
         }
@@ -97,7 +92,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .zip(state.blocks_per_line.iter_mut())
         {
             tokens.clear();
-            format_progress(key, progress, &mut tokens);
+            format_progress(key, progress, state.ticks, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             let current_block_count = block_count_sans_ansi_codes(&tokens);
@@ -122,11 +117,17 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             // Move cursor back to end of the portion we have actually drawn
             crosstermion::execute!(
                 out,
-                crosstermion::cursor::MoveToPreviousLine((state.blocks_per_line.len() - state.tree.len()) as u16)
+                crosstermion::cursor::MoveToPreviousLine((state.blocks_per_line.len() as u16).saturating_sub(1))
             )?;
             state.blocks_per_line.resize(state.tree.len(), 0);
+        } else {
+            crosstermion::execute!(
+                out,
+                crosstermion::cursor::MoveToPreviousLine((state.tree.len() as u16).saturating_sub(1))
+            )?;
         }
     }
+    state.ticks += 1;
     Ok(())
 }
 
@@ -134,7 +135,8 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn format_progress<'a>(key: &tree::Key, progress: &'a tree::Value, buf: &mut Vec<ANSIString<'a>>) {
+fn format_progress<'a>(key: &tree::Key, progress: &'a tree::Value, ticks: usize, buf: &mut Vec<ANSIString<'a>>) {
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
+    buf.push(Color::Yellow.paint(format!("{}", ticks)));
     buf.push(Color::Green.on(Color::Red).paint(&progress.name));
 }

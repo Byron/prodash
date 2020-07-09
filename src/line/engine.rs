@@ -57,7 +57,9 @@ impl Default for Options {
 /// A handle to the render thread, which when dropped will instruct it to stop showing progress.
 pub struct JoinHandle {
     inner: Option<std::thread::JoinHandle<io::Result<()>>>,
-    connect: Option<flume::Sender<Event>>,
+    connection: flume::Sender<Event>,
+    // If we disconnect before sending a Quit event, the selector continuously informs about the 'Disconnect' state
+    disconnected: bool,
 }
 
 impl JoinHandle {
@@ -68,7 +70,7 @@ impl JoinHandle {
     }
     /// Remove the handles capability to instruct the render thread to stop.
     pub fn disconnect(&mut self) {
-        self.connect.take();
+        self.disconnected = true;
     }
     /// Remove the handles capability to `join()` by forgetting the threads handle
     pub fn forget(&mut self) {
@@ -80,8 +82,8 @@ impl JoinHandle {
     }
     /// Send the signal to shutdown and wait for the thread to be shutdown.
     pub fn shutdown_and_wait(mut self) {
-        if let Some(chan) = self.connect.take() {
-            chan.send(Event::Quit).ok();
+        if !self.disconnected {
+            self.connection.send(Event::Quit).ok();
         }
         self.inner.take().and_then(|h| h.join().ok());
     }
@@ -89,8 +91,8 @@ impl JoinHandle {
 
 impl Drop for JoinHandle {
     fn drop(&mut self) {
-        if let Some(chan) = self.connect.take() {
-            chan.send(Event::Quit).ok();
+        if !self.disconnected {
+            self.connection.send(Event::Quit).ok();
         }
     }
 }
@@ -121,7 +123,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         level_filter,
     };
 
-    let (quit_send, quit_recv) = flume::bounded::<Event>(1);
+    let (quit_send, quit_recv) = flume::unbounded::<Event>();
 
     let handle = std::thread::spawn(move || {
         {
@@ -159,7 +161,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
-            let (tick_send, tick_recv) = flume::bounded::<Event>(1);
+            let (tick_send, tick_recv) = flume::unbounded::<Event>();
             let secs = 1.0 / frames_per_second;
             let _ticker = std::thread::spawn(move || loop {
                 if tick_send.send(Event::Tick).is_err() {
@@ -186,6 +188,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
 
     JoinHandle {
         inner: Some(handle),
-        connect: Some(quit_send),
+        connection: quit_send,
+        disconnected: false,
     }
 }
