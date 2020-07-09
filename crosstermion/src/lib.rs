@@ -6,10 +6,13 @@ pub mod input;
 #[cfg(any(feature = "termion", feature = "crossterm"))]
 pub mod terminal;
 
+#[cfg(any(feature = "termion", feature = "crossterm"))]
+pub mod cursor;
+
 pub mod color;
 
 #[cfg(feature = "crossterm")]
-mod crossterm_utils;
+pub mod crossterm_utils;
 
 // Reexports
 #[cfg(feature = "ansi_term")]

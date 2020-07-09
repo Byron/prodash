@@ -84,7 +84,7 @@ fn launch_ambient_gui(
         "line" => smol::Task::blocking(async move {
             let output_is_terminal = atty::is(atty::Stream::Stdout);
             let mut handle = line::render(
-                std::io::stdout(),
+                std::io::stderr(),
                 progress,
                 line::Options {
                     output_is_terminal,

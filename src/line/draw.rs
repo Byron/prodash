@@ -66,13 +66,14 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
     Ok(())
 }
 
-pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, config: &Options) -> io::Result<()> {
+pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, config: &Options) -> io::Result<()> {
     progress.sorted_snapshot(&mut state.tree);
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
     state.from_copying = Some(progress.copy_new_messages(&mut state.messages, state.from_copying.take()));
     messages(out, state, config.colored, config.timestamp)?;
+
     if config.output_is_terminal {
         let level_range = config
             .level_filter
@@ -80,6 +81,10 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
             .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
         if state.blocks_per_line.len() > 0 {
             // Move the cursor back all the way so we can start overwriting the screen
+            crosstermion::execute!(
+                out,
+                crosstermion::cursor::MoveToPreviousLine(state.blocks_per_line.len() as u16)
+            )?;
         }
         if state.blocks_per_line.len() < state.tree.len() {
             state.blocks_per_line.resize(state.tree.len(), 0);
@@ -100,7 +105,7 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
                 // fill to the end of line to overwrite what was previously there
                 writeln!(
                     out,
-                    "{:width$}",
+                    "{:>width$}",
                     "",
                     width = (**blocks_in_last_iteration - current_block_count) as usize
                 )?;
@@ -112,8 +117,13 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
         // overwrite remaining lines that we didn't touch naturally
         if state.blocks_per_line.len() > state.tree.len() {
             for blocks_in_last_iteration in &state.blocks_per_line[state.tree.len()..] {
-                writeln!(out, "{:width$}", width = *blocks_in_last_iteration as usize)?;
+                writeln!(out, "{:>width$}", "", width = *blocks_in_last_iteration as usize)?;
             }
+            // Move cursor back to end of the portion we have actually drawn
+            crosstermion::execute!(
+                out,
+                crosstermion::cursor::MoveToPreviousLine((state.blocks_per_line.len() - state.tree.len()) as u16)
+            )?;
             state.blocks_per_line.resize(state.tree.len(), 0);
         }
     }

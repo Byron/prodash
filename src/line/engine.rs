@@ -155,7 +155,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 if let Ok(Event::Quit) = quit_recv.try_recv() {
                     break;
                 }
-                draw::lines(&mut out, &progress, &mut state, &config)?;
+                draw::all(&mut out, &progress, &mut state, &config)?;
                 std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
@@ -178,7 +178,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 })
                 .recv(&tick_recv, |_res| Event::Tick);
             while let Event::Tick = selector.wait() {
-                draw::lines(&mut out, &progress, &mut state, &config)?;
+                draw::all(&mut out, &progress, &mut state, &config)?;
             }
         }
         Ok(())
