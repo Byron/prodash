@@ -121,7 +121,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         level_filter,
     };
 
-    let (quit_send, quit_recv) = flume::bounded::<Event>(0);
+    let (quit_send, quit_recv) = flume::bounded::<Event>(1);
 
     let handle = std::thread::spawn(move || {
         {
@@ -159,7 +159,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
-            let (tick_send, tick_recv) = flume::bounded::<Event>(0);
+            let (tick_send, tick_recv) = flume::bounded::<Event>(1);
             let secs = 1.0 / frames_per_second;
             let _ticker = std::thread::spawn(move || loop {
                 if tick_send.send(Event::Tick).is_err() {
