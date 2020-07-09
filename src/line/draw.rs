@@ -1,5 +1,5 @@
 use crate::tree;
-use crosstermion::ansi_term::{Color, Style};
+use crosstermion::ansi_term::{ANSIString, ANSIStrings, Color, Style};
 use std::{io, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
@@ -9,6 +9,8 @@ pub struct State {
     messages: Vec<tree::Message>,
     from_copying: Option<tree::MessageCopyState>,
     max_message_origin_size: usize,
+    /// The amount of blocks per line we have written last time.
+    blocks_per_line: Vec<u16>,
 }
 
 pub struct Options {
@@ -76,9 +78,53 @@ pub fn lines(out: &mut impl io::Write, progress: &tree::Root, state: &mut State,
             .level_filter
             .clone()
             .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
-        for (_key, _progress) in state.tree.iter().filter(|(k, _)| level_range.contains(&k.level())) {
-            // unimplemented!("drawing to be done")
+        if state.blocks_per_line.len() > 0 {
+            // Move the cursor back all the way so we can start overwriting the screen
+        }
+        if state.blocks_per_line.len() < state.tree.len() {
+            state.blocks_per_line.resize(state.tree.len(), 0);
+        }
+        let mut tokens: Vec<ANSIString<'_>> = Vec::new();
+        for ((key, progress), ref mut blocks_in_last_iteration) in state
+            .tree
+            .iter()
+            .filter(|(k, _)| level_range.contains(&k.level()))
+            .zip(state.blocks_per_line.iter_mut())
+        {
+            tokens.clear();
+            format_progress(key, progress, &mut tokens);
+            write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
+
+            let current_block_count = block_count_sans_ansi_codes(&tokens);
+            if **blocks_in_last_iteration > current_block_count {
+                // fill to the end of line to overwrite what was previously there
+                writeln!(
+                    out,
+                    "{:width$}",
+                    "",
+                    width = (**blocks_in_last_iteration - current_block_count) as usize
+                )?;
+            } else {
+                writeln!(out)?;
+            }
+            **blocks_in_last_iteration = current_block_count;
+        }
+        // overwrite remaining lines that we didn't touch naturally
+        if state.blocks_per_line.len() > state.tree.len() {
+            for blocks_in_last_iteration in &state.blocks_per_line[state.tree.len()..] {
+                writeln!(out, "{:width$}", width = *blocks_in_last_iteration as usize)?;
+            }
+            state.blocks_per_line.resize(state.tree.len(), 0);
         }
     }
     Ok(())
+}
+
+fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
+    strings.iter().map(|s| s.width() as u16).sum()
+}
+
+fn format_progress<'a>(key: &tree::Key, progress: &'a tree::Value, buf: &mut Vec<ANSIString<'a>>) {
+    buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
+    buf.push(Color::Green.on(Color::Red).paint(&progress.name));
 }
