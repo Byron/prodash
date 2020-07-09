@@ -67,10 +67,16 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
         * **tui-react-crossterm** _implies `crossterm` feature_
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
+* _mutually exclusive_
+    * **localtime**
+       * Support formatting time in local time
+       * This is quite heavy in dependencies
+    * **utctime**
+       * Support formatting time in UTC time
+       * The dependencies for this one are light
 * **flume-async**
    * activates 'flume/async'
    * note that 'flume/select' is always active, as it is just a few lines of code without any additional dependencies
 * **color**
    * Add support for `ansi_term` based conditional coloring. The crate is small, to the point and allows zero-copy drawing
      of bytes and UTF-8 string, while supporting Windows 10 as well.
-

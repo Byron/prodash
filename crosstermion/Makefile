@@ -25,6 +25,9 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features tui-crossterm
 	cargo check --features flume-async
 	cargo check --features color
+	cargo check --features utctime
+	cargo check --features localtime
+	cargo check --features localtime,humantime
 	cargo check --all-features
 
 
