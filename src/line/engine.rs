@@ -144,24 +144,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     let handle = std::thread::spawn(move || {
         {
             let (delay_send, delay_recv) = flume::bounded::<Event>(1);
-            let mut inital_delay = {
-                match initial_delay {
-                    Some(delay) => drop(std::thread::spawn(move || {
-                        std::thread::sleep(delay);
-                        delay_send.send(Event::Tick).unwrap();
-                    })),
-                    None => delay_send.send(Event::Tick).unwrap(),
-                };
-                flume::Selector::new()
-                    .recv(&delay_recv, |_| Event::Tick)
-                    .recv(&quit_recv, |res| {
-                        if let Ok(Event::Quit) = res {
-                            Event::Quit
-                        } else {
-                            Event::Tick
-                        }
-                    })
-            };
+            let mut inital_delay = handle_initial_delay(initial_delay, delay_send, &delay_recv, &quit_recv);
             if let Event::Quit = inital_delay.wait() {
                 return Ok(());
             }
@@ -211,4 +194,28 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         connection: quit_send,
         disconnected: false,
     }
+}
+
+fn handle_initial_delay<'a>(
+    initial_delay: Option<Duration>,
+    delay_send: flume::Sender<Event>,
+    delay_recv: &'a flume::Receiver<Event>,
+    quit_recv: &'a flume::Receiver<Event>,
+) -> flume::Selector<'a, Event> {
+    match initial_delay {
+        Some(delay) => drop(std::thread::spawn(move || {
+            std::thread::sleep(delay);
+            delay_send.send(Event::Tick).unwrap();
+        })),
+        None => delay_send.send(Event::Tick).unwrap(),
+    };
+    flume::Selector::new()
+        .recv(&delay_recv, |_| Event::Tick)
+        .recv(&quit_recv, |res| {
+            if let Ok(Event::Quit) = res {
+                Event::Quit
+            } else {
+                Event::Tick
+            }
+        })
 }
