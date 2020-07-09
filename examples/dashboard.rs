@@ -88,6 +88,10 @@ fn launch_ambient_gui(
                 progress,
                 line::Options {
                     output_is_terminal,
+                    #[cfg(feature = "ctrlc")]
+                    hide_cursor: true,
+                    #[cfg(not(feature = "ctrlc"))]
+                    hide_cursor: false,
                     timestamp: args.line_timestamp,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
                     level_filter: Some(RangeInclusive::new(0, 1)),

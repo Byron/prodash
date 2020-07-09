@@ -21,6 +21,7 @@ pub struct Options {
     pub output_is_terminal: bool,
     pub colored: bool,
     pub timestamp: bool,
+    pub hide_cursor: bool,
 }
 
 fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestamp: bool) -> io::Result<()> {

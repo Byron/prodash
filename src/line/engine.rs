@@ -17,6 +17,12 @@ pub struct Options {
     /// If true, _(default: false)_, a timestamp will be shown before each message.
     pub timestamp: bool,
 
+    /// If true, _(default: false)_, the cursor will be hidden for a more visually appealing display.
+    ///
+    /// Please note that you must make sure the line renderer is properly shut down to restore the previous cursor
+    /// settings. See the `ctrlc` documentation in the README for more information.
+    pub hide_cursor: bool,
+
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
     ///
     /// This is useful to filter out high-noise lower level progress items in the tree.
@@ -46,6 +52,7 @@ impl Default for Options {
             output_is_terminal: true,
             colored: true,
             timestamp: false,
+            hide_cursor: false,
             level_filter: None,
             initial_delay: None,
             frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
@@ -114,6 +121,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         initial_delay,
         frames_per_second,
         keep_running_if_progress_is_empty,
+        hide_cursor,
     } = config;
     let config = draw::Options {
         output_is_terminal,
@@ -121,10 +129,11 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         timestamp,
         keep_running_if_progress_is_empty,
         level_filter,
+        hide_cursor,
     };
 
     let (quit_send, quit_recv) = flume::unbounded::<Event>();
-    let show_cursor = possibly_hide_cursor(&mut out, quit_send.clone());
+    let show_cursor = possibly_hide_cursor(&mut out, quit_send.clone(), hide_cursor);
 
     let handle = std::thread::spawn(move || {
         {
@@ -181,14 +190,17 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     }
 }
 
-fn possibly_hide_cursor(out: &mut impl io::Write, quit_send: flume::Sender<Event>) -> bool {
-    #[cfg(not(feature = "ctrlc"))]
-    let hide_cursor = false;
+// Not all configurations actually need it to be mut, but those with the 'ctrlc' feature do
+#[allow(unused_mut)]
+fn possibly_hide_cursor(out: &mut impl io::Write, quit_send: flume::Sender<Event>, mut hide_cursor: bool) -> bool {
     #[cfg(not(feature = "ctrlc"))]
     drop(quit_send);
 
     #[cfg(feature = "ctrlc")]
-    let hide_cursor = ctrlc::set_handler(move || drop(quit_send.send(Event::Quit).ok())).is_ok();
+    if hide_cursor {
+        hide_cursor = ctrlc::set_handler(move || drop(quit_send.send(Event::Quit).ok())).is_ok();
+    }
+
     if hide_cursor {
         crosstermion::execute!(out, crosstermion::cursor::Hide).is_ok()
     } else {
