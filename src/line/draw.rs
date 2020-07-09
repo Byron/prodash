@@ -1,5 +1,5 @@
 use crate::tree;
-use crosstermion::ansi_term::Color;
+use crosstermion::ansi_term::{Color, Style};
 use std::{io, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
@@ -36,7 +36,8 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
         message,
     } in &state.messages
     {
-        state.max_message_origin_size = state.max_message_origin_size.max(origin.width());
+        let message_block_len = origin.width();
+        state.max_message_origin_size = state.max_message_origin_size.max(message_block_len);
         let color = to_color(*level);
         writeln!(
             out,
@@ -51,13 +52,12 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
             } else {
                 "".into()
             },
-            brush
-                .style(crosstermion::ansi_term::Style::default().dimmed())
-                .paint(format!(
-                    "{:>max_size$}",
-                    origin,
-                    max_size = state.max_message_origin_size
-                )),
+            brush.style(Style::default().dimmed()).paint(format!(
+                "{:>fill_size$}{}",
+                "",
+                origin,
+                fill_size = state.max_message_origin_size - message_block_len,
+            )),
             brush.style(color.bold()).paint(message),
         )?;
     }
