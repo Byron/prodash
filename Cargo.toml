@@ -71,6 +71,7 @@ env_logger = { version = "0.7.1", default-features = false, features = ["termcol
 criterion = { version = "0.3.1", default-features = false }
 argh = "0.1.3"
 futures = "0.3.5"
+atty = "0.2.14"
 
 [[bench]]
 name = "usage"

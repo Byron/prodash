@@ -8,7 +8,7 @@ pub struct Options {
     /// If false, we won't print any live progress, only log messages.
     pub output_is_terminal: bool,
 
-    /// If true, _(default: output_is_terminal && crosstermion::should_colorize())_ we will display color.
+    /// If true, _(default: true)_ we will display color. You should use `output_is_terminal && crosstermion::should_colorize()`
     ///
     /// Please note that you can enforce color even if the output stream is not connected to a terminal by setting
     /// this field to true.

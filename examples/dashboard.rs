@@ -82,10 +82,13 @@ fn launch_ambient_gui(
     let mut interruptible = true;
     let render_fut = match renderer {
         "line" => smol::Task::blocking(async move {
+            let output_is_terminal = atty::is(atty::Stream::Stdout);
             let mut handle = line::render(
                 std::io::stdout(),
                 progress,
                 line::Options {
+                    output_is_terminal,
+                    colored: !args.no_line_color && output_is_terminal && crosstermion::should_colorize(),
                     level_filter: Some(RangeInclusive::new(0, 1)),
                     initial_delay: args.line_initial_delay.map(|d| Duration::from_secs_f32(d)),
                     frames_per_second: args.fps,
@@ -357,6 +360,10 @@ mod arg {
         /// If set ot "log", there will only be logging. Set 'RUST_LOG=info' before running the program to see them.
         #[argh(option)]
         pub renderer: Option<String>,
+
+        /// if set, coloring of the line renderer is forcefully disabled
+        #[argh(switch)]
+        pub no_line_color: bool,
     }
 }
 
