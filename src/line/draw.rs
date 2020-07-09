@@ -36,7 +36,7 @@ fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool
         let color = to_color(*level);
         writeln!(
             _out,
-            "{} → {}",
+            "{}→{}",
             brush.style(color.dimmed()).paint(origin),
             brush.style(color.bold()).paint(message)
         )?;

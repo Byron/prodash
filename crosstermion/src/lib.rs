@@ -8,9 +8,6 @@ pub mod terminal;
 
 pub mod color;
 
-#[cfg(any(feature = "humantime", feature = "localtime"))]
-pub mod time;
-
 #[cfg(feature = "crossterm")]
 mod crossterm_utils;
 
