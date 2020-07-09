@@ -88,7 +88,7 @@ fn launch_ambient_gui(
                 progress,
                 line::Options {
                     output_is_terminal,
-                    colored: !args.no_line_color && output_is_terminal && crosstermion::should_colorize(),
+                    colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
                     level_filter: Some(RangeInclusive::new(0, 1)),
                     initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
