@@ -34,6 +34,7 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
             Failure => Color::Red,
         }
     }
+    let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(6);
     for tree::Message {
         time,
         level,
@@ -41,33 +42,39 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
         message,
     } in &state.messages
     {
-        let _last_drawn_line_length = state.blocks_per_line.pop_front().unwrap_or(0);
+        tokens.clear();
+        let blocks_drawn_during_previous_tick = state.blocks_per_line.pop_front().unwrap_or(0);
         let message_block_len = origin.width();
         state.max_message_origin_size = state.max_message_origin_size.max(message_block_len);
+
         let color = to_color(*level);
-        writeln!(
-            out,
-            " {}{} {}{:>overdraw_size$}",
-            if timestamp {
-                format!(
-                    "{} ",
-                    brush
-                        .style(color.dimmed().on(Color::Yellow))
-                        .paint(crate::time::format_time_for_messages(*time)),
-                )
-            } else {
-                "".into()
-            },
-            brush.style(Style::default().dimmed()).paint(format!(
-                "{:>fill_size$}{}",
-                "",
-                origin,
-                fill_size = state.max_message_origin_size - message_block_len,
-            )),
-            brush.style(color.bold()).paint(message),
+        tokens.push(" ".into());
+        if timestamp {
+            tokens.push(
+                brush
+                    .style(color.dimmed().on(Color::Yellow))
+                    .paint(crate::time::format_time_for_messages(*time)),
+            );
+            tokens.push(Style::new().paint(" "));
+        } else {
+            tokens.push("".into());
+        };
+        tokens.push(brush.style(Style::default().dimmed()).paint(format!(
+            "{:>fill_size$}{}",
             "",
-            overdraw_size = 0,
-        )?;
+            origin,
+            fill_size = state.max_message_origin_size - message_block_len,
+        )));
+        tokens.push(" ".into());
+        tokens.push(brush.style(color.bold()).paint(message));
+        let message_block_count = block_count_sans_ansi_codes(&tokens);
+        write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
+
+        if blocks_drawn_during_previous_tick > message_block_count {
+            newline_with_overdraw(out, &tokens, blocks_drawn_during_previous_tick)?;
+        } else {
+            writeln!(out)?;
+        }
     }
     Ok(())
 }

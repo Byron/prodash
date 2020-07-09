@@ -94,7 +94,7 @@ fn launch_ambient_gui(
                     hide_cursor: false,
                     timestamp: args.line_timestamp,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
-                    level_filter: Some(RangeInclusive::new(0, 1)),
+                    level_filter: Some(RangeInclusive::new(0, 2)),
                     initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
