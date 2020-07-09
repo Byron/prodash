@@ -124,28 +124,13 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     };
 
     let (quit_send, quit_recv) = flume::unbounded::<Event>();
-    let show_cursor = {
-        #[cfg(not(feature = "ctrlc"))]
-        let hide_cursor = false;
-
-        #[cfg(feature = "ctrlc")]
-        let hide_cursor = ctrlc::set_handler({
-            let quit_send = quit_send.clone();
-            move || drop(quit_send.send(Event::Quit).ok())
-        })
-        .is_ok();
-        if hide_cursor {
-            crosstermion::execute!(out, crosstermion::cursor::Hide).is_ok()
-        } else {
-            false
-        }
-    };
+    let show_cursor = possibly_hide_cursor(&mut out, quit_send.clone());
 
     let handle = std::thread::spawn(move || {
         {
             let (delay_send, delay_recv) = flume::bounded::<Event>(1);
-            let mut inital_delay = handle_initial_delay(initial_delay, delay_send, &delay_recv, &quit_recv);
-            if let Event::Quit = inital_delay.wait() {
+            let mut initial_delay = handle_initial_delay(initial_delay, delay_send, &delay_recv, &quit_recv);
+            if let Event::Quit = initial_delay.wait() {
                 return Ok(());
             }
         }
@@ -193,6 +178,21 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         inner: Some(handle),
         connection: quit_send,
         disconnected: false,
+    }
+}
+
+fn possibly_hide_cursor(out: &mut impl io::Write, quit_send: flume::Sender<Event>) -> bool {
+    #[cfg(not(feature = "ctrlc"))]
+    let hide_cursor = false;
+    #[cfg(not(feature = "ctrlc"))]
+    drop(quit_send);
+
+    #[cfg(feature = "ctrlc")]
+    let hide_cursor = ctrlc::set_handler(move || drop(quit_send.send(Event::Quit).ok())).is_ok();
+    if hide_cursor {
+        crosstermion::execute!(out, crosstermion::cursor::Hide).is_ok()
+    } else {
+        false
     }
 }
 
