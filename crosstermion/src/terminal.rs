@@ -1,10 +1,16 @@
 #[cfg(all(feature = "crossterm", not(feature = "termion")))]
 mod _impl {
+    use crate::crossterm_utils::into_io_error;
     use crossterm::{
         execute,
         terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
     };
     use std::io;
+
+    /// Return the horizontal and vertical size of the terminal, if available.
+    pub fn size() -> io::Result<(u16, u16)> {
+        crossterm::terminal::size().map_err(into_io_error)
+    }
 
     /// A utility writer to activate an alternate screen in raw mode on instantiation, and resets to previous settings on drop.
     ///
@@ -16,7 +22,7 @@ mod _impl {
 
     impl<T: io::Write> AlternateRawScreen<T> {
         pub fn try_from(mut write: T) -> Result<Self, io::Error> {
-            terminal::enable_raw_mode().map_err(crate::crossterm_utils::into_io_error)?;
+            terminal::enable_raw_mode().map_err(into_io_error)?;
             execute!(write, EnterAlternateScreen).map_err(crate::crossterm_utils::into_io_error)?;
             Ok(AlternateRawScreen { inner: write })
         }
@@ -65,6 +71,8 @@ mod _impl {
 #[cfg(feature = "termion")]
 mod _impl {
     use std::io;
+    pub use termion::terminal_size as size;
+
     pub struct AlternateRawScreen<T: io::Write> {
         inner: termion::screen::AlternateScreen<T>,
     }
