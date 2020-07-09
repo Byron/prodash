@@ -92,7 +92,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
         if state.blocks_per_line.len() < lines_to_be_drawn {
             state.blocks_per_line.resize(lines_to_be_drawn, 0);
         }
-        let mut tokens: Vec<ANSIString<'_>> = Vec::new();
+        let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(4);
         for ((key, progress), ref mut blocks_in_last_iteration) in state
             .tree
             .iter()

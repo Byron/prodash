@@ -124,6 +124,22 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     };
 
     let (quit_send, quit_recv) = flume::unbounded::<Event>();
+    let show_cursor = {
+        #[cfg(not(feature = "ctrlc"))]
+        let hide_cursor = false;
+
+        #[cfg(feature = "ctrlc")]
+        let hide_cursor = ctrlc::set_handler({
+            let quit_send = quit_send.clone();
+            move || drop(quit_send.send(Event::Quit).ok())
+        })
+        .is_ok();
+        if hide_cursor {
+            crosstermion::execute!(out, crosstermion::cursor::Hide).is_ok()
+        } else {
+            false
+        }
+    };
 
     let handle = std::thread::spawn(move || {
         {
@@ -182,6 +198,10 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
             while let Event::Tick = selector.wait() {
                 draw::all(&mut out, &progress, &mut state, &config)?;
             }
+        }
+
+        if show_cursor {
+            crosstermion::execute!(out, crosstermion::cursor::Show).ok();
         }
         Ok(())
     });

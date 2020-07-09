@@ -33,6 +33,10 @@ This crate comes with various cargo features to tailor it to your needs.
     ** _(one required, mutually exclusive)_
        * **line-renderer-crossterm** - use the _crossterm_ backend, useful for working on windows
        * **line-renderer-termion** - use the _termion_ backend, useful for lean unix-only builds
+  * _Optional features_
+       * **ctrlc**
+          * If set, the cursor will be hidden and *SIG_INT* and *SIG_TERM* handlers will be installed to reset the cursor on exit.
+          * Comes at the cost of an extra thread and additional dependencies.
 * **tui-renderer**
   * Provide a terminal user interface visualizing every detail of the current progress state. It treats the terminal
     as a matrix display.
