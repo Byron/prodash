@@ -120,13 +120,10 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
                 writeln!(out, "{:>width$}", "", width = *blocks_in_last_iteration as usize)?;
             }
             // Move cursor back to end of the portion we have actually drawn
-            crosstermion::execute!(
-                out,
-                crosstermion::cursor::MoveToPreviousLine(state.blocks_per_line.len() as u16)
-            )?;
+            crosstermion::execute!(out, crosstermion::cursor::MoveUp(state.blocks_per_line.len() as u16))?;
             state.blocks_per_line.resize(lines_to_be_drawn, 0);
         } else {
-            crosstermion::execute!(out, crosstermion::cursor::MoveToPreviousLine(lines_to_be_drawn as u16))?;
+            crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_to_be_drawn as u16))?;
         }
     }
     state.ticks += 1;

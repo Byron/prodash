@@ -1,7 +1,6 @@
 #[cfg(feature = "crossterm")]
 mod _impl {
-    // pub use crossterm::cursor::MoveToPreviousLine;
-    pub use crossterm::cursor::MoveUp as MoveToPreviousLine;
+    pub use crossterm::cursor::MoveUp;
 }
 #[cfg(feature = "crossterm")]
 pub use _impl::*;
@@ -18,8 +17,18 @@ macro_rules! execute {
 }
 
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
+#[macro_export]
+macro_rules! execute {
+    ($writer:expr $(, $command:expr)* $(,)? ) => {
+        Ok(()) $(
+            .and_then(|()| write!($writer, "{}", $command))
+        )*.and_then(|_| $writer.flush())
+    }
+}
+
+#[cfg(all(feature = "termion", not(feature = "crossterm")))]
 mod _impl {
-    compile_error!("not implemented");
+    pub use termion::cursor::Up as MoveUp;
 }
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
 pub use _impl::*;

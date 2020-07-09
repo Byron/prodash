@@ -17,10 +17,15 @@ name = "dashboard"
 path = "examples/dashboard.rs"
 required-features = ["tui-renderer", "tui-renderer-crossterm", "line-renderer", "line-renderer-crossterm"]
 
+[[example]]
+name = "dashboard-termion"
+path = "examples/dashboard.rs"
+required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "line-renderer-termion"]
+
 [features]
 default = ["log-renderer", "localtime"]
 tui-renderer-termion = ["crosstermion/tui-react-termion"]
-tui-renderer-crossterm = ["crosstermion/tui-react-crossterm"]
+tui-renderer-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 tui-renderer = ["tui",
                 "unicode-segmentation",
                 "unicode-width",
@@ -33,6 +38,7 @@ tui-renderer = ["tui",
 line-renderer = ["flume", "crosstermion/color", "humantime", "unicode-width"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
+
 log-renderer = ["log"]
 localtime = ["time"]
 

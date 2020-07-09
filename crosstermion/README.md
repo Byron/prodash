@@ -43,7 +43,7 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
               * Adds input handling by spawning a thread providing input via `crossbeam` channels
             * **input-thread-flume**
               * Adds input handling by spawning a thread providing input via `flume` channels
-        * **input-async**
+        * **input-async-crossterm**
           * adds native async capabilites to crossterm, which works without spawning an extra thread thanks to `mio`.
     * **termion**
       * provides `Key` conversion support from `termion::event::Key` and an `AlternativeRawTerminal`
@@ -73,4 +73,10 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
 * **color**
    * Add support for `ansi_term` based conditional coloring. The crate is small, to the point and allows zero-copy drawing
      of bytes and UTF-8 string, while supporting Windows 10 as well.
+* _cursor movement_
+   * _mutually exclusive_
+       * **crossterm**
+         * Implements cursor movement with crossterm
+       * **termion**
+         * Implements cursor movement with termion
 

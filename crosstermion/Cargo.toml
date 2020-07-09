@@ -14,7 +14,8 @@ default = []
 
 color = ["ansi_term"]
 
-input-async = ["futures-channel", "futures-util", "futures-executor", "crossterm/event-stream"]
+input-async = ["futures-channel", "futures-util", "futures-executor", ]
+input-async-crossterm = ["crossterm/event-stream", "input-async"]
 input-thread = ["crossbeam-channel"]
 input-thread-flume = ["flume"]
 

@@ -150,7 +150,7 @@ mod _impl {
     /// Return a stream of key input Events
     ///
     /// Requires the `input-async` feature.
-    #[cfg(feature = "input-async")]
+    #[cfg(feature = "input-async-crossterm")]
     pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = super::Key> {
         use futures_util::StreamExt;
         use std::convert::TryFrom;
