@@ -13,7 +13,7 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features line-renderer,line-renderer-termion
 	cargo check --features line-renderer,line-renderer-crossterm
 	cargo check --features line-renderer,line-renderer-termion,tui-renderer,tui-renderer-termion --example dashboard-termion
-	cargo check --features line-renderer,line-renderer-crossterm,tui-renderer,tui-renderer-crossterm --example dashboard
+	cargo check --features line-renderer,line-renderer-crossterm,tui-renderer,tui-renderer-crossterm,ctrlc --example dashboard
 	cargo check
 	$(MAKE) -C crosstermion check
 
