@@ -27,7 +27,7 @@ fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool
         }
     }
     for tree::Message {
-        time: _,
+        time,
         level,
         origin,
         message,
@@ -36,7 +36,10 @@ fn messages(_out: &mut impl io::Write, messages: &[tree::Message], colored: bool
         let color = to_color(*level);
         writeln!(
             _out,
-            "{}→{}",
+            " {} {} {}",
+            brush
+                .style(color.dimmed().on(Color::Yellow))
+                .paint(crate::time::format_time_for_messages(*time)),
             brush.style(color.dimmed()).paint(origin),
             brush.style(color.bold()).paint(message)
         )?;
