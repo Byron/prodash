@@ -103,19 +103,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             format_progress(key, progress, state.ticks, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
-            let current_block_count = block_count_sans_ansi_codes(&tokens);
-            if **blocks_in_last_iteration > current_block_count {
-                // fill to the end of line to overwrite what was previously there
-                writeln!(
-                    out,
-                    "{:>width$}",
-                    "",
-                    width = (**blocks_in_last_iteration - current_block_count) as usize
-                )?;
-            } else {
-                writeln!(out)?;
-            }
-            **blocks_in_last_iteration = current_block_count;
+            **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
         }
         // overwrite remaining lines that we didn't touch naturally
         let lines_drawn = lines_to_be_drawn;
@@ -132,6 +120,27 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
     }
     state.ticks += 1;
     Ok(())
+}
+
+/// Must be called directly after `tokens` were drawn, without newline. Takes care of adding the newline.
+fn newline_with_overdraw(
+    out: &mut impl io::Write,
+    tokens: &[ANSIString<'_>],
+    blocks_in_last_iteration: u16,
+) -> io::Result<u16> {
+    let current_block_count = block_count_sans_ansi_codes(&tokens);
+    if blocks_in_last_iteration > current_block_count {
+        // fill to the end of line to overwrite what was previously there
+        writeln!(
+            out,
+            "{:>width$}",
+            "",
+            width = (blocks_in_last_iteration - current_block_count) as usize
+        )?;
+    } else {
+        writeln!(out)?;
+    };
+    Ok(current_block_count)
 }
 
 fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
