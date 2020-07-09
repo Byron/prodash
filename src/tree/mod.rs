@@ -13,6 +13,12 @@ pub struct Root {
     pub(crate) inner: Arc<Mutex<Item>>,
 }
 
+impl Default for Root {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Root {
     /// Create a new tree with default configuration.
     ///
@@ -45,13 +51,7 @@ impl Root {
     /// it can be traversed from beginning to end in order of hierarchy.
     pub fn sorted_snapshot(&self, out: &mut Vec<(Key, Value)>) {
         out.clear();
-        out.extend(
-            self.inner
-                .lock()
-                .tree
-                .iter()
-                .map(|r| (r.key().clone(), r.value().clone())),
-        );
+        out.extend(self.inner.lock().tree.iter().map(|r| (*r.key(), r.value().clone())));
         out.sort_by_key(|t| t.0);
     }
 
@@ -244,31 +244,31 @@ impl Item {
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
     pub fn init(&mut self, max: Option<ProgressStep>, unit: Option<&'static str>) {
-        self.tree.get_mut(&self.key).map(|mut r| {
+        if let Some(mut r) = self.tree.get_mut(&self.key) {
             r.value_mut().progress = Some(Progress {
                 done_at: max,
                 unit,
                 ..Default::default()
             })
-        });
+        };
     }
 
     fn alter_progress(&mut self, f: impl FnMut(&mut Progress)) {
-        self.tree.get_mut(&self.key).map(|mut r| {
+        if let Some(mut r) = self.tree.get_mut(&self.key) {
             // NOTE: since we wrap around, if there are more tasks than we can have IDs for,
             // and if all these tasks are still alive, two progress trees may see the same ID
             // when these go out of scope, they delete the key and the other tree will not find
             // its value anymore. Besides, it's probably weird to see tasks changing their progress
             // all the time…
             r.value_mut().progress.as_mut().map(f);
-        });
+        };
     }
 
     /// Set the name of this task's progress to the given `name`.
     pub fn set_name(&mut self, name: impl Into<String>) {
-        self.tree.get_mut(&self.key).map(|mut r| {
+        if let Some(mut r) = self.tree.get_mut(&self.key) {
             r.value_mut().name = name.into();
-        });
+        };
     }
 
     /// Get the name of this task's progress
@@ -373,7 +373,7 @@ impl Item {
 
     fn deep_clone(&self) -> Item {
         Item {
-            key: self.key.clone(),
+            key: self.key,
             highest_child_id: self.highest_child_id,
             tree: Arc::new(self.tree.deref().clone()),
             messages: Arc::new(Mutex::new(self.messages.lock().clone())),
@@ -520,7 +520,7 @@ impl Key {
             2 => self.1.as_ref(),
             3 => self.2.as_ref(),
             4 => self.3.as_ref(),
-            _ => return None,
+            _ => None,
         }
     }
 
@@ -537,7 +537,7 @@ impl Key {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     /// Compute the adjacency map for the key in `sorted` at the given `index`.

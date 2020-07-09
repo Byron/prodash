@@ -9,7 +9,7 @@ mod message_buffer {
         buf.copy_all(out);
     }
 
-    fn assert_messages(actual: &Vec<Message>, expected: &[&'static str]) {
+    fn assert_messages(actual: &[Message], expected: &[&'static str]) {
         let actual: Vec<_> = actual.iter().map(|m| m.message.as_str()).collect();
         assert_eq!(expected, actual.as_slice(), "messages are ordered old to new");
     }
@@ -100,7 +100,7 @@ mod message_buffer {
             push(&mut buf, "1");
             push(&mut buf, "2");
             push(&mut buf, "3");
-            Some(buf.copy_new(&mut out, state));
+            buf.copy_new(&mut out, state);
             assert_messages(&out, &["2", "3"]);
         }
     }
@@ -126,10 +126,10 @@ mod key_adjacency {
         let p2 = r.add_child(2);
         to_kv(
             &[
-                p1.clone(),
+                p1,
                 p1.add_child(1),
                 p1.add_child(2),
-                p2.clone(),
+                p2,
                 p2.add_child(1),
                 p2.add_child(2),
             ][..],
@@ -140,7 +140,7 @@ mod key_adjacency {
         let r = Key::default();
         let p1 = r.add_child(1);
         let p2 = p1.add_child(2);
-        to_kv(&[p1, p2.clone(), p2.add_child(1)][..])
+        to_kv(&[p1, p2, p2.add_child(1)][..])
     }
 
     fn root_with_three_levels_two_siblings_on_level_2() -> Vec<(Key, Value)> {
@@ -148,7 +148,7 @@ mod key_adjacency {
         let p1 = r.add_child(1);
         let p11 = p1.add_child(1);
         let p12 = p1.add_child(2);
-        to_kv(&[p1, p11.clone(), p11.add_child(1), p12.clone(), p12.add_child(1)][..])
+        to_kv(&[p1, p11, p11.add_child(1), p12, p12.add_child(1)][..])
     }
 
     #[test]

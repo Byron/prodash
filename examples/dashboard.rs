@@ -26,7 +26,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
     let speed = args.speed_multitplier;
     let changing_names = args.changing_names;
 
-    let renderer = args.renderer.take().unwrap_or("tui".into());
+    let renderer = args.renderer.take().unwrap_or_else(|| "tui".into());
     let mut gui_handle = if renderer == "log" {
         let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
         Some(never_ending.boxed())
@@ -90,10 +90,9 @@ fn launch_ambient_gui(
                     output_is_terminal,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::should_colorize(),
                     level_filter: Some(RangeInclusive::new(0, 1)),
-                    initial_delay: args.line_initial_delay.map(|d| Duration::from_secs_f32(d)),
+                    initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
-                    ..line::Options::default()
                 },
             );
             handle.disconnect();

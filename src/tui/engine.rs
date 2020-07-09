@@ -155,7 +155,7 @@ pub fn render_with_input(
         let mut messages = Vec::with_capacity(progress.messages_capacity());
         let mut events = stream::select_all(vec![
             ticker(duration_per_frame).map(|_| Event::Tick).boxed(),
-            key_receive.map(|key| Event::Input(key)).boxed(),
+            key_receive.map(Event::Input).boxed(),
             events.boxed(),
         ]);
 
@@ -257,5 +257,5 @@ pub fn render(
     progress: Root,
     config: Options,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
-    return render_with_input(out, progress, config, stream::pending());
+    render_with_input(out, progress, config, stream::pending())
 }

@@ -380,12 +380,10 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
                     NotFound => {
                         if level == 1 {
                             '│'
+                        } else if is_orphan {
+                            '·'
                         } else {
-                            if is_orphan {
-                                '·'
-                            } else {
-                                ' '
-                            }
+                            ' '
                         }
                     }
                     Above => '└',

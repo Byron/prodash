@@ -41,7 +41,7 @@ impl Default for Options {
     fn default() -> Self {
         Options {
             output_is_terminal: true,
-            colored: true && crosstermion::should_colorize(),
+            colored: true,
             level_filter: None,
             initial_delay: None,
             frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
@@ -91,6 +91,7 @@ impl Drop for JoinHandle {
     }
 }
 
+#[derive(Debug)]
 enum Event {
     Tick,
     Quit,
@@ -123,10 +124,9 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 match initial_delay {
                     Some(delay) => drop(std::thread::spawn(move || {
                         std::thread::sleep(delay);
-                        delay_send.send(Event::Tick).ok();
-                        drop(delay_send);
+                        delay_send.send(Event::Tick).unwrap();
                     })),
-                    None => drop(delay_send.send(Event::Tick).ok()),
+                    None => delay_send.send(Event::Tick).unwrap(),
                 };
                 flume::Selector::new()
                     .recv(&delay_recv, |_| Event::Tick)
