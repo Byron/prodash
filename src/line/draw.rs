@@ -106,7 +106,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            format_progress(key, progress, config.column_count, &mut tokens);
+            format_progress(key, progress, config.column_count, config.colored, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
@@ -152,7 +152,16 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn draw_progress_bar<'a>(p: &tree::Progress, style: Style, mut blocks_available: u16, buf: &mut Vec<ANSIString<'a>>) {
+fn draw_progress_bar<'a>(
+    p: &tree::Progress,
+    style: Style,
+    mut blocks_available: u16,
+    colored: bool,
+    buf: &mut Vec<ANSIString<'a>>,
+) {
+    let mut brush = crosstermion::color::Brush::new(colored);
+    let style = brush.style(style);
+
     blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
     buf.push(" [".into());
     match p.fraction() {
@@ -202,17 +211,24 @@ fn progress_style(p: &tree::Progress) -> Style {
     }
 }
 
-fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, column_count: u16, buf: &mut Vec<ANSIString<'a>>) {
+fn format_progress<'a>(
+    key: &tree::Key,
+    value: &'a tree::Value,
+    column_count: u16,
+    colored: bool,
+    buf: &mut Vec<ANSIString<'a>>,
+) {
+    let mut brush = crosstermion::color::Brush::new(colored);
     buf.clear();
 
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
     match value.progress {
         Some(progress) => {
             let style = progress_style(&progress);
-            buf.push(Color::Cyan.bold().paint(&value.name));
+            buf.push(brush.style(Color::Cyan.bold()).paint(&value.name));
             buf.push(" ".into());
 
-            buf.push(Style::new().dimmed().paint(match progress.done_at {
+            buf.push(brush.style(Style::new().bold().dimmed()).paint(match progress.done_at {
                 Some(done_at) => format!("{} / {}", progress.step, done_at),
                 None => format!("{}", progress.step),
             }));
@@ -223,12 +239,12 @@ fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, column_count: u1
 
             let blocks_left = column_count.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
             if blocks_left > 0 {
-                draw_progress_bar(&progress, style, blocks_left, buf);
+                draw_progress_bar(&progress, style, blocks_left, colored, buf);
             }
         }
         None => {
             // headline only - FIXME: would have to truncate it if it is too long for the line…
-            buf.push(Color::White.bold().paint(&value.name));
+            buf.push(brush.style(Color::White.bold()).paint(&value.name));
         }
     }
 }
