@@ -8,7 +8,6 @@ pub struct State {
     tree: Vec<(tree::Key, tree::Value)>,
     messages: Vec<tree::Message>,
     for_next_copy: Option<tree::MessageCopyState>,
-    max_message_origin_size: usize,
     message_origin_size: VecDeque<usize>,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
@@ -24,7 +23,13 @@ pub struct Options {
     pub hide_cursor: bool,
 }
 
-fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestamp: bool) -> io::Result<()> {
+fn messages(
+    out: &mut impl io::Write,
+    state: &mut State,
+    colored: bool,
+    max_height: usize,
+    timestamp: bool,
+) -> io::Result<()> {
     let mut brush = crosstermion::color::Brush::new(colored);
     fn to_color(level: tree::MessageLevel) -> Color {
         use tree::MessageLevel::*;
@@ -35,6 +40,7 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
         }
     }
     let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(6);
+    let mut current_maximum = state.message_origin_size.iter().max().cloned().unwrap_or(0);
     for tree::Message {
         time,
         level,
@@ -45,7 +51,11 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
         tokens.clear();
         let blocks_drawn_during_previous_tick = state.blocks_per_line.pop_front().unwrap_or(0);
         let message_block_len = origin.width();
-        state.max_message_origin_size = state.max_message_origin_size.max(message_block_len);
+        current_maximum = current_maximum.max(message_block_len);
+        if state.message_origin_size.len() == max_height {
+            state.message_origin_size.pop_front();
+        }
+        state.message_origin_size.push_back(message_block_len);
 
         let color = to_color(*level);
         tokens.push(" ".into());
@@ -63,7 +73,7 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
             "{:>fill_size$}{}",
             "",
             origin,
-            fill_size = state.max_message_origin_size - message_block_len,
+            fill_size = current_maximum - message_block_len,
         )));
         tokens.push(" ".into());
         tokens.push(brush.style(color.bold()).paint(message));
@@ -91,7 +101,13 @@ pub fn all(
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
     state.for_next_copy = Some(progress.copy_new_messages(&mut state.messages, state.for_next_copy.take()));
-    messages(out, state, config.colored, config.timestamp)?;
+    messages(
+        out,
+        state,
+        config.colored,
+        config.terminal_dimensions.1 as usize,
+        config.timestamp,
+    )?;
 
     if show_progress && config.output_is_terminal {
         let level_range = config

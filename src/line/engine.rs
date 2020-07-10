@@ -23,7 +23,7 @@ pub struct Options {
     pub timestamp: bool,
 
     /// The amount of columns and rows to use for drawing. Defaults to (80, 20).
-    pub terminal_dimension: (u16, u16),
+    pub terminal_dimensions: (u16, u16),
 
     /// If true, _(default: false)_, the cursor will be hidden for a more visually appealing display.
     ///
@@ -60,7 +60,7 @@ impl Default for Options {
             output_is_terminal: true,
             colored: true,
             timestamp: false,
-            terminal_dimension: (80, 20),
+            terminal_dimensions: (80, 20),
             hide_cursor: false,
             level_filter: None,
             initial_delay: None,
@@ -127,7 +127,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         colored,
         timestamp,
         level_filter,
-        terminal_dimension: column_count,
+        terminal_dimensions,
         initial_delay,
         frames_per_second,
         keep_running_if_progress_is_empty,
@@ -135,7 +135,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     } = config;
     let config = draw::Options {
         output_is_terminal,
-        terminal_dimensions: column_count,
+        terminal_dimensions,
         colored,
         timestamp,
         keep_running_if_progress_is_empty,

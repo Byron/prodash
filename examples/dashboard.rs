@@ -110,7 +110,7 @@ fn launch_ambient_gui(
                     hide_cursor: true,
                     #[cfg(not(feature = "ctrlc"))]
                     hide_cursor: false,
-                    terminal_dimension: crosstermion::terminal::size()
+                    terminal_dimensions: crosstermion::terminal::size()
                         .ok()
                         .map(|(w, h)| args.line_column_count.map(|width| (width, h)).unwrap_or((w, h)))
                         .unwrap_or((80, 20)),
