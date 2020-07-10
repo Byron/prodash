@@ -162,7 +162,9 @@ pub fn all(
             crosstermion::execute!(out, crosstermion::cursor::MoveUp(state.blocks_per_line.len() as u16))?;
             state.blocks_per_line.resize(lines_drawn, 0);
         } else {
-            crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
+            if lines_drawn > 0 {
+                crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
+            }
         }
     }
     Ok(())
