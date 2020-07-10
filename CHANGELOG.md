@@ -1,3 +1,5 @@
+## v7.0.1 - Prevent cursor movement if no progress bar is drawn
+
 ## v7.0.0 - Add new line-renderer, change feature flag names
 
 ### New Features
