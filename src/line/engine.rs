@@ -17,6 +17,9 @@ pub struct Options {
     /// If true, _(default: false)_, a timestamp will be shown before each message.
     pub timestamp: bool,
 
+    /// The amount of columns to use for drawing. Defaults to 80.
+    pub column_count: u16,
+
     /// If true, _(default: false)_, the cursor will be hidden for a more visually appealing display.
     ///
     /// Please note that you must make sure the line renderer is properly shut down to restore the previous cursor
@@ -52,6 +55,7 @@ impl Default for Options {
             output_is_terminal: true,
             colored: true,
             timestamp: false,
+            column_count: 80,
             hide_cursor: false,
             level_filter: None,
             initial_delay: None,
@@ -118,6 +122,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         colored,
         timestamp,
         level_filter,
+        column_count,
         initial_delay,
         frames_per_second,
         keep_running_if_progress_is_empty,
@@ -125,6 +130,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
     } = config;
     let config = draw::Options {
         output_is_terminal,
+        column_count,
         colored,
         timestamp,
         keep_running_if_progress_is_empty,

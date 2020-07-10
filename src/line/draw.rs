@@ -17,6 +17,7 @@ pub struct State {
 
 pub struct Options {
     pub level_filter: Option<RangeInclusive<tree::Level>>,
+    pub column_count: u16,
     pub keep_running_if_progress_is_empty: bool,
     pub output_is_terminal: bool,
     pub colored: bool,
@@ -107,7 +108,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            format_progress(key, progress, state.ticks, &mut tokens);
+            format_progress(key, progress, config.column_count, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
@@ -154,9 +155,23 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn draw_progress_bar<'a>(_p: &tree::Progress, _style: Style, buf: &mut Vec<ANSIString<'a>>) {
-    // [=====================================================> ]
-    buf.push("[".into());
+fn draw_progress_bar<'a>(p: &tree::Progress, style: Style, mut blocks_available: u16, buf: &mut Vec<ANSIString<'a>>) {
+    blocks_available = blocks_available.saturating_sub(4); // account for closing bracket
+                                                           // [=====================================================> ]
+    buf.push(" [".into());
+    match p.fraction() {
+        Some(fraction) => {
+            let progress_blocks = (blocks_available as f32 * fraction).floor() as usize;
+            buf.push(style.paint(format!("{:=<width$}", "", width = progress_blocks)));
+            buf.push(">".into());
+            buf.push(style.paint(format!(
+                "{:width$}",
+                "",
+                width = (blocks_available - progress_blocks as u16) as usize
+            )));
+        }
+        None => buf.push("progress without limit".into()),
+    }
     buf.push("]".into());
 }
 
@@ -178,8 +193,7 @@ fn progress_style(p: &tree::Progress) -> Style {
     }
 }
 
-fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, _ticks: usize, buf: &mut Vec<ANSIString<'a>>) {
-    const LINE_LENGTH: u16 = 80;
+fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, column_count: u16, buf: &mut Vec<ANSIString<'a>>) {
     buf.clear();
 
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
@@ -188,11 +202,23 @@ fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, _ticks: usize, b
             let style = progress_style(&progress);
             buf.push(Color::Cyan.bold().paint(&value.name));
             buf.push(" ".into());
-            let _blocks_left = LINE_LENGTH.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
-            draw_progress_bar(&progress, style, buf);
+
+            buf.push(Style::new().dimmed().paint(match progress.done_at {
+                Some(done_at) => format!("{} / {}", progress.step, done_at),
+                None => format!("{}", progress.step),
+            }));
+            if let Some(unit) = progress.unit {
+                buf.push(" ".into());
+                buf.push(unit.into());
+            }
+
+            let blocks_left = column_count.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
+            if blocks_left > 0 {
+                draw_progress_bar(&progress, style, blocks_left, buf);
+            }
         }
         None => {
-            // headline only
+            // headline only - FIXME: would have to truncate it if it is too long for the line…
             buf.push(Color::White.bold().paint(&value.name));
         }
     }

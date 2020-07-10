@@ -92,9 +92,13 @@ fn launch_ambient_gui(
                     hide_cursor: true,
                     #[cfg(not(feature = "ctrlc"))]
                     hide_cursor: false,
+                    column_count: crosstermion::terminal::size().unwrap_or((80, 0)).0,
                     timestamp: args.line_timestamp,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
-                    level_filter: Some(RangeInclusive::new(0, 2)),
+                    level_filter: Some(RangeInclusive::new(
+                        args.line_start.unwrap_or(1),
+                        args.line_end.unwrap_or(2),
+                    )),
                     initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
@@ -358,6 +362,14 @@ mod arg {
         /// for 'line' renderer: If true, timestamps will be displayed for each printed message.
         #[argh(switch)]
         pub line_timestamp: bool,
+
+        /// for 'line' renderer: The first level to display, defaults to 0
+        #[argh(option)]
+        pub line_start: Option<prodash::tree::Level>,
+
+        /// for 'line' renderer: The first level to display, defaults to 1
+        #[argh(option)]
+        pub line_end: Option<prodash::tree::Level>,
 
         /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
         #[argh(switch)]

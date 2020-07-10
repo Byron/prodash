@@ -63,6 +63,7 @@ This crate comes with various cargo features to tailor it to your needs.
 
 ## Limitations
 
+* the *line renderer* is inherently limited in the amount of progress it can display without visual artifacts.
 * it does copy quite some state each time it displays progress information and messages
 * The underlying sync data structure, `dashmap`, does not document every use of unsafe
   * I also evaluated `evmap`, which has 25% less uses of unsafe, but a more complex interface.
@@ -78,6 +79,13 @@ This crate comes with various cargo features to tailor it to your needs.
   * fix
     * make the id bigger, like u32
     * we should do that once there is a performance test
+* If the log lines are too long for the terminal width when using the *line renderer*
+  * then
+    * visual artifacts will appear
+  * why
+    * trying to draw beyond the terminal boundary will add a line break automatically, which can cause unexpected overdraw.
+  * fix
+    * count amount of blocks drawn, without ansi codes, and stop drawing at the boundary.
     
 ## Lessons Learned
 
