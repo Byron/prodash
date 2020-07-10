@@ -110,7 +110,10 @@ fn launch_ambient_gui(
                     hide_cursor: true,
                     #[cfg(not(feature = "ctrlc"))]
                     hide_cursor: false,
-                    column_count: crosstermion::terminal::size().unwrap_or((80, 0)).0,
+                    column_count: args
+                        .line_column_count
+                        .or_else(|| crosstermion::terminal::size().ok().map(|(w, _)| w))
+                        .unwrap_or(80),
                     timestamp: args.line_timestamp,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
                     level_filter: Some(RangeInclusive::new(
@@ -392,6 +395,10 @@ mod arg {
         /// for 'line' renderer: The first level to display, defaults to 0
         #[argh(option)]
         pub line_start: Option<prodash::tree::Level>,
+
+        /// for 'line' renderer: Amount of columns we should draw into. If unset, the whole width of the terminal.
+        #[argh(option)]
+        pub line_column_count: Option<u16>,
 
         /// for 'line' renderer: The first level to display, defaults to 1
         #[argh(option)]
