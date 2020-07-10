@@ -107,7 +107,6 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            tokens.clear();
             format_progress(key, progress, state.ticks, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
@@ -155,9 +154,46 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn format_progress<'a>(key: &tree::Key, progress: &'a tree::Value, ticks: usize, buf: &mut Vec<ANSIString<'a>>) {
+fn draw_progress_bar<'a>(_p: &tree::Progress, _style: Style, buf: &mut Vec<ANSIString<'a>>) {
+    // [=====================================================> ]
+    buf.push("[".into());
+    buf.push("]".into());
+}
+
+fn progress_style(p: &tree::Progress) -> Style {
+    use tree::ProgressState::*;
+    match p.state {
+        Running => if let Some(fraction) = p.fraction() {
+            if fraction > 0.8 {
+                Color::Green
+            } else {
+                Color::Yellow
+            }
+        } else {
+            Color::White
+        }
+        .normal(),
+        Halted(_, _) => Color::Red.dimmed(),
+        Blocked(_, _) => Color::Red.normal(),
+    }
+}
+
+fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, _ticks: usize, buf: &mut Vec<ANSIString<'a>>) {
+    const LINE_LENGTH: u16 = 80;
+    buf.clear();
+
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
-    buf.push(Color::Yellow.paint(format!("{}", ticks)));
-    buf.push(Color::Green.on(Color::Red).paint(&progress.name));
-    buf.push(Style::new().paint("long text long text long text long text long text long text long text long text long text long text long text "));
+    match value.progress {
+        Some(progress) => {
+            let style = progress_style(&progress);
+            buf.push(Color::Cyan.bold().paint(&value.name));
+            buf.push(" ".into());
+            let _blocks_left = LINE_LENGTH.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
+            draw_progress_bar(&progress, style, buf);
+        }
+        None => {
+            // headline only
+            buf.push(Color::White.bold().paint(&value.name));
+        }
+    }
 }
