@@ -11,8 +11,6 @@ pub struct State {
     max_message_origin_size: usize,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: std::collections::VecDeque<u16>,
-    /// Amount of times we drew so far
-    ticks: usize,
 }
 
 pub struct Options {
@@ -108,7 +106,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            format_progress(key, progress, state.ticks, config.column_count, &mut tokens);
+            format_progress(key, progress, config.column_count, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
@@ -126,7 +124,6 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
             crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
         }
     }
-    state.ticks += 1;
     Ok(())
 }
 
@@ -155,13 +152,7 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn draw_progress_bar<'a>(
-    p: &tree::Progress,
-    style: Style,
-    ticks: usize,
-    mut blocks_available: u16,
-    buf: &mut Vec<ANSIString<'a>>,
-) {
+fn draw_progress_bar<'a>(p: &tree::Progress, style: Style, mut blocks_available: u16, buf: &mut Vec<ANSIString<'a>>) {
     blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
     buf.push(" [".into());
     match p.fraction() {
@@ -177,19 +168,17 @@ fn draw_progress_bar<'a>(
             )));
         }
         None => {
-            buf.push(style.paint(match p.state {
-                tree::ProgressState::Running => {
-                    const CHARS: [char; 6] = ['=', '=', '=', ' ', ' ', ' '];
-                    (0usize..std::usize::MAX)
+            const CHARS: [char; 6] = ['=', '=', '=', ' ', ' ', ' '];
+            buf.push(
+                style.paint(
+                    (p.step as usize..std::usize::MAX)
                         .into_iter()
-                        .skip(ticks)
                         .take(blocks_available as usize)
                         .map(|idx| CHARS[idx % CHARS.len()])
                         .rev()
-                        .collect::<String>()
-                }
-                _ => std::iter::repeat('-').take(blocks_available as usize).collect(),
-            }));
+                        .collect::<String>(),
+                ),
+            );
         }
     }
     buf.push("]".into());
@@ -213,13 +202,7 @@ fn progress_style(p: &tree::Progress) -> Style {
     }
 }
 
-fn format_progress<'a>(
-    key: &tree::Key,
-    value: &'a tree::Value,
-    ticks: usize,
-    column_count: u16,
-    buf: &mut Vec<ANSIString<'a>>,
-) {
+fn format_progress<'a>(key: &tree::Key, value: &'a tree::Value, column_count: u16, buf: &mut Vec<ANSIString<'a>>) {
     buf.clear();
 
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
@@ -240,7 +223,7 @@ fn format_progress<'a>(
 
             let blocks_left = column_count.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
             if blocks_left > 0 {
-                draw_progress_bar(&progress, style, ticks, blocks_left, buf);
+                draw_progress_bar(&progress, style, blocks_left, buf);
             }
         }
         None => {
