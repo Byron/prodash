@@ -181,11 +181,12 @@ fn draw_progress_bar<'a>(
                 '⠁', '⠁', '⠉', '⠙', '⠚', '⠒', '⠂', '⠂', '⠒', '⠲', '⠴', '⠤', '⠄', '⠄', '⠤', '⠠', '⠠', '⠤', '⠦', '⠖',
                 '⠒', '⠐', '⠐', '⠒', '⠓', '⠋', '⠉', '⠈', '⠈',
             ];
-            let bar: String = (0usize..)
+            let bar: String = (0usize..std::usize::MAX)
                 .into_iter()
                 .skip(ticks)
                 .take(blocks_available as usize)
                 .map(|idx| chars[idx % chars.len()])
+                .rev()
                 .collect();
             buf.push(style.paint(bar));
         }
