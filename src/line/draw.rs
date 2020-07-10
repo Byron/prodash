@@ -1,6 +1,6 @@
 use crate::tree;
 use crosstermion::ansi_term::{ANSIString, ANSIStrings, Color, Style};
-use std::{collections::VecDeque, io, ops::RangeInclusive};
+use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
@@ -8,7 +8,10 @@ pub struct State {
     tree: Vec<(tree::Key, tree::Value)>,
     messages: Vec<tree::Message>,
     for_next_copy: Option<tree::MessageCopyState>,
+    /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
     message_origin_size: VecDeque<usize>,
+    /// The maximum progress midpoint (point till progress bar starts) seen at the last tick
+    last_progress_midpoint: Option<u16>,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
 }
@@ -123,17 +126,29 @@ pub fn all(
             state.blocks_per_line.resize(lines_to_be_drawn, 0);
         }
         let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(4);
+        let mut max_midpoint = 0;
         for ((key, progress), ref mut blocks_in_last_iteration) in state
             .tree
             .iter()
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            format_progress(key, progress, config.terminal_dimensions.0, config.colored, &mut tokens);
+            max_midpoint = max_midpoint.max(
+                format_progress(
+                    key,
+                    progress,
+                    config.terminal_dimensions.0,
+                    config.colored,
+                    state.last_progress_midpoint,
+                    &mut tokens,
+                )
+                .unwrap_or(0),
+            );
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
         }
+        state.last_progress_midpoint = Some(max_midpoint);
         // overwrite remaining lines that we didn't touch naturally
         let lines_drawn = lines_to_be_drawn;
         if state.blocks_per_line.len() > lines_drawn {
@@ -239,8 +254,9 @@ fn format_progress<'a>(
     value: &'a tree::Value,
     column_count: u16,
     colored: bool,
+    midpoint: Option<u16>,
     buf: &mut Vec<ANSIString<'a>>,
-) {
+) -> Option<u16> {
     let mut brush = crosstermion::color::Brush::new(colored);
     buf.clear();
 
@@ -251,6 +267,7 @@ fn format_progress<'a>(
             buf.push(brush.style(Color::Cyan.bold()).paint(&value.name));
             buf.push(" ".into());
 
+            let pre_unit = buf.len();
             buf.push(brush.style(Style::new().bold().dimmed()).paint(match progress.done_at {
                 Some(done_at) => format!("{} / {}", progress.step, done_at),
                 None => format!("{}", progress.step),
@@ -259,15 +276,29 @@ fn format_progress<'a>(
                 buf.push(" ".into());
                 buf.push(unit.into());
             }
-
-            let blocks_left = column_count.saturating_sub(block_count_sans_ansi_codes(buf.as_slice()));
+            let desired_midpoint = block_count_sans_ansi_codes(buf.as_slice());
+            let actual_midpoint = if let Some(midpoint) = midpoint {
+                let padding = midpoint.saturating_sub(desired_midpoint);
+                if padding > 0 {
+                    buf.insert(
+                        pre_unit,
+                        String::from_iter(std::iter::repeat(' ').take(padding as usize)).into(),
+                    );
+                }
+                block_count_sans_ansi_codes(buf.as_slice())
+            } else {
+                desired_midpoint
+            };
+            let blocks_left = column_count.saturating_sub(actual_midpoint);
             if blocks_left > 0 {
                 draw_progress_bar(&progress, style, blocks_left, colored, buf);
             }
+            Some(desired_midpoint)
         }
         None => {
             // headline only - FIXME: would have to truncate it if it is too long for the line…
             buf.push(brush.style(Color::White.bold()).paint(&value.name));
+            None
         }
     }
 }
