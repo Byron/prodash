@@ -162,11 +162,11 @@ fn draw_progress_bar<'a>(
     mut blocks_available: u16,
     buf: &mut Vec<ANSIString<'a>>,
 ) {
-    blocks_available = blocks_available.saturating_sub(4); // account for closing bracket
-                                                           // [=====================================================> ]
+    blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
     buf.push(" [".into());
     match p.fraction() {
         Some(fraction) => {
+            blocks_available = blocks_available.saturating_sub(1); // account for '>' apparently
             let progress_blocks = (blocks_available as f32 * fraction).floor() as usize;
             buf.push(style.paint(format!("{:=<width$}", "", width = progress_blocks)));
             buf.push(">".into());
@@ -177,18 +177,19 @@ fn draw_progress_bar<'a>(
             )));
         }
         None => {
-            const CHARS: [char; 29] = [
-                '⠁', '⠁', '⠉', '⠙', '⠚', '⠒', '⠂', '⠂', '⠒', '⠲', '⠴', '⠤', '⠄', '⠄', '⠤', '⠠', '⠠', '⠤', '⠦', '⠖',
-                '⠒', '⠐', '⠐', '⠒', '⠓', '⠋', '⠉', '⠈', '⠈',
-            ];
-            let bar: String = (0usize..std::usize::MAX)
-                .into_iter()
-                .skip(ticks)
-                .take(blocks_available as usize)
-                .map(|idx| CHARS[idx % CHARS.len()])
-                .rev()
-                .collect();
-            buf.push(style.paint(bar));
+            buf.push(style.paint(match p.state {
+                tree::ProgressState::Running => {
+                    const CHARS: [char; 6] = ['=', '=', '=', ' ', ' ', ' '];
+                    (0usize..std::usize::MAX)
+                        .into_iter()
+                        .skip(ticks)
+                        .take(blocks_available as usize)
+                        .map(|idx| CHARS[idx % CHARS.len()])
+                        .rev()
+                        .collect::<String>()
+                }
+                _ => std::iter::repeat('-').take(blocks_available as usize).collect(),
+            }));
         }
     }
     buf.push("]".into());
