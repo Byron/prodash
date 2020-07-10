@@ -78,7 +78,13 @@ fn messages(out: &mut impl io::Write, state: &mut State, colored: bool, timestam
     Ok(())
 }
 
-pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, config: &Options) -> io::Result<()> {
+pub fn all(
+    out: &mut impl io::Write,
+    progress: &tree::Root,
+    show_progress: bool,
+    state: &mut State,
+    config: &Options,
+) -> io::Result<()> {
     progress.sorted_snapshot(&mut state.tree);
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
@@ -86,7 +92,7 @@ pub fn all(out: &mut impl io::Write, progress: &tree::Root, state: &mut State, c
     state.for_next_copy = Some(progress.copy_new_messages(&mut state.messages, state.for_next_copy.take()));
     messages(out, state, config.colored, config.timestamp)?;
 
-    if config.output_is_terminal {
+    if show_progress && config.output_is_terminal {
         let level_range = config
             .level_filter
             .clone()

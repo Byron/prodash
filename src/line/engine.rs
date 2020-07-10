@@ -1,5 +1,10 @@
 use crate::{line::draw, tree};
-use std::{io, ops::RangeInclusive, time::Duration};
+use std::{
+    io,
+    ops::RangeInclusive,
+    sync::atomic::{AtomicBool, Ordering},
+    time::Duration,
+};
 
 #[derive(Clone)]
 pub struct Options {
@@ -31,7 +36,7 @@ pub struct Options {
     /// This is useful to filter out high-noise lower level progress items in the tree.
     pub level_filter: Option<RangeInclusive<tree::Level>>,
 
-    /// If set, progress will only actually be shown after the given duration.
+    /// If set, progress will only actually be shown after the given duration. Log messages will always be shown without delay.
     ///
     /// This option can be useful to not enforce progress for short actions, causing it to flicker.
     /// Please note that this won't affect display of messages, which are simply logged.
@@ -140,13 +145,17 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
 
     let (quit_send, quit_recv) = flume::unbounded::<Event>();
     let show_cursor = possibly_hide_cursor(&mut out, quit_send.clone(), hide_cursor);
+    static SHOW_PROGRESS: AtomicBool = AtomicBool::new(false);
 
     let handle = std::thread::spawn(move || {
         {
-            let (delay_send, delay_recv) = flume::bounded::<Event>(1);
-            let mut initial_delay = handle_initial_delay(initial_delay, delay_send, &delay_recv, &quit_recv);
-            if let Event::Quit = initial_delay.wait() {
-                return Ok(());
+            let initial_delay = initial_delay.unwrap_or_else(Duration::default);
+            SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
+            if !SHOW_PROGRESS.load(Ordering::Relaxed) {
+                std::thread::spawn(move || {
+                    std::thread::sleep(initial_delay);
+                    SHOW_PROGRESS.store(true, Ordering::Relaxed);
+                });
             }
         }
 
@@ -156,7 +165,13 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 if let Ok(Event::Quit) = quit_recv.try_recv() {
                     break;
                 }
-                draw::all(&mut out, &progress, &mut state, &config)?;
+                draw::all(
+                    &mut out,
+                    &progress,
+                    SHOW_PROGRESS.load(Ordering::Relaxed),
+                    &mut state,
+                    &config,
+                )?;
                 std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
             }
         } else {
@@ -179,7 +194,13 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 })
                 .recv(&tick_recv, |_res| Event::Tick);
             while let Event::Tick = selector.wait() {
-                draw::all(&mut out, &progress, &mut state, &config)?;
+                draw::all(
+                    &mut out,
+                    &progress,
+                    SHOW_PROGRESS.load(Ordering::Relaxed),
+                    &mut state,
+                    &config,
+                )?;
             }
         }
 
@@ -212,28 +233,4 @@ fn possibly_hide_cursor(out: &mut impl io::Write, quit_send: flume::Sender<Event
     } else {
         false
     }
-}
-
-fn handle_initial_delay<'a>(
-    initial_delay: Option<Duration>,
-    delay_send: flume::Sender<Event>,
-    delay_recv: &'a flume::Receiver<Event>,
-    quit_recv: &'a flume::Receiver<Event>,
-) -> flume::Selector<'a, Event> {
-    match initial_delay {
-        Some(delay) => drop(std::thread::spawn(move || {
-            std::thread::sleep(delay);
-            delay_send.send(Event::Tick).unwrap();
-        })),
-        None => delay_send.send(Event::Tick).unwrap(),
-    };
-    flume::Selector::new()
-        .recv(&delay_recv, |_| Event::Tick)
-        .recv(&quit_recv, |res| {
-            if let Ok(Event::Quit) = res {
-                Event::Quit
-            } else {
-                Event::Tick
-            }
-        })
 }

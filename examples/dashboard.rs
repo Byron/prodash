@@ -25,8 +25,13 @@ async fn work_forever(mut args: arg::Options) -> Result {
     {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
-        sp.fail("engine failure");
-        sp.done("warmup complete");
+        smol::Task::spawn(async move {
+            smol::Timer::after(Duration::from_millis(500)).await;
+            sp.fail("engine failure");
+            smol::Timer::after(Duration::from_millis(750)).await;
+            sp.done("warmup complete");
+        })
+        .detach();
     }
     // Now we should handle signals to be able to cleanup properly
     let speed = args.speed_multitplier;
