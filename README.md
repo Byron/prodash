@@ -6,6 +6,7 @@
 It's easy to integrate thanks to a pragmatic API, and comes with a terminal user interface by default.
 
 [![asciicast](https://asciinema.org/a/315956.svg)](https://asciinema.org/a/315956)
+[![asciicast](https://asciinema.org/a/346619.svg)](https://asciinema.org/a/346619)
 
 ## How to use…
 
