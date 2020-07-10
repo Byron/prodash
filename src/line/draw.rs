@@ -177,7 +177,7 @@ fn draw_progress_bar<'a>(
             )));
         }
         None => {
-            let chars = [
+            const CHARS: [char; 29] = [
                 '⠁', '⠁', '⠉', '⠙', '⠚', '⠒', '⠂', '⠂', '⠒', '⠲', '⠴', '⠤', '⠄', '⠄', '⠤', '⠠', '⠠', '⠤', '⠦', '⠖',
                 '⠒', '⠐', '⠐', '⠒', '⠓', '⠋', '⠉', '⠈', '⠈',
             ];
@@ -185,7 +185,7 @@ fn draw_progress_bar<'a>(
                 .into_iter()
                 .skip(ticks)
                 .take(blocks_available as usize)
-                .map(|idx| chars[idx % chars.len()])
+                .map(|idx| CHARS[idx % CHARS.len()])
                 .rev()
                 .collect();
             buf.push(style.paint(bar));
