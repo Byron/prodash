@@ -22,6 +22,12 @@ async fn work_forever(mut args: arg::Options) -> Result {
         ..prodash::TreeOptions::default()
     }
     .create();
+    {
+        let mut sp = progress.add_child("preparation");
+        sp.info("warming up");
+        sp.fail("engine failure");
+        sp.done("warmup complete");
+    }
     // Now we should handle signals to be able to cleanup properly
     let speed = args.speed_multitplier;
     let changing_names = args.changing_names;
