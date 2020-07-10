@@ -1,3 +1,10 @@
+#### v0.1.5
+
+* support for simple cursor movements
+* get terminal size
+* color support to learn if color is allowed, and dynamically disable it
+  if `ansi_term` is used.
+
 #### v0.1.4
 
 * Fix precendence of imports in 'terminal' module.

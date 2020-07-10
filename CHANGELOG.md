@@ -3,7 +3,8 @@
 ### New Features
 
 * **line**
-  * There is a new line renderer as neat trade off between bare logs and full-blown tui.
+  * There is a new line renderer as neat trade off between bare logs and full-blown tui. It will work best with 'simple' and not
+    too dynamically changing progress trees.
   * Activate it with the `line-renderer` + one of `line-renderer-crossterm` or `line-renderer-termion` feature flags.
 * **tui**
   * **Root* now has the `copy_new_messages(…)` method, copying only messages seen since last time it was called
