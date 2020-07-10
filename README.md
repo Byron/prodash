@@ -29,8 +29,9 @@ This crate comes with various cargo features to tailor it to your needs.
   * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
   * It's like the tui-renderer, but with far less dependencies and less visual fidelity - all it needs is to move
     the cursor a little while drawing characters and block graphics.
+  * Support for [clicolors spec](https://bixense.com/clicolors/) and [no-color spec](https://no-color.org)
   * Requires one of these additional feature flags to be set to be functional
-    ** _(one required, mutually exclusive)_
+    * **one required** _(mutually exclusive)_
        * **line-renderer-crossterm** - use the _crossterm_ backend, useful for working on windows
        * **line-renderer-termion** - use the _termion_ backend, useful for lean unix-only builds
   * _Optional features_

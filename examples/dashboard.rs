@@ -27,6 +27,8 @@ async fn work_forever(mut args: arg::Options) -> Result {
     let changing_names = args.changing_names;
 
     let renderer = args.renderer.take().unwrap_or_else(|| "tui".into());
+    let work_min = args.pooled_work_min;
+    let work_max = args.pooled_work_max;
     let mut gui_handle = if renderer == "log" {
         let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
         Some(never_ending.boxed())
@@ -42,7 +44,12 @@ async fn work_forever(mut args: arg::Options) -> Result {
             changing_names,
         )
         .boxed_local();
-        let pooled_work = (0..thread_rng().gen_range(6, 16usize)).map(|_| {
+        let num_chunks = if work_min < work_max {
+            thread_rng().gen_range(work_min, work_max)
+        } else {
+            work_min
+        };
+        let pooled_work = (0..num_chunks).map(|_| {
             smol::Task::spawn(new_chunk_of_work(
                 NestingLevel(thread_rng().gen_range(0, Key::max_level())),
                 progress.clone(),
@@ -349,6 +356,14 @@ mod arg {
         /// the amount of scrollback for task messages.
         #[argh(option, default = "80")]
         pub message_scrollback_buffer_size: usize,
+
+        /// the amount of pooled work chunks that can be created at most
+        #[argh(option, default = "16")]
+        pub pooled_work_max: usize,
+
+        /// the amount of pooled work chunks that should at least be created
+        #[argh(option, default = "6")]
+        pub pooled_work_min: usize,
 
         /// multiplies the speed at which tasks seem to be running. Driving this down makes the TUI easier on the eyes
         /// Defaults to 1.0. A valud of 0.5 halves the speed.
