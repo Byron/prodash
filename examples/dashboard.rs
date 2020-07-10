@@ -110,10 +110,10 @@ fn launch_ambient_gui(
                     hide_cursor: true,
                     #[cfg(not(feature = "ctrlc"))]
                     hide_cursor: false,
-                    column_count: args
-                        .line_column_count
-                        .or_else(|| crosstermion::terminal::size().ok().map(|(w, _)| w))
-                        .unwrap_or(80),
+                    terminal_dimension: crosstermion::terminal::size()
+                        .ok()
+                        .map(|(w, h)| args.line_column_count.map(|width| (width, h)).unwrap_or((w, h)))
+                        .unwrap_or((80, 20)),
                     timestamp: args.line_timestamp,
                     colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
                     level_filter: Some(RangeInclusive::new(

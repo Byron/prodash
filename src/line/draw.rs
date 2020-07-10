@@ -1,6 +1,6 @@
 use crate::tree;
 use crosstermion::ansi_term::{ANSIString, ANSIStrings, Color, Style};
-use std::{io, ops::RangeInclusive};
+use std::{collections::VecDeque, io, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
@@ -9,13 +9,14 @@ pub struct State {
     messages: Vec<tree::Message>,
     for_next_copy: Option<tree::MessageCopyState>,
     max_message_origin_size: usize,
+    message_origin_size: VecDeque<usize>,
     /// The amount of blocks per line we have written last time.
-    blocks_per_line: std::collections::VecDeque<u16>,
+    blocks_per_line: VecDeque<u16>,
 }
 
 pub struct Options {
     pub level_filter: Option<RangeInclusive<tree::Level>>,
-    pub column_count: u16,
+    pub terminal_dimensions: (u16, u16),
     pub keep_running_if_progress_is_empty: bool,
     pub output_is_terminal: bool,
     pub colored: bool,
@@ -112,7 +113,7 @@ pub fn all(
             .filter(|(k, _)| level_range.contains(&k.level()))
             .zip(state.blocks_per_line.iter_mut())
         {
-            format_progress(key, progress, config.column_count, config.colored, &mut tokens);
+            format_progress(key, progress, config.terminal_dimensions.0, config.colored, &mut tokens);
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;

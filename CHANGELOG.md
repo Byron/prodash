@@ -6,8 +6,10 @@
   * There is a new line renderer as neat trade off between bare logs and full-blown tui. It will work best with 'simple' and not
     too dynamically changing progress trees.
   * Activate it with the `line-renderer` + one of `line-renderer-crossterm` or `line-renderer-termion` feature flags.
-* **tui**
-  * **Root* now has the `copy_new_messages(…)` method, copying only messages seen since last time it was called
+* **tree**
+  * New methods in **Root*
+    * `copy_new_messages(…)` method, copying only messages seen since last time it was called
+    * `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
 
 ### Breaking Changes
 
