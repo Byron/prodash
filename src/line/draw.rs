@@ -1,5 +1,8 @@
 use crate::tree;
-use crosstermion::ansi_term::{ANSIString, ANSIStrings, Color, Style};
+use crosstermion::{
+    ansi_term::{ANSIString, ANSIStrings, Color, Style},
+    color,
+};
 use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
@@ -33,7 +36,7 @@ fn messages(
     max_height: usize,
     timestamp: bool,
 ) -> io::Result<()> {
-    let mut brush = crosstermion::color::Brush::new(colored);
+    let mut brush = color::Brush::new(colored);
     fn to_color(level: tree::MessageLevel) -> Color {
         use tree::MessageLevel::*;
         match level {
@@ -197,7 +200,7 @@ fn draw_progress_bar<'a>(
     colored: bool,
     buf: &mut Vec<ANSIString<'a>>,
 ) {
-    let mut brush = crosstermion::color::Brush::new(colored);
+    let mut brush = color::Brush::new(colored);
     let style = brush.style(style);
 
     blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
@@ -257,7 +260,7 @@ fn format_progress<'a>(
     midpoint: Option<u16>,
     buf: &mut Vec<ANSIString<'a>>,
 ) -> Option<u16> {
-    let mut brush = crosstermion::color::Brush::new(colored);
+    let mut brush = color::Brush::new(colored);
     buf.clear();
 
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
