@@ -35,7 +35,7 @@ tui-renderer = ["tui",
                 "futures-core",
                 "smol",
                 "humantime"]
-line-renderer = ["flume", "crosstermion/color", "humantime", "unicode-width"]
+line-renderer = ["crosstermion/color", "humantime", "unicode-width"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
 
@@ -66,7 +66,6 @@ crosstermion = { version = "0.1.0", path = "crosstermion", optional = true, defa
 time = { version = "0.2.9", optional = true, features = ["std"], default-features = false }
 
 # line renderer
-flume = { version = "0.7.1", optional = true, default-features = false, features = ['select'] }
 ctrlc = { version = "3.1.4", optional = true, default-features = false, features = ['termination'] }
 
 [package.metadata.docs.rs]

@@ -73,7 +73,7 @@ impl Default for Options {
 /// A handle to the render thread, which when dropped will instruct it to stop showing progress.
 pub struct JoinHandle {
     inner: Option<std::thread::JoinHandle<io::Result<()>>>,
-    connection: flume::Sender<Event>,
+    connection: std::sync::mpsc::SyncSender<Event>,
     // If we disconnect before sending a Quit event, the selector continuously informs about the 'Disconnect' state
     disconnected: bool,
 }
@@ -145,67 +145,69 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         hide_cursor,
     };
 
-    let (quit_send, quit_recv) = flume::unbounded::<Event>();
-    let show_cursor = possibly_hide_cursor(&mut out, quit_send.clone(), hide_cursor);
+    let (event_send, event_recv) = std::sync::mpsc::sync_channel::<Event>(1);
+    let show_cursor = possibly_hide_cursor(&mut out, event_send.clone(), hide_cursor);
     static SHOW_PROGRESS: AtomicBool = AtomicBool::new(false);
 
-    let handle = std::thread::spawn(move || {
-        {
-            let initial_delay = initial_delay.unwrap_or_else(Duration::default);
-            SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
-            if !SHOW_PROGRESS.load(Ordering::Relaxed) {
-                std::thread::spawn(move || {
-                    std::thread::sleep(initial_delay);
-                    SHOW_PROGRESS.store(true, Ordering::Relaxed);
-                });
-            }
-        }
-
-        let mut state = draw::State::default();
-        let (tick_send, tick_recv) = flume::unbounded::<Event>();
-        let secs = 1.0 / frames_per_second;
-        let _ticker = std::thread::spawn(move || loop {
-            if tick_send.send(Event::Tick).is_err() {
-                break;
-            }
-            std::thread::sleep(Duration::from_secs_f32(secs));
-        });
-
-        let mut selector = flume::Selector::new()
-            .recv(&quit_recv, |res| {
-                if let Ok(Event::Quit) = res {
-                    Event::Quit
-                } else {
-                    Event::Tick
+    let handle = std::thread::spawn({
+        let tick_send = event_send.clone();
+        move || {
+            {
+                let initial_delay = initial_delay.unwrap_or_else(Duration::default);
+                SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
+                if !SHOW_PROGRESS.load(Ordering::Relaxed) {
+                    std::thread::spawn(move || {
+                        std::thread::sleep(initial_delay);
+                        SHOW_PROGRESS.store(true, Ordering::Relaxed);
+                    });
                 }
-            })
-            .recv(&tick_recv, |_res| Event::Tick);
-        while let Event::Tick = selector.wait() {
-            draw::all(
-                &mut out,
-                &progress,
-                SHOW_PROGRESS.load(Ordering::Relaxed),
-                &mut state,
-                &config,
-            )?;
-        }
+            }
 
-        if show_cursor {
-            crosstermion::execute!(out, crosstermion::cursor::Show).ok();
+            let mut state = draw::State::default();
+            let secs = 1.0 / frames_per_second;
+            let _ticker = std::thread::spawn(move || loop {
+                if tick_send.send(Event::Tick).is_err() {
+                    break;
+                }
+                std::thread::sleep(Duration::from_secs_f32(secs));
+            });
+
+            for event in event_recv {
+                match event {
+                    Event::Tick => {
+                        draw::all(
+                            &mut out,
+                            &progress,
+                            SHOW_PROGRESS.load(Ordering::Relaxed),
+                            &mut state,
+                            &config,
+                        )?;
+                    }
+                    Event::Quit => break,
+                }
+            }
+
+            if show_cursor {
+                crosstermion::execute!(out, crosstermion::cursor::Show).ok();
+            }
+            Ok(())
         }
-        Ok(())
     });
 
     JoinHandle {
         inner: Some(handle),
-        connection: quit_send,
+        connection: event_send,
         disconnected: false,
     }
 }
 
 // Not all configurations actually need it to be mut, but those with the 'ctrlc' feature do
 #[allow(unused_mut)]
-fn possibly_hide_cursor(out: &mut impl io::Write, quit_send: flume::Sender<Event>, mut hide_cursor: bool) -> bool {
+fn possibly_hide_cursor(
+    out: &mut impl io::Write,
+    quit_send: std::sync::mpsc::SyncSender<Event>,
+    mut hide_cursor: bool,
+) -> bool {
     #[cfg(not(feature = "ctrlc"))]
     drop(quit_send);
 
