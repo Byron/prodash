@@ -1,3 +1,7 @@
+#### v0.2.0
+
+* remove native support for `flume` and `crossbeam-channel` for key input in favor of `std::sync::mpsc::Receiver`s :).
+
 #### v0.1.5
 
 * support for simple cursor movements

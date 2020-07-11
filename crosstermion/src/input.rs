@@ -95,38 +95,10 @@ mod convert {
 #[cfg(feature = "crossterm")]
 mod _impl {
     /// Return a receiver of user input events to avoid blocking the main thread.
-    ///
-    /// Requires feature `input-thread`
-    #[cfg(feature = "input-thread")]
-    pub fn key_input_channel() -> crossbeam_channel::Receiver<super::Key> {
+    pub fn key_input_channel() -> std::sync::mpsc::Receiver<super::Key> {
         use std::convert::TryInto;
 
-        let (key_send, key_receive) = crossbeam_channel::bounded::<super::Key>(0);
-        std::thread::spawn(move || -> Result<(), std::io::Error> {
-            loop {
-                let event = crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
-                match event {
-                    crossterm::event::Event::Key(key) => {
-                        let key: Result<super::Key, _> = key.try_into();
-                        if let Ok(key) = key {
-                            if key_send.send(key).is_err() {
-                                break;
-                            }
-                        };
-                    }
-                    _ => continue,
-                };
-            }
-            Ok(())
-        });
-        key_receive
-    }
-
-    #[cfg(all(feature = "input-thread-flume", not(feature = "input-thread")))]
-    pub fn key_input_channel() -> flume::Receiver<super::Key> {
-        use std::convert::TryInto;
-
-        let (key_send, key_receive) = flume::bounded::<super::Key>(0);
+        let (key_send, key_receive) = std::sync::mpsc::sync_channel(0);
         std::thread::spawn(move || -> Result<(), std::io::Error> {
             loop {
                 let event = crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
@@ -192,32 +164,11 @@ mod _impl {
         key_receive
     }
 
-    #[cfg(feature = "input-thread")]
-    pub fn key_input_channel() -> crossbeam_channel::Receiver<super::Key> {
+    pub fn key_input_channel() -> std::sync::mpsc::Receiver<super::Key> {
         use std::{convert::TryInto, io};
         use termion::input::TermRead;
 
-        let (key_send, key_receive) = crossbeam_channel::bounded::<super::Key>(1);
-        std::thread::spawn(move || -> Result<(), io::Error> {
-            for key in io::stdin().keys() {
-                let key: Result<super::Key, _> = key?.try_into();
-                if let Ok(key) = key {
-                    if key_send.send(key).is_err() {
-                        break;
-                    }
-                }
-            }
-            Ok(())
-        });
-        key_receive
-    }
-
-    #[cfg(all(feature = "input-thread-flume", not(feature = "input-thread")))]
-    pub fn key_input_channel() -> flume::Receiver<super::Key> {
-        use std::{convert::TryInto, io};
-        use termion::input::TermRead;
-
-        let (key_send, key_receive) = flume::bounded::<super::Key>(1);
+        let (key_send, key_receive) = std::sync::mpsc::sync_channel(0);
         std::thread::spawn(move || -> Result<(), io::Error> {
             for key in io::stdin().keys() {
                 let key: Result<super::Key, _> = key?.try_into();

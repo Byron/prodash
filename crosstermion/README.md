@@ -38,24 +38,16 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
       * provides `Key` conversion support from `crossbeam::event::KeyEvent` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
       * _additive_
-        * _mutually exclusive_
-            * **input-thread**
-              * Adds input handling by spawning a thread providing input via `crossbeam` channels
-            * **input-thread-flume**
-              * Adds input handling by spawning a thread providing input via `flume` channels
         * **input-async-crossterm**
           * adds native async capabilites to crossterm, which works without spawning an extra thread thanks to `mio`.
+          * note that threaded key input is always supported.
     * **termion**
       * provides `Key` conversion support from `termion::event::Key` and an `AlternativeRawTerminal`
       * provides a threaded key input channel
       * _additive_
-        * _mutually exclusive_
-            * **input-thread**
-              * Adds input handling by spawning a thread providing input via `crossbeam` channels
-            * **input-thread-flume**
-              * Adds input handling by spawning a thread providing input via `flume` channels
         * **input-async**
           * Spawn a thread and provide input events via a futures Stream
+          * note that threaded key input is always supported.
 * _mutually exclusive_
     * _using `tui_` _(mutually exclusive)_
         * **tui-termion** _implies `termion` feature_
@@ -67,9 +59,6 @@ in case of `tui-react` and `tui`, or `crossterm` and `termion`, the more general
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
         * **tui-react-crossterm** _implies `crossterm` feature_
           * combines `tui-react` with `crossterm` and provides a `tui::Terminal` with `crossterm` backend
-* **flume-async**
-   * activates 'flume/async'
-   * note that 'flume/select' is always active, as it is just a few lines of code without any additional dependencies
 * **color**
    * Add support for `ansi_term` based conditional coloring. The crate is small, to the point and allows zero-copy drawing
      of bytes and UTF-8 string, while supporting Windows 10 as well.
