@@ -47,7 +47,7 @@ pub struct Options {
     /// *e.g.* 1.0/4.0 is one frame every 4 seconds.
     pub frames_per_second: f32,
 
-    /// If true (default: false), we will keep waiting for progress even after we encountered an empty list of drawable progress items.
+    /// If true (default: true), we will keep waiting for progress even after we encountered an empty list of drawable progress items.
     ///
     /// Please note that you should add at least one item to the `prodash::Tree` before launching the application or else
     /// risk a race causing nothing to be rendered at all.
@@ -64,8 +64,8 @@ impl Default for Options {
             hide_cursor: false,
             level_filter: None,
             initial_delay: None,
-            frames_per_second: FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH,
-            keep_running_if_progress_is_empty: false,
+            frames_per_second: 6.0,
+            keep_running_if_progress_is_empty: true,
         }
     }
 }
@@ -96,20 +96,24 @@ impl JoinHandle {
     pub fn wait(mut self) {
         self.inner.take().and_then(|h| h.join().ok());
     }
-    /// Send the signal to shutdown and wait for the thread to be shutdown.
-    pub fn shutdown_and_wait(mut self) {
+    /// Send the shutdown signal right after one last redraw
+    pub fn shutdown(&mut self) {
         if !self.disconnected {
+            self.connection.send(Event::Tick).ok();
             self.connection.send(Event::Quit).ok();
         }
-        self.inner.take().and_then(|h| h.join().ok());
+    }
+    /// Send the signal to shutdown and wait for the thread to be shutdown.
+    pub fn shutdown_and_wait(mut self) {
+        self.shutdown();
+        self.wait();
     }
 }
 
 impl Drop for JoinHandle {
     fn drop(&mut self) {
-        if !self.disconnected {
-            self.connection.send(Event::Quit).ok();
-        }
+        self.shutdown();
+        self.inner.take().and_then(|h| h.join().ok());
     }
 }
 
@@ -118,8 +122,6 @@ enum Event {
     Tick,
     Quit,
 }
-
-const FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH: f32 = 6.0;
 
 pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, config: Options) -> JoinHandle {
     let Options {
@@ -160,48 +162,32 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         }
 
         let mut state = draw::State::default();
-        if frames_per_second >= FPS_NEEDED_TO_SHUTDOWN_FAST_ENOUGH {
-            loop {
-                if let Ok(Event::Quit) = quit_recv.try_recv() {
-                    break;
-                }
-                draw::all(
-                    &mut out,
-                    &progress,
-                    SHOW_PROGRESS.load(Ordering::Relaxed),
-                    &mut state,
-                    &config,
-                )?;
-                std::thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second));
+        let (tick_send, tick_recv) = flume::unbounded::<Event>();
+        let secs = 1.0 / frames_per_second;
+        let _ticker = std::thread::spawn(move || loop {
+            if tick_send.send(Event::Tick).is_err() {
+                break;
             }
-        } else {
-            let (tick_send, tick_recv) = flume::unbounded::<Event>();
-            let secs = 1.0 / frames_per_second;
-            let _ticker = std::thread::spawn(move || loop {
-                if tick_send.send(Event::Tick).is_err() {
-                    break;
-                }
-                std::thread::sleep(Duration::from_secs_f32(secs));
-            });
+            std::thread::sleep(Duration::from_secs_f32(secs));
+        });
 
-            let mut selector = flume::Selector::new()
-                .recv(&quit_recv, |res| {
-                    if let Ok(Event::Quit) = res {
-                        Event::Quit
-                    } else {
-                        Event::Tick
-                    }
-                })
-                .recv(&tick_recv, |_res| Event::Tick);
-            while let Event::Tick = selector.wait() {
-                draw::all(
-                    &mut out,
-                    &progress,
-                    SHOW_PROGRESS.load(Ordering::Relaxed),
-                    &mut state,
-                    &config,
-                )?;
-            }
+        let mut selector = flume::Selector::new()
+            .recv(&quit_recv, |res| {
+                if let Ok(Event::Quit) = res {
+                    Event::Quit
+                } else {
+                    Event::Tick
+                }
+            })
+            .recv(&tick_recv, |_res| Event::Tick);
+        while let Event::Tick = selector.wait() {
+            draw::all(
+                &mut out,
+                &progress,
+                SHOW_PROGRESS.load(Ordering::Relaxed),
+                &mut state,
+                &config,
+            )?;
         }
 
         if show_cursor {

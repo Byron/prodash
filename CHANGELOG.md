@@ -1,3 +1,11 @@
+## v7.0.2
+
+* **line-renderer** `JoinHandle` will 
+  * now send a signal to perform a render before shutting down to capture the final state
+  * wait for the render thread to complete the aforementioned actions on drop. You can still override this behaviour through
+   `disconnect()` or `forget()`.
+  * removed special code-paths that avoided bringing up another thread for 'ticks' at the expense of shutdown delay.
+
 ## v7.0.1 - Prevent cursor movement if no progress bar is drawn
 
 ## v7.0.0 - Add new line-renderer, change feature flag names
