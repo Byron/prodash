@@ -1,3 +1,5 @@
+## v7.0.3 - cleanup and code simplification in the line renderer
+
 ## v7.0.2
 
 * **line-renderer** `JoinHandle` will 
