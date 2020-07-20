@@ -70,15 +70,15 @@ In order for the build-time improvements to become effective, we need…
 
 * **crosstermion**
   * `StreamExt::filter_map(…)`
+* **prodash::tui::engine**
+  * `stream::select_all(…)`
+  * `StreamExt::map(…)`
+  * `StreamExt::boxed(…)`
 * **prodash -> example -> dashboard**
   * `stream::select(…)` 
   * `future::select(…)`
   * `future::join_all(…)`
   * `FutureExt::boxed(…)`
-* **prodash::tui::engine**
-  * `stream::select_all(…)`
-  * `StreamExt::map(…)`
-  * `StreamExt::boxed(…)`
 
 
 ## Limitations
