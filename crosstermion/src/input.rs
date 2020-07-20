@@ -123,13 +123,13 @@ mod _impl {
     ///
     /// Requires the `input-async` feature.
     #[cfg(feature = "input-async-crossterm")]
-    pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = super::Key> {
+    pub fn key_input_stream() -> impl futures_core::stream::Stream<Item = super::Key> {
         use futures_util::StreamExt;
         use std::convert::TryFrom;
         crossterm::event::EventStream::new()
-            .filter_map(|r| futures_util::future::ready(r.ok()))
+            .filter_map(|r| futures_lite::future::ready(r.ok()))
             .filter_map(|e| {
-                futures_util::future::ready(match e {
+                futures_lite::future::ready(match e {
                     crossterm::event::Event::Key(key) => super::Key::try_from(key).ok(),
                     _ => None,
                 })
@@ -143,12 +143,11 @@ mod _impl {
     ///
     /// Requires feature `futures-channel`
     #[cfg(feature = "input-async")]
-    pub fn key_input_stream() -> impl futures_util::stream::Stream<Item = super::Key> {
-        use futures_util::SinkExt;
+    pub fn key_input_stream() -> impl futures_core::stream::Stream<Item = super::Key> {
         use std::{convert::TryInto, io};
         use termion::input::TermRead;
 
-        let (mut key_send, key_receive) = futures_channel::mpsc::channel::<super::Key>(1);
+        let (key_send, key_receive) = async_channel::bounded::<super::Key>(1);
         // This brings blocking key-handling into the async world
         std::thread::spawn(move || -> Result<(), io::Error> {
             for key in io::stdin().keys() {

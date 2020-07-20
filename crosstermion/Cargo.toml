@@ -14,7 +14,7 @@ default = []
 
 color = ["ansi_term"]
 
-input-async = ["futures-channel", "futures-util", "futures-executor", ]
+input-async = ["futures-channel", "async-channel", "futures-lite", "futures-util", "futures-core", "futures-executor", ]
 input-async-crossterm = ["crossterm/event-stream", "input-async"]
 
 tui-termion = ["tui", "tui-termion-backend", "termion"]
@@ -31,11 +31,14 @@ tui-crossterm-backend = ["tui/crossterm"]
 crossterm = { version = "0.17.5", optional = true, default-features = false }
 termion = { version = "1.5.5", optional = true, default-features = false }
 futures-channel = { version = "0.3.5", optional = true, default-features = false, features = ["std", "sink"] }
-futures-util = { version = "0.3.5", optional = true, default-features = false, features = ["sink"] }
+futures-core = { version = "0.3.5", optional = true, default-features = false }
+futures-util = { version = "0.3.5", optional = true, default-features = false }
 futures-executor = { version = "0.3.5", default-features = false, optional = true, features = ["std"] }
 tui = { version = "0.9.5", optional = true, default-features = false }
 tui-react = { version = "0.4.0", optional = true, default-features = false }
 ansi_term = { version = "0.12.1", optional = true, default-features = false }
+async-channel = { version = "1.1.1", optional = true }
+futures-lite = { version = "0.1.5", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
