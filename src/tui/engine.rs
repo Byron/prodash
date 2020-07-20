@@ -1,6 +1,6 @@
 use crate::{tree::Root, tui::draw, tui::ticker};
 
-use futures_util::{stream, StreamExt};
+use futures_util::StreamExt;
 use std::{
     io::{self, Write},
     time::Duration,
@@ -153,7 +153,7 @@ pub fn render_with_input(
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());
         let mut messages = Vec::with_capacity(progress.messages_capacity());
-        let mut events = stream::select_all(vec![
+        let mut events = futures_util::stream::select_all(vec![
             ticker(duration_per_frame).map(|_| Event::Tick).boxed(),
             key_receive.map(Event::Input).boxed(),
             events.boxed(),
@@ -257,5 +257,5 @@ pub fn render(
     progress: Root,
     config: Options,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
-    render_with_input(out, progress, config, stream::pending())
+    render_with_input(out, progress, config, futures_lite::stream::pending())
 }

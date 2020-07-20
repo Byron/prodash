@@ -1,7 +1,5 @@
-use futures_core::task::Poll;
-use futures_util::FutureExt;
 use smol::Timer;
-use std::time::Duration;
+use std::{future::Future, pin::Pin, task::Poll, time::Duration};
 
 /// Returns a stream of 'ticks', each being duration `dur` apart.
 ///
@@ -9,8 +7,8 @@ use std::time::Duration;
 /// when using the [`tui::render_with_input(…events)`](./fn.render_with_input.html) function.
 pub fn ticker(dur: Duration) -> impl futures_core::Stream<Item = ()> {
     let mut delay = Timer::after(dur);
-    futures_util::stream::poll_fn(move |ctx| {
-        let res = delay.poll_unpin(ctx);
+    futures_lite::stream::poll_fn(move |ctx| {
+        let res = Pin::new(&mut delay).poll(ctx);
         match res {
             Poll::Pending => Poll::Pending,
             Poll::Ready(_) => {

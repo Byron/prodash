@@ -41,7 +41,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
     let work_min = args.pooled_work_min;
     let work_max = args.pooled_work_max;
     let mut gui_handle = if renderer == "log" {
-        let never_ending = smol::Task::spawn(futures_util::future::pending::<()>());
+        let never_ending = smol::Task::spawn(futures_lite::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
         Some(launch_ambient_gui(progress.clone(), &renderer, args).unwrap().boxed())
@@ -300,7 +300,7 @@ fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event
     let mut offset_xy = (0u16, 0u16);
     let mut direction = Direction::Shrink;
     if !animate {
-        return futures_util::stream::pending().boxed();
+        return futures_lite::stream::pending().boxed();
     }
 
     ticker(Duration::from_millis(100))
