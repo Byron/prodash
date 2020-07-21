@@ -203,7 +203,7 @@ fn draw_progress_bar<'a>(
     buf: &mut Vec<ANSIString<'a>>,
 ) {
     let mut brush = color::Brush::new(colored);
-    let style = brush.style(style);
+    let styled_brush = brush.style(style);
 
     blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
     buf.push(" [".into());
@@ -211,10 +211,10 @@ fn draw_progress_bar<'a>(
         Some(fraction) => {
             blocks_available = blocks_available.saturating_sub(1); // account for '>' apparently
             let progress_blocks = (blocks_available as f32 * fraction).floor() as usize;
-            buf.push(style.paint(format!("{:=<width$}", "", width = progress_blocks)));
-            buf.push(">".into());
-            buf.push(style.paint(format!(
-                "{:width$}",
+            buf.push(styled_brush.paint(format!("{:=<width$}", "", width = progress_blocks)));
+            buf.push(styled_brush.paint(">"));
+            buf.push(styled_brush.style(style.dimmed()).paint(format!(
+                "{:-<width$}",
                 "",
                 width = (blocks_available - progress_blocks as u16) as usize
             )));
@@ -222,7 +222,7 @@ fn draw_progress_bar<'a>(
         None => {
             const CHARS: [char; 6] = ['=', '=', '=', ' ', ' ', ' '];
             buf.push(
-                style.paint(
+                styled_brush.paint(
                     (p.step as usize..std::usize::MAX)
                         .into_iter()
                         .take(blocks_available as usize)

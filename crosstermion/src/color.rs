@@ -29,7 +29,7 @@ mod _impl {
             I: Into<std::borrow::Cow<'a, S>>,
             <S as ToOwned>::Owned: std::fmt::Debug,
         {
-            match (self.may_paint, self.style.take()) {
+            match (self.may_paint, self.style.as_ref().take()) {
                 (true, Some(style)) => style.paint(input),
                 (_, Some(_)) | (_, None) => ANSIGenericString::from(input),
             }

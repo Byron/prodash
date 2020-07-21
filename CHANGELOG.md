@@ -2,7 +2,8 @@
 
 * **tree::Item**
   * Add new methods `inc_by(step)` and `inc()` for convenience 
-
+* **line renderer**
+  * They now look clearer, as they changed from \[===>     ] to \[===>------]
 
 ## v7.0.3 - cleanup and code simplification in the line renderer
 
