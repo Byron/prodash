@@ -1,3 +1,9 @@
+## v7.0.4 
+
+* **tree::Item**
+  * Add new methods `inc_by(step)` and `inc()` for convenience 
+
+
 ## v7.0.3 - cleanup and code simplification in the line renderer
 
 ## v7.0.2

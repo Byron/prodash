@@ -296,6 +296,26 @@ impl Item {
         });
     }
 
+    /// Increment the current progress by the given `step`.
+    ///
+    /// **Note**: that this call has no effect unless `init(…)` was called before.
+    pub fn inc_by(&mut self, step: ProgressStep) {
+        self.alter_progress(|p| {
+            p.step += step;
+            p.state = ProgressState::Running;
+        });
+    }
+
+    /// Increment the current progress by one.
+    ///
+    /// **Note**: that this call has no effect unless `init(…)` was called before.
+    pub fn inc(&mut self) {
+        self.alter_progress(|p| {
+            p.step += 1;
+            p.state = ProgressState::Running;
+        });
+    }
+
     /// Call to indicate that progress cannot be indicated, and that the task cannot be interrupted.
     /// Use this, as opposed to `halted(…)`, if a non-interruptable call is about to be made without support
     /// for any progress indication.
