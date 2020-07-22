@@ -14,11 +14,12 @@ use unicode_width::UnicodeWidthStr;
 
 pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mut u16, buf: &mut Buffer) {
     let block = Block::default().title("Messages").borders(Borders::TOP);
+    let inner_bound = block.inner(bound);
     block.render(bound, buf);
     let help_text = " ⨯ = `| ▢ = ~ ";
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, None);
 
-    let bound = block.inner(bound);
+    let bound = inner_bound;
     *offset = sanitize_offset(*offset, messages.len(), bound.height);
     let max_origin_width = messages
         .iter()
@@ -99,7 +100,7 @@ fn level_to_style(level: MessageLevel) -> Style {
     use MessageLevel::*;
     Style::default()
         .fg(Color::Black)
-        .modifier(Modifier::BOLD)
+        .add_modifier(Modifier::BOLD)
         .bg(match level {
             Info => Color::White,
             Failure => Color::Red,

@@ -12,15 +12,15 @@ pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {
     let block = Block::default()
         .title("Information")
         .borders(Borders::TOP | Borders::BOTTOM);
+    let inner_bound = block.inner(bound);
     block.render(bound, buf);
 
     let help_text = " ⨯ = [ | ▢ = { ";
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, None);
 
-    let bound = block.inner(bound);
     let bound = Rect {
-        width: bound.width.saturating_sub(1),
-        ..bound
+        width: inner_bound.width.saturating_sub(1),
+        ..inner_bound
     };
     let mut offset = 0;
     for (line, info) in lines.windows(2).enumerate() {

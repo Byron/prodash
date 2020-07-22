@@ -42,7 +42,8 @@ pub(crate) fn all(
         if state.hide_info { &[] } else { &state.information },
         state.maximize_info,
     );
-    let window = Block::default().title(&state.title).borders(Borders::ALL);
+    let window = Block::default().title(state.title.as_str()).borders(Borders::ALL);
+    let inner_area = window.inner(bound);
     window.render(bound, buf);
     if bound.width < 4 || bound.height < 4 {
         return;
@@ -64,10 +65,9 @@ pub(crate) fn all(
         ),
     );
 
-    let inner = window.inner(bound);
     let (progress_pane, messages_pane) = compute_pane_bounds(
         if state.hide_messages { &[] } else { messages },
-        inner,
+        inner_area,
         state.messages_fullscreen,
     );
 
