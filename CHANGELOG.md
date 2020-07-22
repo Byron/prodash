@@ -1,3 +1,7 @@
+## v7.1.0 
+
+* Improved looks thanks to bold fonts
+
 ## v7.0.4 
 
 * **tree::Item**
