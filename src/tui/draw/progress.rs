@@ -18,7 +18,7 @@ use std::{
 use tui::{
     buffer::Buffer,
     layout::Rect,
-    style::{Color, Style},
+    style::{Color, Modifier, Style},
 };
 use tui_react::fill_background;
 
@@ -120,7 +120,9 @@ pub(crate) fn headline(
         num_groups,
         entries.len()
     );
-    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, None);
+
+    let bold = Style::default().add_modifier(Modifier::BOLD);
+    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, bold);
 }
 
 struct ProgressFormat<'a>(&'a Option<Progress>, u16);
@@ -238,8 +240,9 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                 );
             }
             None => {
+                let bold = Style::default().add_modifier(Modifier::BOLD);
                 draw_text_nowrap_fn(progress_rect, buf, progress_text, |_, _, _| Style::default());
-                draw_text_with_ellipsis_nowrap(progress_rect, buf, format!(" {} ", title), None);
+                draw_text_with_ellipsis_nowrap(progress_rect, buf, format!(" {} ", title), bold);
             }
         }
     }
@@ -340,7 +343,13 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
         line_bound.width = line_bound.width.saturating_sub(1);
         let tree_prefix = format!("{} {} ", level_prefix(entries, entry_index), entry.1.name);
         max_prefix_len = max_prefix_len.max(block_width(&tree_prefix));
-        draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
+
+        let style = if entry.1.progress.is_none() {
+            Style::default().add_modifier(Modifier::BOLD).into()
+        } else {
+            None
+        };
+        draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, style);
     }
     max_prefix_len
 }

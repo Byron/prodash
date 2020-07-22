@@ -10,6 +10,8 @@ use std::time::Duration;
 use tui::{
     buffer::Buffer,
     layout::Rect,
+    style::{Modifier, Style},
+    text::Span,
     widgets::{Block, Borders, Widget},
 };
 
@@ -42,7 +44,10 @@ pub(crate) fn all(
         if state.hide_info { &[] } else { &state.information },
         state.maximize_info,
     );
-    let window = Block::default().title(state.title.as_str()).borders(Borders::ALL);
+    let bold = Style::default().add_modifier(Modifier::BOLD);
+    let window = Block::default()
+        .title(Span::styled(state.title.as_str(), bold))
+        .borders(Borders::ALL);
     let inner_area = window.inner(bound);
     window.render(bound, buf);
     if bound.width < 4 || bound.height < 4 {

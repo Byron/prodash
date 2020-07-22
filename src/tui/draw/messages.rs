@@ -8,16 +8,20 @@ use tui::{
     buffer::Buffer,
     layout::Rect,
     style::{Color, Modifier, Style},
+    text::Span,
     widgets::{Block, Borders, Widget},
 };
 use unicode_width::UnicodeWidthStr;
 
 pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mut u16, buf: &mut Buffer) {
-    let block = Block::default().title("Messages").borders(Borders::TOP);
+    let bold = Style::default().add_modifier(Modifier::BOLD);
+    let block = Block::default()
+        .title(Span::styled("Messages", bold))
+        .borders(Borders::TOP);
     let inner_bound = block.inner(bound);
     block.render(bound, buf);
     let help_text = " ⨯ = `| ▢ = ~ ";
-    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, None);
+    draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(help_text)), buf, help_text, bold);
 
     let bound = inner_bound;
     *offset = sanitize_offset(*offset, messages.len(), bound.height);
@@ -74,14 +78,14 @@ pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mu
             rect::offset_x(overflow_bound, 1),
             buf,
             format!("… {} skipped and {} more", messages_skipped, messages_below),
-            None,
+            bold,
         );
         let help_text = " ⇊ = D|↓ = J|⇈ = U|↑ = K ┘";
         draw_text_with_ellipsis_nowrap(
             rect::snap_to_right(overflow_bound, block_width(help_text)),
             buf,
             help_text,
-            None,
+            bold,
         );
     }
 }
