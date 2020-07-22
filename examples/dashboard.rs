@@ -9,11 +9,25 @@ compile_error!(
     "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
 );
 
+static EXECUTOR: Lazy<(LocalExecutor, async_io::parking::Parker)> = Lazy::new(|| {
+    let (p, u) = async_io::parking::pair();
+    (LocalExecutor::new(move || u.unpark()), p)
+});
+
+pub fn spawn<T: 'static>(future: impl Future<Output = T> + 'static) -> multitask::Task<T> {
+    EXECUTOR.deref().0.spawn(future)
+}
+
 fn main() -> Result {
     env_logger::init();
 
     let args: arg::Options = argh::from_env();
-    futures_lite::future::block_on(work_forever(args))
+    spawn(work_forever(args)).detach();
+    loop {
+        if let Ok(false) = std::panic::catch_unwind(|| EXECUTOR.deref().0.tick()) {
+            EXECUTOR.deref().1.park();
+        }
+    }
 }
 
 async fn work_forever(mut args: arg::Options) -> Result {
@@ -25,7 +39,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
     {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
-        smol::Task::spawn(async move {
+        spawn(async move {
             async_io::Timer::new(Duration::from_millis(500)).await;
             sp.fail("engine failure");
             async_io::Timer::new(Duration::from_millis(750)).await;
@@ -41,7 +55,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
     let work_min = args.pooled_work_min;
     let work_max = args.pooled_work_max;
     let mut gui_handle = if renderer == "log" {
-        let never_ending = smol::Task::spawn(futures_lite::future::pending::<()>());
+        let never_ending = spawn(futures_lite::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
         Some(launch_ambient_gui(progress.clone(), &renderer, args).unwrap().boxed())
@@ -61,7 +75,7 @@ async fn work_forever(mut args: arg::Options) -> Result {
             work_min
         };
         let pooled_work = (0..num_chunks).map(|_| {
-            smol::Task::spawn(new_chunk_of_work(
+            spawn(new_chunk_of_work(
                 NestingLevel(thread_rng().gen_range(0, Key::max_level())),
                 progress.clone(),
                 speed,
@@ -85,7 +99,6 @@ async fn work_forever(mut args: arg::Options) -> Result {
     }
 
     if let Some(gui) = gui_handle {
-        // gui.cancel();
         gui.await;
     }
     Ok(())
@@ -95,7 +108,7 @@ fn launch_ambient_gui(
     progress: Tree,
     renderer: &str,
     args: arg::Options,
-) -> std::result::Result<smol::Task<()>, std::io::Error> {
+) -> std::result::Result<multitask::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = match renderer {
@@ -163,7 +176,7 @@ fn launch_ambient_gui(
         .boxed(),
         _ => panic!("Unknown renderer: '{}'", renderer),
     };
-    let handle = smol::Task::spawn(render_fut.map(|_| ()));
+    let handle = spawn(render_fut.map(|_| ()));
     Ok(handle)
 }
 
@@ -227,7 +240,7 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_n
         // one-off ambient tasks
         let num_tasks = max_level as usize * 2;
         for id in 0..num_tasks {
-            let handle = smol::Task::spawn(work_item(
+            let handle = spawn(work_item(
                 level_progress.add_child(format!("{} {}", WORK_NAMES.choose(&mut thread_rng()).unwrap(), id + 1)),
                 speed,
                 changing_names,
@@ -421,6 +434,8 @@ mod arg {
 }
 
 use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
+use multitask::LocalExecutor;
+use once_cell::sync::Lazy;
 use prodash::{
     line,
     tree::{Item, Key},
@@ -428,8 +443,13 @@ use prodash::{
     Tree,
 };
 use rand::prelude::*;
-use std::ops::RangeInclusive;
-use std::{error::Error, ops::Add, time::Duration, time::SystemTime};
+use std::{
+    error::Error,
+    future::Future,
+    ops::Deref,
+    ops::{Add, RangeInclusive},
+    time::{Duration, SystemTime},
+};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];
@@ -479,63 +499,3 @@ const LONG_WORK_DELAY_MS: u64 = 2000;
 const SPAWN_DELAY_MS: u64 = 200;
 const CHANCE_TO_BLOCK_PER_STEP: f64 = 1.0 / 100.0;
 const CHANCE_TO_SHOW_ETA: f64 = 0.5;
-
-mod smol {
-    //! A small and fast executor - with only one thread!
-    //! Copied from https://github.com/stjepang/smol/blob/b3005d942040f68f30ad84b6f8f1621ebaf9d753/src/lib.rs#L149
-
-    #![forbid(unsafe_code)]
-    #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
-
-    use std::{
-        future::Future,
-        panic::catch_unwind,
-        pin::Pin,
-        task::{Context, Poll},
-        thread,
-    };
-
-    use multitask::Executor;
-    use once_cell::sync::Lazy;
-
-    #[must_use = "tasks get canceled when dropped, use `.detach()` to run them in the background"]
-    #[derive(Debug)]
-    pub struct Task<T>(multitask::Task<T>);
-
-    impl<T> Task<T> {
-        pub fn spawn<F>(future: F) -> Task<T>
-        where
-            F: Future<Output = T> + Send + 'static,
-            T: Send + 'static,
-        {
-            static EXECUTOR: Lazy<Executor> = Lazy::new(|| {
-                thread::spawn(|| {
-                    let (p, u) = async_io::parking::pair();
-                    let ticker = EXECUTOR.ticker(move || u.unpark());
-
-                    loop {
-                        if let Ok(false) = catch_unwind(|| ticker.tick()) {
-                            p.park();
-                        }
-                    }
-                });
-
-                Executor::new()
-            });
-
-            Task(EXECUTOR.spawn(future))
-        }
-
-        pub fn detach(self) {
-            self.0.detach();
-        }
-    }
-
-    impl<T> Future for Task<T> {
-        type Output = T;
-
-        fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-            Pin::new(&mut self.0).poll(cx)
-        }
-    }
-}
