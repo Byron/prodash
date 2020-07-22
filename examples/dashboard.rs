@@ -9,23 +9,28 @@ compile_error!(
     "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
 );
 
+static EXECUTOR: Lazy<(LocalExecutor, async_io::parking::Parker)> = Lazy::new(|| {
+    let (p, u) = async_io::parking::pair();
+    (LocalExecutor::new(move || u.unpark()), p)
+});
+
+pub fn spawn<T: 'static>(future: impl Future<Output = T> + 'static) -> multitask::Task<T> {
+    EXECUTOR.deref().0.spawn(future)
+}
+
 fn main() -> Result {
     env_logger::init();
 
-    let (p, u) = async_io::parking::pair();
-    let executor = LocalExecutor::new(move || u.unpark());
-
     let args: arg::Options = argh::from_env();
-    executor.spawn(work_forever(args, &executor)).detach();
-
+    spawn(work_forever(args)).detach();
     loop {
-        if let Ok(false) = std::panic::catch_unwind(|| executor.tick()) {
-            p.park();
+        if let Ok(false) = std::panic::catch_unwind(|| EXECUTOR.deref().0.tick()) {
+            EXECUTOR.deref().1.park();
         }
     }
 }
 
-async fn work_forever(mut args: arg::Options, executor: &LocalExecutor) -> Result {
+async fn work_forever(mut args: arg::Options) -> Result {
     let progress = prodash::TreeOptions {
         message_buffer_capacity: args.message_scrollback_buffer_size,
         ..prodash::TreeOptions::default()
@@ -34,14 +39,13 @@ async fn work_forever(mut args: arg::Options, executor: &LocalExecutor) -> Resul
     {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
-        executor
-            .spawn(async move {
-                async_io::Timer::new(Duration::from_millis(500)).await;
-                sp.fail("engine failure");
-                async_io::Timer::new(Duration::from_millis(750)).await;
-                sp.done("warmup complete");
-            })
-            .detach();
+        spawn(async move {
+            async_io::Timer::new(Duration::from_millis(500)).await;
+            sp.fail("engine failure");
+            async_io::Timer::new(Duration::from_millis(750)).await;
+            sp.done("warmup complete");
+        })
+        .detach();
     }
     // Now we should handle signals to be able to cleanup properly
     let speed = args.speed_multitplier;
@@ -51,14 +55,10 @@ async fn work_forever(mut args: arg::Options, executor: &LocalExecutor) -> Resul
     let work_min = args.pooled_work_min;
     let work_max = args.pooled_work_max;
     let mut gui_handle = if renderer == "log" {
-        let never_ending = executor.spawn(futures_lite::future::pending::<()>());
+        let never_ending = spawn(futures_lite::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
-        Some(
-            launch_ambient_gui(progress.clone(), &renderer, args, executor)
-                .unwrap()
-                .boxed(),
-        )
+        Some(launch_ambient_gui(progress.clone(), &renderer, args).unwrap().boxed())
     };
 
     loop {
@@ -67,24 +67,21 @@ async fn work_forever(mut args: arg::Options, executor: &LocalExecutor) -> Resul
             progress.clone(),
             speed,
             changing_names,
-            executor,
         )
-        .boxed();
+        .boxed_local();
         let num_chunks = if work_min < work_max {
             thread_rng().gen_range(work_min, work_max)
         } else {
             work_min
         };
         let pooled_work = (0..num_chunks).map(|_| {
-            executor
-                .spawn(new_chunk_of_work(
-                    NestingLevel(thread_rng().gen_range(0, Key::max_level())),
-                    progress.clone(),
-                    speed,
-                    changing_names,
-                    executor,
-                ))
-                .boxed()
+            spawn(new_chunk_of_work(
+                NestingLevel(thread_rng().gen_range(0, Key::max_level())),
+                progress.clone(),
+                speed,
+                changing_names,
+            ))
+            .boxed_local()
         });
 
         match futures_util::future::select(
@@ -111,7 +108,6 @@ fn launch_ambient_gui(
     progress: Tree,
     renderer: &str,
     args: arg::Options,
-    executor: &LocalExecutor,
 ) -> std::result::Result<multitask::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
@@ -180,7 +176,7 @@ fn launch_ambient_gui(
         .boxed(),
         _ => panic!("Unknown renderer: '{}'", renderer),
     };
-    let handle = executor.spawn(render_fut.map(|_| ()));
+    let handle = spawn(render_fut.map(|_| ()));
     Ok(handle)
 }
 
@@ -234,13 +230,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     }
 }
 
-async fn new_chunk_of_work(
-    max: NestingLevel,
-    tree: Tree,
-    speed: f32,
-    changing_names: bool,
-    executor: &LocalExecutor,
-) -> Result {
+async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_names: bool) -> Result {
     let NestingLevel(max_level) = max;
     let mut progresses = Vec::new();
     let mut level_progress = tree.add_child(format!("level {} of {}", 1, max_level));
@@ -250,14 +240,11 @@ async fn new_chunk_of_work(
         // one-off ambient tasks
         let num_tasks = max_level as usize * 2;
         for id in 0..num_tasks {
-            let handle = executor.spawn(
-                work_item(
-                    level_progress.add_child(format!("{} {}", WORK_NAMES.choose(&mut thread_rng()).unwrap(), id + 1)),
-                    speed,
-                    changing_names,
-                )
-                .boxed(),
-            );
+            let handle = spawn(work_item(
+                level_progress.add_child(format!("{} {}", WORK_NAMES.choose(&mut thread_rng()).unwrap(), id + 1)),
+                speed,
+                changing_names,
+            ));
             handles.push(handle);
 
             async_io::Timer::new(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
@@ -448,6 +435,7 @@ mod arg {
 
 use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
 use multitask::LocalExecutor;
+use once_cell::sync::Lazy;
 use prodash::{
     line,
     tree::{Item, Key},
@@ -457,6 +445,8 @@ use prodash::{
 use rand::prelude::*;
 use std::{
     error::Error,
+    future::Future,
+    ops::Deref,
     ops::{Add, RangeInclusive},
     time::{Duration, SystemTime},
 };
