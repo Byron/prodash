@@ -1,3 +1,7 @@
+## v7.1.1
+
+* dependency update: smol 0.2
+
 ## v7.1.0 
 
 * Improved looks thanks to bold fonts
