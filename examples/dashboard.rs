@@ -13,7 +13,7 @@ fn main() -> Result {
     env_logger::init();
 
     let args: arg::Options = argh::from_env();
-    smol::run(work_forever(args))
+    futures_lite::future::block_on(work_forever(args))
 }
 
 async fn work_forever(mut args: arg::Options) -> Result {
@@ -26,9 +26,9 @@ async fn work_forever(mut args: arg::Options) -> Result {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
         smol::Task::spawn(async move {
-            smol::Timer::after(Duration::from_millis(500)).await;
+            async_io::Timer::new(Duration::from_millis(500)).await;
             sp.fail("engine failure");
-            smol::Timer::after(Duration::from_millis(750)).await;
+            async_io::Timer::new(Duration::from_millis(750)).await;
             sp.done("warmup complete");
         })
         .detach();
@@ -99,7 +99,7 @@ fn launch_ambient_gui(
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = match renderer {
-        "line" => smol::Task::blocking(async move {
+        "line" => async move {
             let output_is_terminal = atty::is(atty::Stream::Stdout);
             let mut handle = line::render(
                 std::io::stderr(),
@@ -126,8 +126,8 @@ fn launch_ambient_gui(
                 },
             );
             handle.disconnect();
-            handle.wait();
-        })
+            blocking::unblock!(handle.wait());
+        }
         .boxed(),
         "tui" => tui::render_with_input(
             std::io::stdout(),
@@ -208,7 +208,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
         if thread_rng().gen_bool(if changing_names { 0.5 } else { 0.01 }) {
             progress.set_name(WORK_NAMES.choose(&mut thread_rng()).unwrap().to_string());
         }
-        smol::Timer::after(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
+        async_io::Timer::new(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
     }
     if thread_rng().gen_bool(0.95) {
         progress.done(*DONE_MESSAGES.choose(&mut thread_rng()).unwrap());
@@ -234,7 +234,7 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_n
             ));
             handles.push(handle);
 
-            smol::Timer::after(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
+            async_io::Timer::new(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
         }
         if level + 1 != max_level {
             let tmp = level_progress.add_child(format!("Level {}", level + 1));
