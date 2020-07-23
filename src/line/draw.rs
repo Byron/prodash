@@ -274,7 +274,7 @@ fn format_progress<'a>(
 
             let pre_unit = buf.len();
             buf.push(brush.style(Style::new().bold().dimmed()).paint(match progress.done_at {
-                Some(done_at) => format!("{} / {}", progress.step, done_at),
+                Some(done_at) => format!("{}/{}", progress.step, done_at),
                 None => format!("{}", progress.step),
             }));
             if let Some(unit) = progress.unit {
