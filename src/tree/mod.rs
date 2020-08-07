@@ -2,7 +2,7 @@ use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
 use std::ops::{Deref, Index, IndexMut};
-use std::{sync::Arc, time::SystemTime};
+use std::{fmt, sync::Arc, time::SystemTime};
 
 #[cfg(test)]
 mod tests;
@@ -206,6 +206,16 @@ pub struct MessageCopyState {
     cursor: usize,
     buf_len: usize,
     total: usize,
+}
+
+pub trait DisplayValue {
+    fn display_value(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
+    fn display_unit(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
+}
+
+pub enum Unit {
+    Static(&'static str),
+    Dynamic(Box<dyn DisplayValue>),
 }
 
 /// A `Tree` represents an element of the progress tree.
