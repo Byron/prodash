@@ -183,7 +183,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     );
 
     for step in 0..max {
-        progress.set(step as u32);
+        progress.set(step as ProgressStep);
         let delay_ms = if thread_rng().gen_bool(CHANCE_TO_BLOCK_PER_STEP) {
             let eta = if thread_rng().gen_bool(CHANCE_TO_SHOW_ETA) {
                 Some(SystemTime::now().add(Duration::from_millis(LONG_WORK_DELAY_MS)))
@@ -423,13 +423,17 @@ mod arg {
 use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
 use prodash::{
     line,
-    tree::{Item, Key},
+    tree::{Item, Key, ProgressStep},
     tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
 use rand::prelude::*;
-use std::ops::RangeInclusive;
-use std::{error::Error, ops::Add, time::Duration, time::SystemTime};
+use std::{
+    error::Error,
+    ops::Add,
+    ops::RangeInclusive,
+    time::{Duration, SystemTime},
+};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];

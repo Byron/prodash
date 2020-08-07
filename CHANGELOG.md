@@ -1,3 +1,8 @@
+## v8.0.0
+
+* Turn `ProgressStep` type into usize to allow for a broader range of values. Specifically, this enables counting bytes read and written
+  of files or streams bigger than 2^32-1
+
 ## v7.1.1
 
 * dependency update: smol 0.2

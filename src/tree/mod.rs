@@ -429,7 +429,7 @@ type ItemId = u16; // NOTE: This means we will show weird behaviour if there are
 pub type Level = u8; // a level in the hierarchy of key components
 
 /// The amount of steps a progress can make
-pub type ProgressStep = u32;
+pub type ProgressStep = usize;
 
 /// A type identifying a spot in the hierarchy of `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
