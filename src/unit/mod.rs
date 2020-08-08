@@ -9,29 +9,29 @@ pub use bytes::Bytes;
 pub trait DisplayValue {
     fn display_current_value(
         &self,
-        f: &mut fmt::Formatter,
+        w: &mut dyn fmt::Write,
         value: ProgressStep,
         _upper: Option<ProgressStep>,
     ) -> fmt::Result {
-        write!(f, "{}", value)
+        fmt::write(w, format_args!("{}", value))
     }
     fn display_upper_bound(
         &self,
-        f: &mut fmt::Formatter,
+        w: &mut dyn fmt::Write,
         upper_bound: ProgressStep,
         _value: ProgressStep,
     ) -> fmt::Result {
-        write!(f, "{}", upper_bound)
+        fmt::write(w, format_args!("{}", upper_bound))
     }
-    fn display_unit(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
-    fn display_percentage(&self, f: &mut fmt::Formatter, percentage: f64) -> fmt::Result {
-        write!(f, "[{}%]", percentage as usize)
+    fn display_unit(&self, w: &mut dyn fmt::Write, value: ProgressStep) -> fmt::Result;
+    fn display_percentage(&self, w: &mut dyn fmt::Write, percentage: f64) -> fmt::Result {
+        fmt::write(w, format_args!("[{}%]", percentage as usize))
     }
 }
 
 impl DisplayValue for &'static str {
-    fn display_unit(&self, f: &mut fmt::Formatter, _value: usize) -> fmt::Result {
-        write!(f, "{}", self)
+    fn display_unit(&self, w: &mut dyn fmt::Write, _value: usize) -> fmt::Result {
+        fmt::write(w, format_args!("{}", self))
     }
 }
 
