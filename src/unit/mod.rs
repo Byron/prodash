@@ -1,5 +1,5 @@
 use crate::tree::ProgressStep;
-use std::{fmt, fmt::Write, ops::Deref};
+use std::{fmt, fmt::Write, ops::Deref, sync::Arc};
 
 #[cfg(feature = "unit-bytes")]
 mod bytes;
@@ -42,19 +42,35 @@ pub trait DisplayValue {
     }
     fn display_unit(&self, w: &mut dyn fmt::Write, value: ProgressStep) -> fmt::Result;
     fn display_percentage(&self, w: &mut dyn fmt::Write, percentage: f64) -> fmt::Result {
-        fmt::write(w, format_args!("[{}%]", percentage as usize))
+        w.write_fmt(format_args!("[{}%]", percentage as usize))
     }
 }
 
 impl DisplayValue for &'static str {
     fn display_unit(&self, w: &mut dyn fmt::Write, _value: usize) -> fmt::Result {
-        fmt::write(w, format_args!("{}", self))
+        w.write_fmt(format_args!("{}", self))
     }
 }
 
+#[derive(Clone)]
 pub enum Unit {
     Label(&'static str, Option<Mode>),
-    Dynamic(Box<dyn DisplayValue>, Option<Mode>),
+    Dynamic(Arc<dyn DisplayValue + Send + Sync>, Option<Mode>),
+}
+
+impl fmt::Debug for Unit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Unit::Label(name, mode) => f.write_fmt(format_args!("Unit::Label({:?}, {:?})", name, mode)),
+            Unit::Dynamic(_, mode) => f.write_fmt(format_args!("Unit::Dynamic(.., {:?})", mode)),
+        }
+    }
+}
+
+impl From<&'static str> for Unit {
+    fn from(v: &'static str) -> Self {
+        Unit::label(v)
+    }
 }
 
 /// Construction
@@ -65,11 +81,11 @@ impl Unit {
     pub fn label_and_mode(label: &'static str, mode: Mode) -> Self {
         Unit::Label(label, Some(mode))
     }
-    pub fn dynamic(label: impl DisplayValue + 'static) -> Self {
-        Unit::Dynamic(Box::new(label), None)
+    pub fn dynamic(label: impl DisplayValue + Send + Sync + 'static) -> Self {
+        Unit::Dynamic(Arc::new(label), None)
     }
-    pub fn dynamic_and_mode(label: impl DisplayValue + 'static, mode: Mode) -> Self {
-        Unit::Dynamic(Box::new(label), Some(mode))
+    pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: Mode) -> Self {
+        Unit::Dynamic(Arc::new(label), Some(mode))
     }
 }
 
@@ -127,11 +143,15 @@ impl WhatToDisplay {
 }
 
 impl<'a> UnitDisplay<'a> {
-    pub fn values(mut self) -> Self {
+    pub fn all(&mut self) -> &Self {
+        self.display = WhatToDisplay::ValuesAndUnit;
+        self
+    }
+    pub fn values(&mut self) -> &Self {
         self.display = WhatToDisplay::Values;
         self
     }
-    pub fn unit(mut self) -> Self {
+    pub fn unit(&mut self) -> &Self {
         self.display = WhatToDisplay::Unit;
         self
     }

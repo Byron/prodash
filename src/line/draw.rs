@@ -266,20 +266,27 @@ fn format_progress<'a>(
     buf.clear();
 
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
-    match value.progress {
+    match value.progress.as_ref() {
         Some(progress) => {
             let style = progress_style(&progress);
             buf.push(brush.style(Color::Cyan.bold()).paint(&value.name));
             buf.push(" ".into());
 
             let pre_unit = buf.len();
-            buf.push(brush.style(Style::new().bold().dimmed()).paint(match progress.done_at {
-                Some(done_at) => format!("{}/{}", progress.step, done_at),
-                None => format!("{}", progress.step),
-            }));
-            if let Some(unit) = progress.unit {
-                buf.push(" ".into());
-                buf.push(unit.into());
+            let values_brush = brush.style(Style::new().bold().dimmed());
+            match progress.unit.as_ref() {
+                Some(unit) => {
+                    let mut display = unit.display(progress.step, progress.done_at);
+                    buf.push(values_brush.paint(format!("{}", display.values())));
+                    buf.push(" ".into());
+                    buf.push(display.unit().to_string().into());
+                }
+                None => {
+                    buf.push(values_brush.paint(match progress.done_at {
+                        Some(done_at) => format!("{}/{}", progress.step, done_at),
+                        None => format!("{}", progress.step),
+                    }));
+                }
             }
             let desired_midpoint = block_count_sans_ansi_codes(buf.as_slice());
             let actual_midpoint = if let Some(midpoint) = midpoint {

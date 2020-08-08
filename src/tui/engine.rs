@@ -161,7 +161,6 @@ pub fn render_with_input(
 
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
-        let mut previous_root = None::<Root>;
         let mut previous_state = None::<draw::State>;
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
@@ -205,20 +204,11 @@ pub fn render_with_input(
                 }
             }
             if !skip_redraw && redraw_only_on_state_change {
-                let (new_prev_state, state_changed) = match previous_state.take() {
-                    Some(prev) if prev == state => (Some(prev), false),
-                    None | Some(_) => (Some(state.clone()), true),
+                let new_prev_state = match previous_state.take() {
+                    Some(prev) if prev == state => Some(prev),
+                    None | Some(_) => Some(state.clone()),
                 };
                 previous_state = new_prev_state;
-                if !state_changed {
-                    previous_root = match previous_root.take() {
-                        Some(prev) if prev.deep_eq(&progress) => {
-                            skip_redraw = true;
-                            Some(prev)
-                        }
-                        None | Some(_) => Some(progress.deep_clone()),
-                    };
-                }
             }
             if !skip_redraw {
                 tick += 1;

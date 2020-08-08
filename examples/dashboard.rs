@@ -106,7 +106,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
         if (max as usize % UNITS.len() + 1) == 0 {
             None
         } else {
-            UNITS.choose(&mut thread_rng()).copied()
+            UNITS.choose(&mut thread_rng()).copied().map(Into::into)
         },
     );
 
@@ -128,7 +128,10 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
             thread_rng().gen_range(SHORT_DELAY_MS, WORK_DELAY_MS)
         };
         if thread_rng().gen_bool(0.01) {
-            progress.init(Some(max.into()), UNITS.choose(&mut thread_rng()).copied())
+            progress.init(
+                Some(max.into()),
+                UNITS.choose(&mut thread_rng()).copied().map(Into::into),
+            )
         }
         if thread_rng().gen_bool(0.01) {
             progress.info(*INFO_MESSAGES.choose(&mut thread_rng()).unwrap());

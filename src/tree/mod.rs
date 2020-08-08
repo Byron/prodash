@@ -1,3 +1,4 @@
+use crate::unit::Unit;
 use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
@@ -84,11 +85,6 @@ impl Root {
         Root {
             inner: Arc::new(Mutex::new(self.inner.lock().deep_clone())),
         }
-    }
-
-    /// Compare all content in this root and the given one to see if they are the same.
-    pub fn deep_eq(&self, other: &Root) -> bool {
-        self.inner.lock().deep_eq(other.inner.lock().deref())
     }
 }
 
@@ -218,7 +214,7 @@ pub struct MessageCopyState {
 /// let tree = prodash::Tree::new();
 /// let mut progress = tree.add_child("task 1");
 ///
-/// progress.init(Some(10), Some("elements"));
+/// progress.init(Some(10), Some("elements".into()));
 /// for p in 0..10 {
 ///     progress.set(p);
 /// }
@@ -256,7 +252,7 @@ impl Item {
     /// to the progress tree.
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    pub fn init(&mut self, max: Option<ProgressStep>, unit: Option<&'static str>) {
+    pub fn init(&mut self, max: Option<ProgressStep>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
             r.value_mut().progress = Some(Progress {
                 done_at: max,
@@ -411,20 +407,6 @@ impl Item {
             tree: Arc::new(self.tree.deref().clone()),
             messages: Arc::new(Mutex::new(self.messages.lock().clone())),
         }
-    }
-
-    fn deep_eq(&self, other: &Item) -> bool {
-        if !(*self.messages.lock() == *other.messages.lock()) {
-            return false;
-        }
-
-        // This is racy, but it's OK
-        for (lhs, rhs) in self.tree.iter().zip(other.tree.iter()) {
-            if lhs.key() != rhs.key() || lhs.value() != rhs.value() {
-                return false;
-            }
-        }
-        true
     }
 }
 
@@ -683,7 +665,7 @@ impl Default for ProgressState {
 }
 
 /// Progress associated with some item in the progress tree.
-#[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct Progress {
     /// The amount of progress currently made
     pub step: ProgressStep,
@@ -692,7 +674,7 @@ pub struct Progress {
     /// If unset, the progress is unbounded.
     pub done_at: Option<ProgressStep>,
     /// The unit associated with the progress.
-    pub unit: Option<&'static str>,
+    pub unit: Option<Unit>,
     /// Whether progress can be made or not
     pub state: ProgressState,
 }
@@ -707,7 +689,7 @@ impl Progress {
 }
 
 /// The value associated with a spot in the hierarchy.
-#[derive(Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct Value {
     /// The name of the `Item` or task.
     pub name: String,

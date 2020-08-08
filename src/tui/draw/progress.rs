@@ -86,7 +86,7 @@ pub(crate) fn headline(
     let (num_running_tasks, num_blocked_tasks, num_groups) = entries.iter().fold(
         (0, 0, 0),
         |(mut running, mut blocked, mut groups), (_key, Value { progress, .. })| {
-            match progress.map(|p| p.state) {
+            match progress.as_ref().map(|p| p.state) {
                 Some(ProgressState::Running) => running += 1,
                 Some(ProgressState::Blocked(_, _)) | Some(ProgressState::Halted(_, _)) => blocked += 1,
                 None => groups += 1,
@@ -130,16 +130,13 @@ struct ProgressFormat<'a>(&'a Option<Progress>, u16);
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
-            Some(p) => {
-                match p.done_at {
-                    Some(done_at) => write!(f, "{} / {}", p.step, done_at),
+            Some(p) => match p.unit.as_ref() {
+                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at)),
+                None => match p.done_at {
+                    Some(done_at) => write!(f, "{}/{}", p.step, done_at),
                     None => write!(f, "{}", p.step),
-                }?;
-                if let Some(unit) = p.unit {
-                    write!(f, " {}", unit)?;
-                }
-                Ok(())
-            }
+                },
+            },
             None => write!(f, "{:─<width$}", '─', width = self.1 as usize),
         }
     }
@@ -198,7 +195,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
         let tree_prefix = level_prefix(entries, entry_index);
         let progress_rect = rect::offset_x(line_bound, block_width(&tree_prefix) as u16);
         draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
-        match progress.map(|p| (p.fraction(), p.state, p.step)) {
+        match progress.as_ref().map(|p| (p.fraction(), p.state, p.step)) {
             Some((Some(fraction), state, _step)) => {
                 let mut progress_text = progress_text;
                 add_block_eta(state, &mut progress_text);
@@ -420,7 +417,7 @@ pub fn draw_overflow(
         .take(offset as usize)
         .chain(entries.iter().skip((offset + num_entries_on_display) as usize))
         .fold((0usize, 0f32), |(count, progress_fraction), (_key, value)| {
-            let progress = value.progress.and_then(|p| p.fraction()).unwrap_or_default();
+            let progress = value.progress.as_ref().and_then(|p| p.fraction()).unwrap_or_default();
             (count + 1, progress_fraction + progress)
         });
     progress_fraction /= count as f32;

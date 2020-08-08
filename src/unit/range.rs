@@ -20,7 +20,7 @@ impl DisplayValue for Range {
         value: ProgressStep,
         _upper: Option<ProgressStep>,
     ) -> fmt::Result {
-        fmt::write(w, format_args!("{}", value + 1))
+        w.write_fmt(format_args!("{}", value + 1))
     }
     fn separator(&self, w: &mut dyn fmt::Write, _value: ProgressStep, _upper: Option<ProgressStep>) -> fmt::Result {
         w.write_str(" of ")
