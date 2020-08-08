@@ -25,7 +25,14 @@ required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "l
 [[example]]
 name = "units"
 path = "examples/units.rs"
-required-features = ["tui-renderer", "tui-renderer-crossterm", "line-renderer", "line-renderer-crossterm", "ctrlc"]
+required-features = [
+    "unit-bytes",
+    "tui-renderer",
+    "tui-renderer-crossterm",
+    "line-renderer",
+    "line-renderer-crossterm",
+    "ctrlc"
+]
 
 [features]
 default = ["log-renderer", "localtime"]

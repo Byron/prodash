@@ -43,6 +43,8 @@ impl<T> Task<T> {
         Task(EXECUTOR.spawn(future))
     }
 
+    // Used by 'dashboard'
+    #[allow(dead_code)]
     pub fn detach(self) {
         self.0.detach();
     }

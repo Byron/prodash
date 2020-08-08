@@ -208,7 +208,8 @@ fn draw_progress_bar<'a>(
     blocks_available = blocks_available.saturating_sub(3); // account for…I don't really know it's magic
     buf.push(" [".into());
     match p.fraction() {
-        Some(fraction) => {
+        Some(mut fraction) => {
+            fraction = fraction.min(1.0);
             blocks_available = blocks_available.saturating_sub(1); // account for '>' apparently
             let progress_blocks = (blocks_available as f32 * fraction).floor() as usize;
             buf.push(styled_brush.paint(format!("{:=<width$}", "", width = progress_blocks)));

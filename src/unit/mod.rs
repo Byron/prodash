@@ -69,24 +69,21 @@ impl fmt::Debug for Unit {
 
 impl From<&'static str> for Unit {
     fn from(v: &'static str) -> Self {
-        Unit::label(v)
+        label(v)
     }
 }
 
-/// Construction
-impl Unit {
-    pub fn label(label: &'static str) -> Self {
-        Unit::Label(label, None)
-    }
-    pub fn label_and_mode(label: &'static str, mode: Mode) -> Self {
-        Unit::Label(label, Some(mode))
-    }
-    pub fn dynamic(label: impl DisplayValue + Send + Sync + 'static) -> Self {
-        Unit::Dynamic(Arc::new(label), None)
-    }
-    pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: Mode) -> Self {
-        Unit::Dynamic(Arc::new(label), Some(mode))
-    }
+pub fn label(label: &'static str) -> Unit {
+    Unit::Label(label, None)
+}
+pub fn label_and_mode(label: &'static str, mode: Mode) -> Unit {
+    Unit::Label(label, Some(mode))
+}
+pub fn dynamic(label: impl DisplayValue + Send + Sync + 'static) -> Unit {
+    Unit::Dynamic(Arc::new(label), None)
+}
+pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: Mode) -> Unit {
+    Unit::Dynamic(Arc::new(label), Some(mode))
 }
 
 /// Display and utilities
