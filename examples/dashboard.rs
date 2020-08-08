@@ -182,11 +182,6 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_n
     Ok(())
 }
 
-enum Direction {
-    Shrink,
-    Grow,
-}
-
 struct NestingLevel(u8);
 type Result = std::result::Result<(), Box<dyn Error + Send>>;
 

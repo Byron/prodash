@@ -1,4 +1,3 @@
-use crate::Direction;
 use futures_util::{future::FutureExt, stream::StreamExt};
 use prodash::{
     line, tui,
@@ -11,6 +10,11 @@ use std::{ops::RangeInclusive, time::Duration};
 
 pub mod args;
 pub mod smol;
+
+enum Direction {
+    Shrink,
+    Grow,
+}
 
 const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 

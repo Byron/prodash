@@ -22,6 +22,11 @@ name = "dashboard-termion"
 path = "examples/dashboard.rs"
 required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "line-renderer-termion"]
 
+[[example]]
+name = "units"
+path = "examples/units.rs"
+required-features = ["tui-renderer", "tui-renderer-crossterm", "line-renderer", "line-renderer-crossterm", "ctrlc"]
+
 [features]
 default = ["log-renderer", "localtime"]
 unit-bytes = ["bytesize"]
