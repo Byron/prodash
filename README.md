@@ -56,6 +56,8 @@ This crate comes with various cargo features to tailor it to your needs.
          * Use the `termion` crate as terminal backend 
          * It has less dependencies but works only on `unix` systems
          * to get this, disable default features and chose at least `tui-renderer` and `tui-renderer-termion`.
+* **unit-bytes**
+  * Supports dynamic unit rendering using the tiny `bytesize` crate.
 
 ## Features
 

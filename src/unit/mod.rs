@@ -1,18 +1,27 @@
 use crate::tree::ProgressStep;
-use std::fmt::Write;
-use std::{fmt, ops::Deref};
+use std::{fmt, fmt::Write, ops::Deref};
+
+#[cfg(feature = "unit-bytes")]
+mod bytes;
+#[cfg(feature = "unit-bytes")]
+pub use bytes::Bytes;
 
 pub trait DisplayValue {
     fn display_current_value(
         &self,
         f: &mut fmt::Formatter,
         value: ProgressStep,
-        _max: Option<ProgressStep>,
+        _upper: Option<ProgressStep>,
     ) -> fmt::Result {
         write!(f, "{}", value)
     }
-    fn display_upper_bound(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result {
-        write!(f, "{}", value)
+    fn display_upper_bound(
+        &self,
+        f: &mut fmt::Formatter,
+        upper_bound: ProgressStep,
+        _value: ProgressStep,
+    ) -> fmt::Result {
+        write!(f, "{}", upper_bound)
     }
     fn display_unit(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
     fn display_percentage(&self, f: &mut fmt::Formatter, percentage: f64) -> fmt::Result {
@@ -38,6 +47,12 @@ impl Unit {
     }
     pub fn label_and_mode(label: &'static str, mode: Mode) -> Self {
         Unit::Label(label, Some(mode))
+    }
+    pub fn dynamic(label: impl DisplayValue + 'static) -> Self {
+        Unit::Dynamic(Box::new(label), None)
+    }
+    pub fn dynamic_and_mode(label: impl DisplayValue + 'static, mode: Mode) -> Self {
+        Unit::Dynamic(Box::new(label), Some(mode))
     }
 }
 
@@ -121,13 +136,13 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
             unit.display_current_value(f, self.current_value, self.upper_bound)?;
             if let Some(upper) = self.upper_bound {
                 f.write_char('/')?;
-                unit.display_upper_bound(f, upper)?;
-            }
-            if self.display.unit() {
-                f.write_char(' ')?;
+                unit.display_upper_bound(f, upper, self.current_value)?;
             }
         }
         if self.display.unit() {
+            if self.display.values() {
+                f.write_char(' ')?;
+            }
             unit.display_unit(f, self.current_value)?;
 
             if let Some((Mode::PercentageAfterUnit, fraction)) = mode_and_fraction {

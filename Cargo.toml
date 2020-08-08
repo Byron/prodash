@@ -24,18 +24,19 @@ required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "l
 
 [features]
 default = ["log-renderer", "localtime"]
+unit-bytes = ["bytesize"]
 tui-renderer-termion = ["crosstermion/tui-react-termion"]
 tui-renderer-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 tui-renderer = ["tui",
-                "unicode-segmentation",
-                "unicode-width",
-                "crosstermion/input-async",
-                "tui-react",
-                "futures-util",
-                "futures-lite",
-                "futures-core",
-                "async-io",
-                "humantime"]
+    "unicode-segmentation",
+    "unicode-width",
+    "crosstermion/input-async",
+    "tui-react",
+    "futures-util",
+    "futures-lite",
+    "futures-core",
+    "async-io",
+    "humantime"]
 line-renderer = ["crosstermion/color", "humantime", "unicode-width"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
@@ -68,6 +69,9 @@ time = { version = "0.2.9", optional = true, features = ["std"], default-feature
 
 # line renderer
 ctrlc = { version = "3.1.4", optional = true, default-features = false, features = ['termination'] }
+
+# units
+bytesize = { version = "1.0.1", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
