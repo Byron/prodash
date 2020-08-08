@@ -2,7 +2,7 @@ use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
 use std::ops::{Deref, Index, IndexMut};
-use std::{fmt, sync::Arc, time::SystemTime};
+use std::{sync::Arc, time::SystemTime};
 
 #[cfg(test)]
 mod tests;

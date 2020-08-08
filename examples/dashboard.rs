@@ -44,7 +44,11 @@ async fn work_forever(mut args: arg::Options) -> Result {
         let never_ending = smol::Task::spawn(futures_lite::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
-        Some(launch_ambient_gui(progress.clone(), &renderer, args).unwrap().boxed())
+        Some(
+            shared::launch_ambient_gui(progress.clone(), &renderer, args)
+                .unwrap()
+                .boxed(),
+        )
     };
 
     loop {
@@ -89,82 +93,6 @@ async fn work_forever(mut args: arg::Options) -> Result {
         gui.await;
     }
     Ok(())
-}
-
-fn launch_ambient_gui(
-    progress: Tree,
-    renderer: &str,
-    args: arg::Options,
-) -> std::result::Result<smol::Task<()>, std::io::Error> {
-    let mut ticks: usize = 0;
-    let mut interruptible = true;
-    let render_fut = match renderer {
-        "line" => async move {
-            let output_is_terminal = atty::is(atty::Stream::Stdout);
-            let mut handle = line::render(
-                std::io::stderr(),
-                progress,
-                line::Options {
-                    output_is_terminal,
-                    #[cfg(feature = "ctrlc")]
-                    hide_cursor: true,
-                    #[cfg(not(feature = "ctrlc"))]
-                    hide_cursor: false,
-                    terminal_dimensions: crosstermion::terminal::size()
-                        .ok()
-                        .map(|(w, h)| args.line_column_count.map(|width| (width, h)).unwrap_or((w, h)))
-                        .unwrap_or((80, 20)),
-                    timestamp: args.line_timestamp,
-                    colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
-                    level_filter: Some(RangeInclusive::new(
-                        args.line_start.unwrap_or(1),
-                        args.line_end.unwrap_or(2),
-                    )),
-                    initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
-                    frames_per_second: args.fps,
-                    keep_running_if_progress_is_empty: true,
-                },
-            );
-            handle.disconnect();
-            blocking::unblock!(handle.wait());
-        }
-        .boxed(),
-        "tui" => tui::render_with_input(
-            std::io::stdout(),
-            progress,
-            tui::Options {
-                title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
-                frames_per_second: args.fps,
-                recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
-                redraw_only_on_state_change: true,
-                ..tui::Options::default()
-            },
-            futures_util::stream::select(
-                window_resize_stream(args.animate_terminal_size),
-                ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
-                    ticks += 1;
-                    if ticks % 2 == 0 {
-                        let is_interruptible = interruptible;
-                        interruptible = !interruptible;
-                        return if is_interruptible {
-                            Event::SetInterruptMode(Interrupt::Instantly)
-                        } else {
-                            Event::SetInterruptMode(Interrupt::Deferred)
-                        };
-                    }
-                    if thread_rng().gen_bool(0.5) {
-                        Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
-                    } else {
-                        Event::SetInformation(generate_statistics())
-                    }
-                }),
-            ),
-        )?
-        .boxed(),
-        _ => panic!("Unknown renderer: '{}'", renderer),
-    };
-    let handle = smol::Task::spawn(render_fut.map(|_| ()));
-    Ok(handle)
 }
 
 async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
@@ -256,189 +184,24 @@ enum Direction {
     Grow,
 }
 
-fn generate_statistics() -> Vec<Line> {
-    let mut lines = vec![
-        Line::Text("You can put here what you want".into()),
-        Line::Text("as long as it fits one line".into()),
-        Line::Text("until a certain limit is reached".into()),
-        Line::Text("which is when truncation happens".into()),
-        Line::Text("这是中文的一些文字。".into()),
-        Line::Text("鹅、鹅、鹅 曲项向天歌 白毛浮绿水 红掌拨清波".into()),
-        Line::Text("床前明月光, 疑是地上霜。举头望明月，低头思故乡。".into()),
-        Line::Text("锄禾日当午，汗滴禾下土。谁知盘中餐，粒粒皆辛苦。".into()),
-        Line::Text("春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少".into()),
-        Line::Text("煮豆燃豆萁，豆在釜中泣。本自同根生，相煎何太急".into()),
-        Line::Text("and this line is without any doubt very very long and it really doesn't want to stop".into()),
-    ];
-    lines.shuffle(&mut thread_rng());
-    lines.insert(0, Line::Title("Hello World".into()));
-
-    lines.extend(vec![
-        Line::Title("Statistics".into()),
-        Line::Text(format!(
-            "lines of unsafe code: {}",
-            thread_rng().gen_range(0usize, 1_000_000)
-        )),
-        Line::Text(format!(
-            "wasted space in crates: {} Kb",
-            thread_rng().gen_range(100usize, 1_000_000)
-        )),
-        Line::Text(format!(
-            "unused dependencies: {} crates",
-            thread_rng().gen_range(100usize, 1_000)
-        )),
-        Line::Text(format!(
-            "average #dependencies: {} crates",
-            thread_rng().gen_range(0usize, 500)
-        )),
-        Line::Text(format!("bloat in code: {} Kb", thread_rng().gen_range(100usize, 5_000))),
-    ]);
-    lines
-}
-
-fn window_resize_stream(animate: bool) -> impl futures_core::Stream<Item = Event> {
-    let mut offset_xy = (0u16, 0u16);
-    let mut direction = Direction::Shrink;
-    if !animate {
-        return futures_lite::stream::pending().boxed();
-    }
-
-    ticker(Duration::from_millis(100))
-        .map(move |_| {
-            let (width, height) = crosstermion::terminal::size().unwrap_or((30, 30));
-            let (ref mut ofs_x, ref mut ofs_y) = offset_xy;
-            let min_size = 2;
-            match direction {
-                Direction::Shrink => {
-                    *ofs_x = ofs_x.saturating_add((1_f32 * (width as f32 / height as f32)).ceil() as u16);
-                    *ofs_y = ofs_y.saturating_add((1_f32 * (height as f32 / width as f32)).ceil() as u16);
-                }
-                Direction::Grow => {
-                    *ofs_x = ofs_x.saturating_sub((1_f32 * (width as f32 / height as f32)).ceil() as u16);
-                    *ofs_y = ofs_y.saturating_sub((1_f32 * (height as f32 / width as f32)).ceil() as u16);
-                }
-            }
-            let bound = tui::tui_export::layout::Rect {
-                x: 0,
-                y: 0,
-                width: width.saturating_sub(*ofs_x).max(min_size),
-                height: height.saturating_sub(*ofs_y).max(min_size),
-            };
-            if bound.area() <= min_size * min_size || bound.area() == width * height {
-                direction = match direction {
-                    Direction::Grow => Direction::Shrink,
-                    Direction::Shrink => Direction::Grow,
-                };
-            }
-            Event::SetWindowSize(bound)
-        })
-        .boxed()
-}
-
 struct NestingLevel(u8);
 type Result = std::result::Result<(), Box<dyn Error + Send>>;
 
-mod arg {
-    use argh::FromArgs;
-
-    #[derive(FromArgs)]
-    /// Reach new heights.
-    pub struct Options {
-        /// if set, the terminal window will be animated to assure resizing works as expected.
-        #[argh(switch, short = 'a')]
-        pub animate_terminal_size: bool,
-
-        /// if set, names of tasks will change rapidly, causing the delay at which column sizes are recalculated to show
-        #[argh(switch, short = 'c')]
-        pub changing_names: bool,
-
-        /// the amount of frames to show per second, can be below zero, e.g.
-        /// 0.25 shows a frame every 4 seconds.
-        #[argh(option, default = "10.0")]
-        pub fps: f32,
-
-        /// if set, recompute the column width of the task tree only every given frame. Otherwise the width will be recomputed every frame.
-        ///
-        /// Use this if there are many short-running tasks with varying names paired with high refresh rates of multiple frames per second to
-        /// stabilize the appearance of the TUI.
-        ///
-        /// For example, setting the value to 40 will with a frame rate of 20 per second will recompute the column width to fit all task names
-        /// every 2 seconds.
-        #[argh(option, short = 'r')]
-        pub recompute_column_width_every_nth_frame: Option<usize>,
-
-        /// the amount of scrollback for task messages.
-        #[argh(option, default = "80")]
-        pub message_scrollback_buffer_size: usize,
-
-        /// the amount of pooled work chunks that can be created at most
-        #[argh(option, default = "16")]
-        pub pooled_work_max: usize,
-
-        /// the amount of pooled work chunks that should at least be created
-        #[argh(option, default = "6")]
-        pub pooled_work_min: usize,
-
-        /// multiplies the speed at which tasks seem to be running. Driving this down makes the TUI easier on the eyes
-        /// Defaults to 1.0. A valud of 0.5 halves the speed.
-        #[argh(option, short = 's', default = "1.0")]
-        pub speed_multitplier: f32,
-
-        /// for 'line' renderer: Determines the amount of seconds that the progress has to last at least until we see the first progress.
-        #[argh(option)]
-        pub line_initial_delay: Option<f32>,
-
-        /// for 'line' renderer: If true, timestamps will be displayed for each printed message.
-        #[argh(switch)]
-        pub line_timestamp: bool,
-
-        /// for 'line' renderer: The first level to display, defaults to 0
-        #[argh(option)]
-        pub line_start: Option<prodash::tree::Level>,
-
-        /// for 'line' renderer: Amount of columns we should draw into. If unset, the whole width of the terminal.
-        #[argh(option)]
-        pub line_column_count: Option<u16>,
-
-        /// for 'line' renderer: The first level to display, defaults to 1
-        #[argh(option)]
-        pub line_end: Option<prodash::tree::Level>,
-
-        /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
-        #[argh(switch)]
-        pub stop_if_empty_progress: bool,
-
-        /// set the renderer to use, defaults to "tui", and furthermore allows "line" and "log".
-        ///
-        /// If set ot "log", there will only be logging. Set 'RUST_LOG=info' before running the program to see them.
-        #[argh(option)]
-        pub renderer: Option<String>,
-
-        /// if set, coloring of the line renderer is forcefully disabled
-        #[argh(switch)]
-        pub no_line_color: bool,
-    }
-}
-
-use futures_util::{future::join_all, future::Either, FutureExt, StreamExt};
+use futures_util::{future::join_all, future::Either, FutureExt};
 use prodash::{
-    line,
     tree::{Item, Key, ProgressStep},
-    tui::{self, ticker, Event, Interrupt, Line},
     Tree,
 };
 use rand::prelude::*;
 use std::{
     error::Error,
     ops::Add,
-    ops::RangeInclusive,
     time::{Duration, SystemTime},
 };
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];
 const REASONS: &[&str] = &["due to star alignment", "IO takes time", "仪表板演示", "just because"];
-const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 const WORK_NAMES: &[&str] = &[
     "Downloading Crate",
     "下载板条箱",
@@ -484,62 +247,6 @@ const SPAWN_DELAY_MS: u64 = 200;
 const CHANCE_TO_BLOCK_PER_STEP: f64 = 1.0 / 100.0;
 const CHANCE_TO_SHOW_ETA: f64 = 0.5;
 
-mod smol {
-    //! A small and fast executor - with only one thread!
-    //! Copied from https://github.com/stjepang/smol/blob/b3005d942040f68f30ad84b6f8f1621ebaf9d753/src/lib.rs#L149
-
-    #![forbid(unsafe_code)]
-    #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
-
-    use std::{
-        future::Future,
-        panic::catch_unwind,
-        pin::Pin,
-        task::{Context, Poll},
-        thread,
-    };
-
-    use multitask::Executor;
-    use once_cell::sync::Lazy;
-
-    #[must_use = "tasks get canceled when dropped, use `.detach()` to run them in the background"]
-    #[derive(Debug)]
-    pub struct Task<T>(multitask::Task<T>);
-
-    impl<T> Task<T> {
-        pub fn spawn<F>(future: F) -> Task<T>
-        where
-            F: Future<Output = T> + Send + 'static,
-            T: Send + 'static,
-        {
-            static EXECUTOR: Lazy<Executor> = Lazy::new(|| {
-                thread::spawn(|| {
-                    let (p, u) = async_io::parking::pair();
-                    let ticker = EXECUTOR.ticker(move || u.unpark());
-
-                    loop {
-                        if let Ok(false) = catch_unwind(|| ticker.tick()) {
-                            p.park();
-                        }
-                    }
-                });
-
-                Executor::new()
-            });
-
-            Task(EXECUTOR.spawn(future))
-        }
-
-        pub fn detach(self) {
-            self.0.detach();
-        }
-    }
-
-    impl<T> Future for Task<T> {
-        type Output = T;
-
-        fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-            Pin::new(&mut self.0).poll(cx)
-        }
-    }
-}
+mod shared;
+use shared::arg;
+use shared::smol;
