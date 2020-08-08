@@ -9,7 +9,7 @@ use prodash::{
 use rand::{seq::SliceRandom, thread_rng, Rng};
 use std::{ops::RangeInclusive, time::Duration};
 
-pub mod arg;
+pub mod args;
 pub mod smol;
 
 const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
@@ -17,7 +17,7 @@ const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 pub fn launch_ambient_gui(
     progress: Tree,
     renderer: &str,
-    args: arg::Options,
+    args: args::Options,
 ) -> std::result::Result<smol::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;

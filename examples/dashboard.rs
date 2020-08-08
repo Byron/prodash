@@ -12,11 +12,11 @@ compile_error!(
 fn main() -> Result {
     env_logger::init();
 
-    let args: arg::Options = argh::from_env();
+    let args: args::Options = argh::from_env();
     futures_lite::future::block_on(work_forever(args))
 }
 
-async fn work_forever(mut args: arg::Options) -> Result {
+async fn work_forever(mut args: args::Options) -> Result {
     let progress = prodash::TreeOptions {
         message_buffer_capacity: args.message_scrollback_buffer_size,
         ..prodash::TreeOptions::default()
@@ -251,5 +251,5 @@ const CHANCE_TO_BLOCK_PER_STEP: f64 = 1.0 / 100.0;
 const CHANCE_TO_SHOW_ETA: f64 = 0.5;
 
 mod shared;
-use shared::arg;
+use shared::args;
 use shared::smol;

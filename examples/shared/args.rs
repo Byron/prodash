@@ -70,7 +70,7 @@ pub struct Options {
     /// set the renderer to use, defaults to "tui", and furthermore allows "line" and "log".
     ///
     /// If set ot "log", there will only be logging. Set 'RUST_LOG=info' before running the program to see them.
-    #[argh(option)]
+    #[argh(option, short = 'R')]
     pub renderer: Option<String>,
 
     /// if set, coloring of the line renderer is forcefully disabled
