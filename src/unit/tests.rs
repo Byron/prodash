@@ -1,4 +1,14 @@
 mod dynamic {
+    mod range {
+        use crate::unit::{Mode, Range, Unit};
+        #[test]
+        fn value_and_upper_bound_with_percentage() {
+            let unit = Unit::dynamic_and_mode(Range::new("step"), Mode::PercentageAfterUnit);
+            assert_eq!(format!("{}", unit.display(0, Some(3))), "step 1 of 3 [0%]");
+            assert_eq!(format!("{}", unit.display(1, Some(3))), "step 2 of 3 [33%]");
+            assert_eq!(format!("{}", unit.display(2, Some(3))), "step 3 of 3 [66%]");
+        }
+    }
     #[cfg(feature = "unit-bytes")]
     mod bytes {
         use crate::unit::{Bytes, Mode, Unit};

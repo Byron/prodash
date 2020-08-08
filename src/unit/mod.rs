@@ -5,6 +5,8 @@ use std::{fmt, fmt::Write, ops::Deref};
 mod bytes;
 #[cfg(feature = "unit-bytes")]
 pub use bytes::Bytes;
+mod range;
+pub use range::Range;
 
 pub trait DisplayValue {
     fn display_current_value(
@@ -14,6 +16,9 @@ pub trait DisplayValue {
         _upper: Option<ProgressStep>,
     ) -> fmt::Result {
         fmt::write(w, format_args!("{}", value))
+    }
+    fn separator(&self, w: &mut dyn fmt::Write, _value: ProgressStep, _upper: Option<ProgressStep>) -> fmt::Result {
+        w.write_str("/")
     }
     fn display_upper_bound(
         &self,
@@ -135,7 +140,7 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
             }
             unit.display_current_value(f, self.current_value, self.upper_bound)?;
             if let Some(upper) = self.upper_bound {
-                f.write_char('/')?;
+                unit.separator(f, self.current_value, self.upper_bound)?;
                 unit.display_upper_bound(f, upper, self.current_value)?;
             }
         }
