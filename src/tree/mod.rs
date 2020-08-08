@@ -6,6 +6,7 @@ use std::{fmt, sync::Arc, time::SystemTime};
 
 #[cfg(test)]
 mod tests;
+mod unit;
 
 /// The top-level of the progress tree.
 #[derive(Clone, Debug)]
@@ -206,16 +207,6 @@ pub struct MessageCopyState {
     cursor: usize,
     buf_len: usize,
     total: usize,
-}
-
-pub trait DisplayValue {
-    fn display_value(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
-    fn display_unit(&self, f: &mut fmt::Formatter, value: ProgressStep) -> fmt::Result;
-}
-
-pub enum Unit {
-    Static(&'static str),
-    Dynamic(Box<dyn DisplayValue>),
 }
 
 /// A `Tree` represents an element of the progress tree.
