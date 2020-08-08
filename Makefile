@@ -14,6 +14,7 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features line-renderer,line-renderer-crossterm
 	cargo check --features line-renderer,line-renderer-termion,tui-renderer,tui-renderer-termion --example dashboard-termion
 	cargo check --features line-renderer,line-renderer-crossterm,tui-renderer,tui-renderer-crossterm,ctrlc --example dashboard
+	cargo check --features unit-bytes,unit-duration,unit-human,tui-renderer,tui-renderer-crossterm,line-renderer,line-renderer-crossterm,ctrlc --example units
 	cargo check
 	$(MAKE) -C crosstermion check
 

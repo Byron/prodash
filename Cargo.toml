@@ -27,6 +27,8 @@ name = "units"
 path = "examples/units.rs"
 required-features = [
     "unit-bytes",
+    "unit-duration",
+    "unit-human",
     "tui-renderer",
     "tui-renderer-crossterm",
     "line-renderer",

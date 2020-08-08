@@ -5,11 +5,12 @@
 * In `Progress::init(max, unit)` , `unit` now is `Option<Unit>`, existing code can be transformed using `progress.init(None, Some("label".into()))`.
 * **removed** `deep_eq()` method in `Root` tree
 
-### Features
+### New Features
 
-* Provide various Units for improved formatting of durations, steps, counts and bytes
+* Provide various Units for improved formatting of durations, steps, counts and bytes, and specify display of percentages.
 * Turn `ProgressStep` type into usize to allow for a broader range of values. Specifically, this enables counting bytes read and written
   of files or streams bigger than 2^32-1
+* A new example program: **units**
 
 ## v7.1.1
 
