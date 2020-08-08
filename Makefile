@@ -18,7 +18,7 @@ check: ## build features in commmon combination to be sure it all stays together
 	$(MAKE) -C crosstermion check
 
 unit-test: ## Run all unit tests
-	cargo test --examples --features unit-bytes
+	cargo test --examples --features unit-bytes,unit-human
 
 tests: check unit-test ## Run all tests we have
 

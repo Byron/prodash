@@ -5,6 +5,13 @@ use std::{fmt, fmt::Write, ops::Deref};
 mod bytes;
 #[cfg(feature = "unit-bytes")]
 pub use bytes::Bytes;
+
+#[cfg(feature = "unit-human")]
+pub mod human;
+#[cfg(feature = "unit-human")]
+#[doc(inline)]
+pub use human::Human;
+
 mod range;
 pub use range::Range;
 
@@ -131,7 +138,7 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
 
         let mode_and_fraction = mode.and_then(|mode| {
             self.upper_bound
-                .map(|upper| (mode, (self.current_value as f64 / upper as f64) * 100.0))
+                .map(|upper| (mode, ((self.current_value as f64 / upper as f64) * 100.0).floor()))
         });
         if self.display.values() {
             if let Some((Mode::PercentageBeforeValue, fraction)) = mode_and_fraction {

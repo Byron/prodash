@@ -31,7 +31,7 @@ impl DisplayValue for Bytes {
     ) -> fmt::Result {
         Self::format_bytes(w, upper_bound)
     }
-    fn display_unit(&self, _w: &mut dyn fmt::Write, _value: usize) -> fmt::Result {
+    fn display_unit(&self, _w: &mut dyn fmt::Write, _value: ProgressStep) -> fmt::Result {
         Ok(())
     }
 }

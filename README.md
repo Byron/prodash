@@ -57,7 +57,9 @@ This crate comes with various cargo features to tailor it to your needs.
          * It has less dependencies but works only on `unix` systems
          * to get this, disable default features and chose at least `tui-renderer` and `tui-renderer-termion`.
 * **unit-bytes**
-  * Supports dynamic unit rendering using the tiny `bytesize` crate.
+  * Supports dynamic byte display using the tiny `bytesize` crate.
+* **unit-human**
+  * Display counts in a way that is easier to grasp for humans, using the tiny `human_format` crate.
 
 ## Features
 

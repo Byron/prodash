@@ -1,4 +1,28 @@
 mod dynamic {
+    #[cfg(feature = "unit-human")]
+    mod human {
+        use crate::unit::{human, Human, Mode, Unit};
+
+        #[test]
+        fn various_combinations() {
+            let unit = Unit::dynamic_and_mode(
+                Human::new(
+                    {
+                        let mut f = human::Formatter::new();
+                        f.with_decimals(1);
+                        f
+                    },
+                    "objects",
+                ),
+                Mode::PercentageAfterUnit,
+            );
+            assert_eq!(
+                format!("{}", unit.display(100_002, Some(7_500_000))),
+                "100.0k/7.5M objects [1%]"
+            );
+            assert_eq!(format!("{}", unit.display(100_002, None)), "100.0k objects");
+        }
+    }
     mod range {
         use crate::unit::{Mode, Range, Unit};
         #[test]

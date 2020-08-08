@@ -25,7 +25,7 @@ impl DisplayValue for Range {
     fn separator(&self, w: &mut dyn fmt::Write, _value: ProgressStep, _upper: Option<ProgressStep>) -> fmt::Result {
         w.write_str(" of ")
     }
-    fn display_unit(&self, w: &mut dyn fmt::Write, _value: usize) -> fmt::Result {
+    fn display_unit(&self, w: &mut dyn fmt::Write, _value: ProgressStep) -> fmt::Result {
         w.write_str(self.name)
     }
 }
