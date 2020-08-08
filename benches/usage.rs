@@ -26,7 +26,7 @@ fn usage(c: &mut Criterion) {
         .bench_function("set tree 5 times", |b| {
             let root = small_tree();
             let mut progress = root.add_child("the one");
-            progress.init(Some(20), Some("element"));
+            progress.init(Some(20), Some("element".into()));
             b.iter(|| {
                 progress.set(1);
                 progress.set(2);
@@ -42,7 +42,7 @@ fn usage(c: &mut Criterion) {
             |b| {
                 let root = small_tree();
                 let mut progress = root.add_child("the one");
-                progress.init(Some(20), Some("element"));
+                progress.init(Some(20), Some("element".into()));
                 b.iter(|| {
                     progress.message(MessageLevel::Success, "for testing");
                 });
@@ -53,7 +53,7 @@ fn usage(c: &mut Criterion) {
         .bench_function("copy all messages with buffer being at capacity", |b| {
             let root = small_tree();
             let mut progress = root.add_child("the one");
-            progress.init(Some(20), Some("element"));
+            progress.init(Some(20), Some("element".into()));
             progress.done("foo");
             progress.done("bar");
             let mut out = Vec::new();
