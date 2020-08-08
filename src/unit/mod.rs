@@ -140,10 +140,15 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
             }
         }
         if self.display.unit() {
+            let mut buf = String::with_capacity(10);
             if self.display.values() {
-                f.write_char(' ')?;
+                buf.write_char(' ')?;
             }
-            unit.display_unit(f, self.current_value)?;
+            unit.display_unit(&mut buf, self.current_value)?;
+            if buf.len() > 1 {
+                // did they actually write a unit?
+                f.write_str(&buf)?;
+            }
 
             if let Some((Mode::PercentageAfterUnit, fraction)) = mode_and_fraction {
                 f.write_char(' ')?;

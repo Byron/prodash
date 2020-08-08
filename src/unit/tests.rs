@@ -13,6 +13,10 @@ mod dynamic {
                 "1.0KB/10.0GB [0%]"
             );
         }
+        #[test]
+        fn just_value() {
+            assert_eq!(format!("{}", Unit::dynamic(Bytes).display(5540, None)), "5.5KB");
+        }
     }
 }
 
