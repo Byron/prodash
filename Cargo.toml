@@ -26,6 +26,7 @@ required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "l
 default = ["log-renderer", "localtime"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
+unit-duration = ["compound_duration"]
 tui-renderer-termion = ["crosstermion/tui-react-termion"]
 tui-renderer-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 tui-renderer = ["tui",
@@ -74,6 +75,7 @@ ctrlc = { version = "3.1.4", optional = true, default-features = false, features
 # units
 bytesize = { version = "1.0.1", optional = true }
 human_format = { version = "1.0.3", optional = true }
+compound_duration = { version = "1.2.0", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true

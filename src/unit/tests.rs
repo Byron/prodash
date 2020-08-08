@@ -1,4 +1,16 @@
 mod dynamic {
+    #[cfg(feature = "unit-duration")]
+    mod duration {
+        use crate::unit::{Duration, Unit};
+
+        #[test]
+        fn value_and_upper_bound_use_own_unit() {
+            assert_eq!(
+                format!("{}", Unit::dynamic(Duration).display(40, Some(300))),
+                "40s of 5m"
+            );
+        }
+    }
     #[cfg(feature = "unit-human")]
     mod human {
         use crate::unit::{human, Human, Mode, Unit};

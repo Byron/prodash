@@ -6,6 +6,11 @@ mod bytes;
 #[cfg(feature = "unit-bytes")]
 pub use bytes::Bytes;
 
+#[cfg(feature = "unit-duration")]
+mod duration;
+#[cfg(feature = "unit-duration")]
+pub use duration::Duration;
+
 #[cfg(feature = "unit-human")]
 pub mod human;
 #[cfg(feature = "unit-human")]
