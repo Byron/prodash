@@ -48,6 +48,7 @@ impl Unit {
             current_value,
             upper_bound,
             parent: self,
+            display: WhatToDisplay::ValuesAndUnit,
         }
     }
 
@@ -69,6 +70,39 @@ pub struct UnitDisplay<'a> {
     current_value: ProgressStep,
     upper_bound: Option<ProgressStep>,
     parent: &'a Unit,
+    display: WhatToDisplay,
+}
+
+enum WhatToDisplay {
+    ValuesAndUnit,
+    Unit,
+    Values,
+}
+
+impl WhatToDisplay {
+    fn values(&self) -> bool {
+        match self {
+            WhatToDisplay::Values | WhatToDisplay::ValuesAndUnit => true,
+            _ => false,
+        }
+    }
+    fn unit(&self) -> bool {
+        match self {
+            WhatToDisplay::Unit | WhatToDisplay::ValuesAndUnit => true,
+            _ => false,
+        }
+    }
+}
+
+impl<'a> UnitDisplay<'a> {
+    pub fn values(mut self) -> Self {
+        self.display = WhatToDisplay::Values;
+        self
+    }
+    pub fn unit(mut self) -> Self {
+        self.display = WhatToDisplay::Unit;
+        self
+    }
 }
 
 impl<'a> fmt::Display for UnitDisplay<'a> {
@@ -79,21 +113,27 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
             self.upper_bound
                 .map(|upper| (mode, (self.current_value as f64 / upper as f64) * 100.0))
         });
-        if let Some((Mode::PercentageBeforeValue, fraction)) = mode_and_fraction {
-            unit.display_percentage(f, fraction)?;
-            f.write_char(' ')?;
+        if self.display.values() {
+            if let Some((Mode::PercentageBeforeValue, fraction)) = mode_and_fraction {
+                unit.display_percentage(f, fraction)?;
+                f.write_char(' ')?;
+            }
+            unit.display_current_value(f, self.current_value, self.upper_bound)?;
+            if let Some(upper) = self.upper_bound {
+                f.write_char('/')?;
+                unit.display_upper_bound(f, upper)?;
+            }
+            if self.display.unit() {
+                f.write_char(' ')?;
+            }
         }
-        unit.display_current_value(f, self.current_value, self.upper_bound)?;
-        if let Some(upper) = self.upper_bound {
-            f.write_char('/')?;
-            unit.display_upper_bound(f, upper)?;
-        }
-        f.write_char(' ')?;
-        unit.display_unit(f, self.current_value)?;
+        if self.display.unit() {
+            unit.display_unit(f, self.current_value)?;
 
-        if let Some((Mode::PercentageAfterUnit, fraction)) = mode_and_fraction {
-            f.write_char(' ')?;
-            unit.display_percentage(f, fraction)?;
+            if let Some((Mode::PercentageAfterUnit, fraction)) = mode_and_fraction {
+                f.write_char(' ')?;
+                unit.display_percentage(f, fraction)?;
+            }
         }
         Ok(())
     }

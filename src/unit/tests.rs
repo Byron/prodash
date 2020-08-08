@@ -1,4 +1,34 @@
 mod label {
+    mod values {
+        use crate::unit::{Mode, Unit};
+        #[test]
+        fn display_current_value_with_upper_bound_percentage_before_value() {
+            assert_eq!(
+                format!(
+                    "{}",
+                    Unit::label_and_mode("items", Mode::PercentageBeforeValue)
+                        .display(123, Some(400))
+                        .values()
+                ),
+                "[30%] 123/400"
+            );
+        }
+    }
+    mod unit {
+        use crate::unit::{Mode, Unit};
+        #[test]
+        fn display_current_value_with_upper_bound_percentage_after_unit() {
+            assert_eq!(
+                format!(
+                    "{}",
+                    Unit::label_and_mode("items", Mode::PercentageAfterUnit)
+                        .display(123, Some(400))
+                        .unit()
+                ),
+                "items [30%]"
+            );
+        }
+    }
     mod with_percentage {
         use crate::unit::{Mode, Unit};
 
