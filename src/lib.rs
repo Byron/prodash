@@ -52,6 +52,7 @@ pub use log::warn;
 
 #[cfg(any(feature = "humantime", feature = "time"))]
 pub mod time;
+mod unit;
 
 #[cfg(not(feature = "log-renderer"))]
 mod log {

@@ -1,12 +1,14 @@
 use crate::TreeOptions;
 use dashmap::DashMap;
 use parking_lot::Mutex;
-use std::ops::{Deref, Index, IndexMut};
-use std::{sync::Arc, time::SystemTime};
+use std::{
+    ops::{Deref, Index, IndexMut},
+    sync::Arc,
+    time::SystemTime,
+};
 
 #[cfg(test)]
 mod tests;
-mod unit;
 
 /// The top-level of the progress tree.
 #[derive(Clone, Debug)]
