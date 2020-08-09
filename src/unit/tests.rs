@@ -26,7 +26,7 @@ mod dynamic {
                     },
                     "objects",
                 ),
-                Mode::PercentageAfterUnit,
+                Mode::new().percentage_after_unit(),
             );
             assert_eq!(
                 format!("{}", unit.display(100_002, Some(7_500_000))),
@@ -39,7 +39,7 @@ mod dynamic {
         use crate::unit::{self, Mode, Range};
         #[test]
         fn value_and_upper_bound_with_percentage() {
-            let unit = unit::dynamic_and_mode(Range::new("steps"), Mode::PercentageAfterUnit);
+            let unit = unit::dynamic_and_mode(Range::new("steps"), Mode::new().percentage_after_unit());
             assert_eq!(format!("{}", unit.display(0, Some(3))), "1 of 3 steps [0%]");
             assert_eq!(format!("{}", unit.display(1, Some(3))), "2 of 3 steps [33%]");
             assert_eq!(format!("{}", unit.display(2, Some(3))), "3 of 3 steps [66%]");
@@ -54,7 +54,8 @@ mod dynamic {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::dynamic_and_mode(Bytes, Mode::PercentageAfterUnit).display(1002, Some(10_000_000_000))
+                    unit::dynamic_and_mode(Bytes, Mode::new().percentage_after_unit())
+                        .display(1002, Some(10_000_000_000))
                 ),
                 "1.0KB/10.0GB [0%]"
             );
@@ -75,7 +76,7 @@ mod label {
                 assert_eq!(
                     format!(
                         "{}",
-                        unit::label_and_mode("items", Mode::PercentageBeforeValue)
+                        unit::label_and_mode("items", Mode::new().percentage_before_value())
                             .display(123, Some(400))
                             .values()
                     ),
@@ -91,7 +92,7 @@ mod label {
                 assert_eq!(
                     format!(
                         "{}",
-                        unit::label_and_mode("items", Mode::PercentageAfterUnit)
+                        unit::label_and_mode("items", Mode::new().percentage_after_unit())
                             .display(123, Some(400))
                             .unit()
                     ),
@@ -106,7 +107,7 @@ mod label {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::PercentageAfterUnit).display(123, None)
+                    unit::label_and_mode("items", Mode::new().percentage_after_unit()).display(123, None)
                 ),
                 "123 items"
             );
@@ -116,14 +117,14 @@ mod label {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::PercentageAfterUnit).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::new().percentage_after_unit()).display(123, Some(500))
                 ),
                 "123/500 items [24%]"
             );
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::PercentageBeforeValue).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::new().percentage_before_value()).display(123, Some(500))
                 ),
                 "[24%] 123/500 items"
             );
