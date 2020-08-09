@@ -12,6 +12,9 @@
 * Turn `ProgressStep` type into usize to allow for a broader range of values. Specifically, this enables counting bytes read and written
   of files or streams bigger than 2^32-1
 * A new example program: **units**
+* Added methods to help determine key hierarchy, useful for writing custom renderers:
+  * `Key::shares_parent_with(…)`
+  * `Key::adjecency(…)`
 
 ## v7.1.1
 

@@ -25,7 +25,7 @@ pub struct Key(Option<item::Id>, Option<item::Id>, Option<item::Id>, Option<item
 
 /// Determines if a sibling is above or below in the given level of hierarchy
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub(crate) enum SiblingLocation {
+pub enum SiblingLocation {
     Above,
     Below,
     AboveAndBelow,
@@ -56,7 +56,7 @@ impl Default for SiblingLocation {
 
 /// A type providing information about what's above and below `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub(crate) struct Adjacency(
+pub struct Adjacency(
     pub SiblingLocation,
     pub SiblingLocation,
     pub SiblingLocation,
@@ -64,7 +64,7 @@ pub(crate) struct Adjacency(
 );
 
 impl Adjacency {
-    pub(crate) fn level(&self) -> Level {
+    pub fn level(&self) -> Level {
         use SiblingLocation::*;
         match self {
             Adjacency(NotFound, NotFound, NotFound, NotFound) => 0,
@@ -142,7 +142,7 @@ impl Key {
         }
     }
 
-    pub(crate) fn shares_parent_with(&self, other: &Key, parent_level: Level) -> bool {
+    pub fn shares_parent_with(&self, other: &Key, parent_level: Level) -> bool {
         if parent_level < 1 {
             return true;
         }
@@ -162,7 +162,7 @@ impl Key {
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
     /// for the result to be reliable.
-    pub(crate) fn adjacency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
+    pub fn adjacency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
         use SiblingLocation::*;
         let key = &sorted[index].0;
         let key_level = key.level();
