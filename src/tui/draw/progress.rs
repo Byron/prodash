@@ -9,7 +9,7 @@ use crate::{
         },
         InterruptDrawInfo,
     },
-    unit::Throughput,
+    unit,
 };
 use humantime::format_duration;
 use std::{
@@ -126,7 +126,7 @@ pub(crate) fn headline(
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, bold);
 }
 
-struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<Throughput>);
+struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<unit::display::Throughput>);
 
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -154,7 +154,7 @@ fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
         .unwrap_or(false)
 }
 
-pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16, elapsed: Option<Duration>) {
+pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16, _elapsed: Option<Duration>) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
     let max_progress_label_width = entries
         .iter()

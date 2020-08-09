@@ -264,7 +264,7 @@ fn format_progress<'a>(
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,
-    elapsed: Option<Duration>,
+    _elapsed: Option<Duration>,
     buf: &mut Vec<ANSIString<'a>>,
 ) -> Option<u16> {
     let mut brush = color::Brush::new(colored);
