@@ -115,8 +115,8 @@ mod message_buffer {
 }
 
 mod key_adjacency {
-    use crate::tree::SiblingLocation::*;
-    use crate::tree::{Adjacency, Key, Value};
+    use crate::tree::key::SiblingLocation::*;
+    use crate::tree::{key::Adjacency, Key, Value};
 
     fn to_kv(keys: &[Key]) -> Vec<(Key, Value)> {
         let mut v: Vec<_> = keys.iter().map(|k| (k.to_owned(), Value::default())).collect();

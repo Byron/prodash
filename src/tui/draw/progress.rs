@@ -360,7 +360,7 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
     let is_orphan = adj.level() != key_level;
     let mut buf = String::with_capacity(key_level as usize);
     for level in 1..=key_level {
-        use crate::tree::SiblingLocation::*;
+        use crate::tree::key::SiblingLocation::*;
         let is_child_level = level == key_level;
         if level != 1 {
             buf.push(' ');
