@@ -1,4 +1,4 @@
-use crate::{progress, tree, Progress};
+use crate::{progress, tree, unit, Progress};
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
@@ -19,6 +19,7 @@ pub struct State {
     blocks_per_line: VecDeque<u16>,
     /// The elapsed time between draw requests. None on the first draw
     pub elapsed: Option<Duration>,
+    pub throughput: Option<tree::Throughput>,
 }
 
 pub struct Options {
@@ -132,6 +133,7 @@ pub fn all(
         }
         let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(4);
         let mut max_midpoint = 0;
+        let elapsed = state.elapsed;
         for ((key, progress), ref mut blocks_in_last_iteration) in state
             .tree
             .iter()
@@ -145,7 +147,10 @@ pub fn all(
                     config.terminal_dimensions.0,
                     config.colored,
                     state.last_progress_midpoint,
-                    state.elapsed,
+                    state
+                        .throughput
+                        .as_mut()
+                        .and_then(|tp| elapsed.and_then(|elapsed| tp.update_and_get(key, progress, elapsed))),
                     &mut tokens,
                 )
                 .unwrap_or(0),
@@ -153,6 +158,9 @@ pub fn all(
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
             **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
+        }
+        if let Some(tp) = state.throughput.as_mut() {
+            tp.reconcile(&state.tree);
         }
         state.last_progress_midpoint = Some(max_midpoint);
         // overwrite remaining lines that we didn't touch naturally
@@ -261,7 +269,7 @@ fn format_progress<'a>(
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,
-    _elapsed: Option<Duration>,
+    throughput: Option<unit::display::Throughput>,
     buf: &mut Vec<ANSIString<'a>>,
 ) -> Option<u16> {
     let mut brush = color::Brush::new(colored);
@@ -278,8 +286,8 @@ fn format_progress<'a>(
             let values_brush = brush.style(Style::new().bold().dimmed());
             match progress.unit.as_ref() {
                 Some(unit) => {
-                    let mut display = unit.display(progress.step, progress.done_at, None);
-                    buf.push(values_brush.paint(format!("{}", display.values())));
+                    let mut display = unit.display(progress.step, progress.done_at, throughput);
+                    buf.push(values_brush.paint(display.values().to_string()));
                     buf.push(" ".into());
                     buf.push(display.unit().to_string().into());
                 }

@@ -213,13 +213,14 @@ pub fn render_with_input(
                     progress.copy_messages(&mut messages);
                 }
 
-                state.elapsed = time_of_previous_draw_request.and_then(|t| t.elapsed().ok());
+                let now = SystemTime::now();
+                state.elapsed = time_of_previous_draw_request.and_then(|then| now.duration_since(then).ok());
+                time_of_previous_draw_request = Some(now);
                 draw::all(&mut state, interrupt_mode, &entries, &messages, window_size, buf);
                 if tick == 1 || tick % store_task_size_every == 0 || state.last_tree_column_width.unwrap_or(0) == 0 {
                     state.next_tree_column_width = state.last_tree_column_width;
                 }
                 terminal.post_render().expect("post render to work");
-                time_of_previous_draw_request = Some(SystemTime::now());
             }
         }
         // Make sure the terminal responds right away when this future stops, to reset back to the 'non-alternate' buffer

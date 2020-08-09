@@ -3,7 +3,7 @@ use std::{
     io,
     ops::RangeInclusive,
     sync::atomic::{AtomicBool, Ordering},
-    time::Duration,
+    time::{Duration, SystemTime},
 };
 
 #[derive(Clone)]
@@ -30,6 +30,13 @@ pub struct Options {
     /// Please note that you must make sure the line renderer is properly shut down to restore the previous cursor
     /// settings. See the `ctrlc` documentation in the README for more information.
     pub hide_cursor: bool,
+
+    /// If true, (default false), we will keep track of the previous progress state to derive
+    /// continuous throughput information from. Throughput will only show for units which have
+    /// explicitly enabled it, it is opt-in.
+    ///
+    /// This comes at the cost of additional memory and CPU time.
+    pub throughput: bool,
 
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
     ///
@@ -65,6 +72,7 @@ impl Default for Options {
             level_filter: None,
             initial_delay: None,
             frames_per_second: 6.0,
+            throughput: false,
             keep_running_if_progress_is_empty: true,
         }
     }
@@ -134,6 +142,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
         frames_per_second,
         keep_running_if_progress_is_empty,
         hide_cursor,
+        throughput,
     } = config;
     let config = draw::Options {
         output_is_terminal,
@@ -164,6 +173,9 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
             }
 
             let mut state = draw::State::default();
+            if throughput {
+                state.throughput = Some(tree::Throughput::default());
+            }
             let secs = 1.0 / frames_per_second;
             let _ticker = std::thread::spawn(move || loop {
                 if tick_send.send(Event::Tick).is_err() {
@@ -172,9 +184,11 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 std::thread::sleep(Duration::from_secs_f32(secs));
             });
 
-            let mut time_of_previous_draw_request = None::<std::time::SystemTime>;
+            let mut time_of_previous_draw_request = None::<SystemTime>;
             for event in event_recv {
-                state.elapsed = time_of_previous_draw_request.as_ref().and_then(|t| t.elapsed().ok());
+                let now = SystemTime::now();
+                state.elapsed = time_of_previous_draw_request.and_then(|then| now.duration_since(then).ok());
+                time_of_previous_draw_request = Some(now);
                 match event {
                     Event::Tick => {
                         draw::all(
@@ -187,7 +201,6 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                     }
                     Event::Quit => break,
                 }
-                time_of_previous_draw_request = Some(std::time::SystemTime::now())
             }
 
             if show_cursor {

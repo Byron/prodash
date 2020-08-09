@@ -50,6 +50,7 @@ pub fn launch_ambient_gui(
                     initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
+                    throughput: true,
                 },
             );
             handle.disconnect();
