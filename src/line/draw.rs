@@ -134,7 +134,7 @@ pub fn all(
         }
         let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(4);
         let mut max_midpoint = 0;
-        for ((key, progress), ref mut blocks_in_last_iteration) in state
+        for ((key, value), ref mut blocks_in_last_iteration) in state
             .tree
             .iter()
             .filter(|(k, _)| level_range.contains(&k.level()))
@@ -143,14 +143,14 @@ pub fn all(
             max_midpoint = max_midpoint.max(
                 format_progress(
                     key,
-                    progress,
+                    value,
                     config.terminal_dimensions.0,
                     config.colored,
                     state.last_progress_midpoint,
                     state
                         .throughput
                         .as_mut()
-                        .and_then(|tp| tp.update_and_get(key, progress)),
+                        .and_then(|tp| tp.update_and_get(key, value.progress.as_ref())),
                     &mut tokens,
                 )
                 .unwrap_or(0),

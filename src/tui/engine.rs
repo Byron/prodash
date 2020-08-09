@@ -1,9 +1,9 @@
-use crate::{tree::Root, tui::draw, tui::ticker};
+use crate::{tree, tree::Root, tui::draw, tui::ticker};
 
 use futures_util::StreamExt;
 use std::{
     io::{self, Write},
-    time::{Duration, SystemTime},
+    time::Duration,
 };
 use tui::layout::Rect;
 
@@ -153,6 +153,9 @@ pub fn render_with_input(
             duration_per_frame,
             ..draw::State::default()
         };
+        if throughput {
+            state.throughput = Some(tree::Throughput::default());
+        }
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());
         let mut messages = Vec::with_capacity(progress.messages_capacity());
@@ -164,7 +167,6 @@ pub fn render_with_input(
 
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
-        let mut time_of_previous_draw_request = None::<std::time::SystemTime>;
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {
@@ -223,9 +225,6 @@ pub fn render_with_input(
                     progress.copy_messages(&mut messages);
                 }
 
-                let now = SystemTime::now();
-                state.elapsed = time_of_previous_draw_request.and_then(|then| now.duration_since(then).ok());
-                time_of_previous_draw_request = Some(now);
                 draw::all(&mut state, interrupt_mode, &entries, &messages, window_size, buf);
                 if tick == 1 || tick % store_task_size_every == 0 || state.last_tree_column_width.unwrap_or(0) == 0 {
                     state.next_tree_column_width = state.last_tree_column_width;

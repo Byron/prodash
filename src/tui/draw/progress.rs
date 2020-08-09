@@ -1,7 +1,7 @@
 use crate::{
     progress::{self, Step, Value},
     time::format_now_datetime_seconds,
-    tree::Key,
+    tree::{self, Key},
     tui::{
         draw::State,
         utils::{
@@ -57,8 +57,22 @@ pub fn pane(entries: &[(Key, progress::Value)], mut bound: Rect, buf: &mut Buffe
     }
 
     {
+        if let Some(tp) = state.throughput.as_mut() {
+            tp.update_elapsed();
+        }
+
         let progress_area = rect::offset_x(bound, desired_max_tree_draw_width);
-        draw_progress(entries, buf, progress_area, state.task_offset, state.elapsed);
+        draw_progress(
+            entries,
+            buf,
+            progress_area,
+            state.task_offset,
+            state.throughput.as_mut(),
+        );
+
+        if let Some(tp) = state.throughput.as_mut() {
+            tp.reconcile(entries);
+        }
     }
 
     if needs_overflow_line {
@@ -155,7 +169,13 @@ fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
         .unwrap_or(false)
 }
 
-pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16, _elapsed: Option<Duration>) {
+pub fn draw_progress(
+    entries: &[(Key, Value)],
+    buf: &mut Buffer,
+    bound: Rect,
+    offset: u16,
+    mut throughput: Option<&mut tree::Throughput>,
+) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
     let max_progress_label_width = entries
         .iter()
@@ -172,13 +192,16 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
             None => state,
         });
 
-    for (line, (entry_index, (_, Value { progress, name: title }))) in entries
+    for (line, (entry_index, (key, Value { progress, name: title }))) in entries
         .iter()
         .enumerate()
         .skip(offset as usize)
         .take(bound.height as usize)
         .enumerate()
     {
+        let throughput = throughput
+            .as_mut()
+            .and_then(|tp| tp.update_and_get(key, progress.as_ref()));
         let line_bound = rect::line_bound(bound, line);
         let progress_text = format!(
             " {progress}",
@@ -189,7 +212,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                 } else {
                     0
                 },
-                None
+                throughput
             )
         );
 

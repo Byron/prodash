@@ -1,4 +1,4 @@
-use crate::{progress, tree, unit};
+use crate::{progress, tree, unit, Progress};
 use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
@@ -68,8 +68,12 @@ impl Throughput {
         self.updated_at = Some(now);
     }
 
-    pub fn update_and_get(&mut self, key: &tree::Key, value: &progress::Value) -> Option<unit::display::Throughput> {
-        value.progress.as_ref().and_then(|progress| {
+    pub fn update_and_get(
+        &mut self,
+        key: &tree::Key,
+        progress: Option<&Progress>,
+    ) -> Option<unit::display::Throughput> {
+        progress.and_then(|progress| {
             self.elapsed
                 .and_then(|elapsed| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
                     Ok(index) => self.sorted_by_key[index].1.update(progress.step, elapsed),

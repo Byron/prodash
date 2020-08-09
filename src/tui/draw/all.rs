@@ -1,5 +1,6 @@
 use crate::{
     progress::Value,
+    tree,
     tree::{Key, Message},
     tui::{
         draw,
@@ -16,7 +17,7 @@ use tui::{
     widgets::{Block, Borders, Widget},
 };
 
-#[derive(Default, Clone, Eq, PartialEq)]
+#[derive(Default)]
 pub struct State {
     pub title: String,
     pub task_offset: u16,
@@ -30,7 +31,7 @@ pub struct State {
     pub maximize_info: bool,
     pub last_tree_column_width: Option<u16>,
     pub next_tree_column_width: Option<u16>,
-    pub elapsed: Option<Duration>,
+    pub throughput: Option<tree::Throughput>,
 }
 
 pub(crate) fn all(
