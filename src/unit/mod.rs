@@ -52,17 +52,23 @@ impl DisplayValue for &'static str {
     }
 }
 
-#[derive(Clone)]
-pub enum Unit {
-    Label(&'static str, Option<Mode>),
-    Dynamic(Arc<dyn DisplayValue + Send + Sync>, Option<Mode>),
+#[derive(Debug, Clone)]
+pub struct Unit {
+    kind: Kind,
+    mode: Option<Mode>,
 }
 
-impl fmt::Debug for Unit {
+#[derive(Clone)]
+pub enum Kind {
+    Label(&'static str),
+    Dynamic(Arc<dyn DisplayValue + Send + Sync>),
+}
+
+impl fmt::Debug for Kind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Unit::Label(name, mode) => f.write_fmt(format_args!("Unit::Label({:?}, {:?})", name, mode)),
-            Unit::Dynamic(_, mode) => f.write_fmt(format_args!("Unit::Dynamic(.., {:?})", mode)),
+            Kind::Label(name) => f.write_fmt(format_args!("Unit::Label({:?})", name)),
+            Kind::Dynamic(_) => f.write_fmt(format_args!("Unit::Dynamic(..)")),
         }
     }
 }
@@ -74,16 +80,28 @@ impl From<&'static str> for Unit {
 }
 
 pub fn label(label: &'static str) -> Unit {
-    Unit::Label(label, None)
+    Unit {
+        kind: Kind::Label(label),
+        mode: None,
+    }
 }
 pub fn label_and_mode(label: &'static str, mode: Mode) -> Unit {
-    Unit::Label(label, Some(mode))
+    Unit {
+        kind: Kind::Label(label),
+        mode: Some(mode),
+    }
 }
 pub fn dynamic(label: impl DisplayValue + Send + Sync + 'static) -> Unit {
-    Unit::Dynamic(Arc::new(label), None)
+    Unit {
+        kind: Kind::Dynamic(Arc::new(label)),
+        mode: None,
+    }
 }
 pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: Mode) -> Unit {
-    Unit::Dynamic(Arc::new(label), Some(mode))
+    Unit {
+        kind: Kind::Dynamic(Arc::new(label)),
+        mode: Some(mode),
+    }
 }
 
 /// Display and utilities
@@ -97,10 +115,10 @@ impl Unit {
         }
     }
 
-    pub fn as_display_value(&self) -> (&dyn DisplayValue, Option<Mode>) {
-        match self {
-            Unit::Label(unit, mode) => (unit, *mode),
-            Unit::Dynamic(unit, mode) => (unit.deref(), *mode),
+    fn as_display_value(&self) -> &dyn DisplayValue {
+        match self.kind {
+            Kind::Label(ref unit) => unit,
+            Kind::Dynamic(ref unit) => unit.deref(),
         }
     }
 }
@@ -175,7 +193,8 @@ impl<'a> UnitDisplay<'a> {
 
 impl<'a> fmt::Display for UnitDisplay<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (unit, mode): (&dyn DisplayValue, _) = self.parent.as_display_value();
+        let unit: &dyn DisplayValue = self.parent.as_display_value();
+        let mode = self.parent.mode;
 
         let mode_and_fraction = mode.and_then(|mode| {
             self.upper_bound
