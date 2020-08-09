@@ -53,16 +53,16 @@ fn work_for_a_long_time_blocking(root: Tree) {
         )),
     );
 
-    fn formatter() -> unit::human::Formatter {
+    fn formatter(decimals: usize) -> unit::human::Formatter {
         let mut f = unit::human::Formatter::new();
-        f.with_decimals(0);
+        f.with_decimals(decimals);
         f
     }
     let mut human_count = root.add_child("item count unknown");
     human_count.init(
         None,
         Some(unit::dynamic_and_mode(
-            unit::Human::new(formatter(), "items"),
+            unit::Human::new(formatter(0), "items"),
             unit::display::Mode::with_throughput(),
         )),
     );
@@ -70,7 +70,7 @@ fn work_for_a_long_time_blocking(root: Tree) {
     human_count_max.init(
         Some(7_542_241),
         Some(unit::dynamic_and_mode(
-            unit::Human::new(formatter(), "items"),
+            unit::Human::new(formatter(2), "items"),
             unit::display::Mode::with_percentage().and_throughput(),
         )),
     );

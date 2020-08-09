@@ -19,12 +19,17 @@ impl State {
         }
     }
     fn update(&mut self, value: progress::Step, elapsed: Duration) -> Option<unit::display::Throughput> {
+        self.aggregate_value_for_observed_duration += value.checked_sub(self.last_value).unwrap_or(0);
+        self.observed += elapsed;
+        self.last_value = value;
         self.throughput()
     }
 
     fn throughput(&self) -> Option<unit::display::Throughput> {
         Some(unit::display::Throughput {
-            value_change_in_timespan: self.aggregate_value_for_observed_duration,
+            value_change_in_timespan: ((self.aggregate_value_for_observed_duration as f64
+                / self.observed.as_secs_f64())
+                * self.desired.as_secs_f64()) as progress::Step,
             timespan: self.desired,
         })
     }
