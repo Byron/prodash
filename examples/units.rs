@@ -26,13 +26,19 @@ fn main() -> Result {
 
 fn work_for_a_long_time_blocking(root: Tree) {
     let mut bytes = root.add_child("download unknown");
-    bytes.init(None, Some(unit::dynamic(unit::Bytes)));
+    bytes.init(
+        None,
+        Some(unit::dynamic_and_mode(
+            unit::Bytes,
+            unit::display::Mode::with_throughput(),
+        )),
+    );
     let mut bytes_max = root.add_child("download");
     bytes_max.init(
         Some(100_000_000),
         Some(unit::dynamic_and_mode(
             unit::Bytes,
-            unit::display::Mode::with_percentage(),
+            unit::display::Mode::with_percentage().and_throughput(),
         )),
     );
 
@@ -53,24 +59,36 @@ fn work_for_a_long_time_blocking(root: Tree) {
         f
     }
     let mut human_count = root.add_child("item count unknown");
-    human_count.init(None, Some(unit::dynamic(unit::Human::new(formatter(), "items"))));
+    human_count.init(
+        None,
+        Some(unit::dynamic_and_mode(
+            unit::Human::new(formatter(), "items"),
+            unit::display::Mode::with_throughput(),
+        )),
+    );
     let mut human_count_max = root.add_child("item count");
     human_count_max.init(
         Some(7_542_241),
         Some(unit::dynamic_and_mode(
             unit::Human::new(formatter(), "items"),
-            unit::display::Mode::with_percentage(),
+            unit::display::Mode::with_percentage().and_throughput(),
         )),
     );
 
     let mut steps = root.add_child("steps to take unknown");
-    steps.init(None, Some(unit::dynamic(unit::Range::new("steps"))));
+    steps.init(
+        None,
+        Some(unit::dynamic_and_mode(
+            unit::Range::new("steps"),
+            unit::display::Mode::with_throughput(),
+        )),
+    );
     let mut steps_max = root.add_child("steps to take");
     steps_max.init(
         Some(100),
         Some(unit::dynamic_and_mode(
             unit::Range::new("steps"),
-            unit::display::Mode::with_percentage(),
+            unit::display::Mode::with_percentage().and_throughput(),
         )),
     );
 

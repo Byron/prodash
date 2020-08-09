@@ -23,7 +23,10 @@ impl State {
     }
 
     fn throughput(&self) -> Option<unit::display::Throughput> {
-        None
+        Some(unit::display::Throughput {
+            value_change_in_timespan: self.aggregate_value_for_observed_duration,
+            timespan: self.desired,
+        })
     }
 }
 
@@ -52,7 +55,8 @@ impl Throughput {
                 }
             })
     }
-    pub fn reconcile(&mut self, values: &[(tree::Key, progress::Value)]) {
-        unimplemented!("reconcile")
+    pub fn reconcile(&mut self, sorted_values: &[(tree::Key, progress::Value)]) {
+        self.sorted_by_key
+            .retain(|(key, _)| sorted_values.binary_search_by_key(key, |e| e.0).is_ok());
     }
 }
