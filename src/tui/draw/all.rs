@@ -1,5 +1,6 @@
 use crate::{
-    tree::{Key, Message, Value},
+    progress::Value,
+    tree::{Key, Message},
     tui::{
         draw,
         utils::{block_width, rect},

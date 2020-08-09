@@ -1,20 +1,26 @@
 ## v8.0.0
 
-### Breaking
-
-* In `Progress::init(max, unit)` , `unit` now is `Option<Unit>`, existing code can be transformed using `progress.init(None, Some("label".into()))`.
-* **removed** `deep_eq()` method in `Root` tree
-* tui engine option `redraw_only_on_state_change` was removed without substitute
-
 ### New Features
 
 * Provide various Units for improved formatting of durations, steps, counts and bytes, and specify display of percentages.
+* Support for throughput display if enabled in _line_ and _tui_ renderer, and when opted in when creating units.
 * Turn `ProgressStep` type into usize to allow for a broader range of values. Specifically, this enables counting bytes read and written
   of files or streams bigger than 2^32-1
 * A new example program: **units**
 * Added methods to help determine key hierarchy, useful for writing custom renderers:
   * `Key::shares_parent_with(…)`
   * `Key::adjecency(…)`
+
+### Breaking
+
+* In `Progress::init(max, unit)` , `unit` now is `Option<Unit>`, existing code can be transformed using `progress.init(None, Some("label".into()))`.
+* **removed** `deep_eq()` method in `Root` tree
+* tui engine option `redraw_only_on_state_change` was removed without substitute
+* **Move and rename**
+  * `tree::ProgressState` → `progress::State`
+  * `tree::Value` → `progress::Value`
+  * `tree::Progress` → `Progress`
+
 
 ## v7.1.1
 

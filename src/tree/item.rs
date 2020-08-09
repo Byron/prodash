@@ -1,6 +1,6 @@
-use crate::tree::ProgressStep;
 use crate::{
-    tree::{messages::MessageRingBuffer, Key, MessageLevel, Progress, ProgressState, Value},
+    progress::{Progress, State, Step, Value},
+    tree::{messages::MessageRingBuffer, Key, MessageLevel},
     unit::Unit,
 };
 use dashmap::DashMap;
@@ -54,7 +54,7 @@ impl Item {
     /// to the progress tree.
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    pub fn init(&mut self, max: Option<ProgressStep>, unit: Option<Unit>) {
+    pub fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
             r.value_mut().progress = Some(Progress {
                 done_at: max,
@@ -90,20 +90,20 @@ impl Item {
     /// Set the current progress to the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    pub fn set(&mut self, step: ProgressStep) {
+    pub fn set(&mut self, step: Step) {
         self.alter_progress(|p| {
             p.step = step;
-            p.state = ProgressState::Running;
+            p.state = State::Running;
         });
     }
 
     /// Increment the current progress by the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    pub fn inc_by(&mut self, step: ProgressStep) {
+    pub fn inc_by(&mut self, step: Step) {
         self.alter_progress(|p| {
             p.step += step;
-            p.state = ProgressState::Running;
+            p.state = State::Running;
         });
     }
 
@@ -113,7 +113,7 @@ impl Item {
     pub fn inc(&mut self) {
         self.alter_progress(|p| {
             p.step += 1;
-            p.state = ProgressState::Running;
+            p.state = State::Running;
         });
     }
 
@@ -126,7 +126,7 @@ impl Item {
     ///
     /// The blocked-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
     pub fn blocked(&mut self, reason: &'static str, eta: Option<SystemTime>) {
-        self.alter_progress(|p| p.state = ProgressState::Blocked(reason, eta));
+        self.alter_progress(|p| p.state = State::Blocked(reason, eta));
     }
 
     /// Call to indicate that progress cannot be indicated, even though the task can be interrupted.
@@ -138,7 +138,7 @@ impl Item {
     ///
     /// The halted-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
     pub fn halted(&mut self, reason: &'static str, eta: Option<SystemTime>) {
-        self.alter_progress(|p| p.state = ProgressState::Halted(reason, eta));
+        self.alter_progress(|p| p.state = State::Halted(reason, eta));
     }
 
     /// Adds a new child `Tree`, whose parent is this instance, with the given `name`.

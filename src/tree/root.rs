@@ -1,4 +1,7 @@
-use crate::tree::{messages::MessageRingBuffer, Item, Key, Message, MessageCopyState, Value};
+use crate::{
+    progress::Value,
+    tree::{messages::MessageRingBuffer, Item, Key, Message, MessageCopyState},
+};
 use dashmap::DashMap;
 use parking_lot::Mutex;
 use std::sync::Arc;

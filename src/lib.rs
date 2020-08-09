@@ -47,10 +47,16 @@ pub use log::info;
 #[cfg(feature = "log-renderer")]
 pub use log::warn;
 
-mod progress;
 #[cfg(any(feature = "humantime", feature = "time"))]
 pub mod time;
+
 pub mod unit;
+#[doc(inline)]
+pub use unit::Unit;
+
+pub mod progress;
+#[doc(inline)]
+pub use progress::Progress;
 
 #[cfg(not(feature = "log-renderer"))]
 mod log {

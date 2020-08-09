@@ -2,11 +2,11 @@ use crate::unit::Unit;
 use std::time::SystemTime;
 
 /// The amount of steps a progress can make
-pub type ProgressStep = usize;
+pub type Step = usize;
 
 /// Indicate whether a progress can or cannot be made.
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub enum ProgressState {
+pub enum State {
     /// Indicates a task is blocked and cannot indicate progress, optionally until the
     /// given time. The task cannot easily be interrupted.
     Blocked(&'static str, Option<SystemTime>),
@@ -17,9 +17,9 @@ pub enum ProgressState {
     Running,
 }
 
-impl Default for ProgressState {
+impl Default for State {
     fn default() -> Self {
-        ProgressState::Running
+        State::Running
     }
 }
 
@@ -27,15 +27,15 @@ impl Default for ProgressState {
 #[derive(Clone, Default, Debug)]
 pub struct Progress {
     /// The amount of progress currently made
-    pub step: ProgressStep,
+    pub step: Step,
     /// The step at which no further progress has to be made.
     ///
     /// If unset, the progress is unbounded.
-    pub done_at: Option<ProgressStep>,
+    pub done_at: Option<Step>,
     /// The unit associated with the progress.
     pub unit: Option<Unit>,
     /// Whether progress can be made or not
-    pub state: ProgressState,
+    pub state: State,
 }
 
 impl Progress {

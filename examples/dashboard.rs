@@ -111,7 +111,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     );
 
     for step in 0..max {
-        progress.set(step as ProgressStep);
+        progress.set(step as Step);
         let delay_ms = if thread_rng().gen_bool(CHANCE_TO_BLOCK_PER_STEP) {
             let eta = if thread_rng().gen_bool(CHANCE_TO_SHOW_ETA) {
                 Some(SystemTime::now().add(Duration::from_millis(LONG_WORK_DELAY_MS)))
@@ -187,7 +187,8 @@ type Result = std::result::Result<(), Box<dyn Error + Send>>;
 
 use futures_util::{future::join_all, future::Either, FutureExt};
 use prodash::{
-    tree::{Item, Key, ProgressStep},
+    progress::Step,
+    tree::{Item, Key},
     Tree,
 };
 use rand::prelude::*;

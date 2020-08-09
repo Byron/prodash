@@ -1,5 +1,5 @@
 use crate::{
-    tree::ProgressStep,
+    progress::Step,
     unit::{DisplayValue, Unit},
 };
 use std::fmt::{self, Write};
@@ -14,8 +14,8 @@ pub enum Location {
 struct ThroughputState {
     desired: std::time::Duration,
     observed: std::time::Duration,
-    aggregate_value_for_observed_duration: ProgressStep,
-    last_value: Option<ProgressStep>,
+    aggregate_value_for_observed_duration: Step,
+    last_value: Option<Step>,
 }
 
 impl Default for ThroughputState {
@@ -31,12 +31,12 @@ impl Default for ThroughputState {
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Throughput {
-    pub value_change_in_timespan: ProgressStep,
+    pub value_change_in_timespan: Step,
     pub timespan: std::time::Duration,
 }
 
 impl Throughput {
-    pub fn new(value_change_in_timespan: ProgressStep, timespan: std::time::Duration) -> Self {
+    pub fn new(value_change_in_timespan: Step, timespan: std::time::Duration) -> Self {
         Throughput {
             value_change_in_timespan,
             timespan,
@@ -100,8 +100,8 @@ impl Mode {
 }
 
 pub struct UnitDisplay<'a> {
-    pub(crate) current_value: ProgressStep,
-    pub(crate) upper_bound: Option<ProgressStep>,
+    pub(crate) current_value: Step,
+    pub(crate) upper_bound: Option<Step>,
     pub(crate) throughput: Option<Throughput>,
     pub(crate) parent: &'a Unit,
     pub(crate) display: What,

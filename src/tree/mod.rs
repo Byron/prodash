@@ -13,5 +13,3 @@ pub use item::Item;
 pub mod key;
 #[doc(inline)]
 pub use key::{Key, Level};
-
-pub use crate::progress::*;

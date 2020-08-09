@@ -1,6 +1,7 @@
 use crate::{
+    progress::{self, Step, Value},
     time::format_now_datetime_seconds,
-    tree::{Key, Progress, ProgressState, ProgressStep, Value},
+    tree::Key,
     tui::{
         draw::State,
         utils::{
@@ -9,7 +10,7 @@ use crate::{
         },
         InterruptDrawInfo,
     },
-    unit,
+    unit, Progress,
 };
 use humantime::format_duration;
 use std::{
@@ -25,7 +26,7 @@ use tui_react::fill_background;
 
 const MIN_TREE_WIDTH: u16 = 20;
 
-pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
+pub fn pane(entries: &[(Key, progress::Value)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
     state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
     let needs_overflow_line =
         if entries.len() > bound.height as usize || (state.task_offset).min(entries.len() as u16) > 0 {
@@ -88,8 +89,8 @@ pub(crate) fn headline(
         (0, 0, 0),
         |(mut running, mut blocked, mut groups), (_key, Value { progress, .. })| {
             match progress.as_ref().map(|p| p.state) {
-                Some(ProgressState::Running) => running += 1,
-                Some(ProgressState::Blocked(_, _)) | Some(ProgressState::Halted(_, _)) => blocked += 1,
+                Some(progress::State::Running) => running += 1,
+                Some(progress::State::Blocked(_, _)) | Some(progress::State::Halted(_, _)) => blocked += 1,
                 None => groups += 1,
             }
             (running, blocked, groups)
@@ -202,9 +203,9 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                 let mut progress_text = progress_text;
                 add_block_eta(state, &mut progress_text);
                 let (bound, style) = draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| match state {
-                    ProgressState::Blocked(_, _) => Color::Red,
-                    ProgressState::Halted(_, _) => Color::LightRed,
-                    ProgressState::Running => {
+                    progress::State::Blocked(_, _) => Color::Red,
+                    progress::State::Halted(_, _) => Color::LightRed,
+                    progress::State::Running => {
                         if fraction >= 0.8 {
                             Color::Green
                         } else {
@@ -232,9 +233,9 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                     step,
                     line,
                     match state {
-                        ProgressState::Blocked(_, _) => Color::Red,
-                        ProgressState::Halted(_, _) => Color::LightRed,
-                        ProgressState::Running => Color::White,
+                        progress::State::Blocked(_, _) => Color::Red,
+                        progress::State::Halted(_, _) => Color::LightRed,
+                        progress::State::Running => Color::White,
                     },
                 );
             }
@@ -247,9 +248,9 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
     }
 }
 
-fn add_block_eta(state: ProgressState, progress_text: &mut String) {
+fn add_block_eta(state: progress::State, progress_text: &mut String) {
     match state {
-        ProgressState::Blocked(reason, maybe_eta) | ProgressState::Halted(reason, maybe_eta) => {
+        progress::State::Blocked(reason, maybe_eta) | progress::State::Halted(reason, maybe_eta) => {
             progress_text.push_str(" [");
             progress_text.push_str(reason);
             progress_text.push_str("]");
@@ -259,7 +260,7 @@ fn add_block_eta(state: ProgressState, progress_text: &mut String) {
                     progress_text.push_str(&format!(
                         " → {} to {}",
                         format_duration(eta.duration_since(now).expect("computation to work")),
-                        if let ProgressState::Blocked(_, _) = state {
+                        if let progress::State::Blocked(_, _) = state {
                             "unblock"
                         } else {
                             "continue"
@@ -268,11 +269,11 @@ fn add_block_eta(state: ProgressState, progress_text: &mut String) {
                 }
             }
         }
-        ProgressState::Running => {}
+        progress::State::Running => {}
     }
 }
 
-fn draw_spinner(buf: &mut Buffer, bound: Rect, step: ProgressStep, seed: usize, color: Color) {
+fn draw_spinner(buf: &mut Buffer, bound: Rect, step: Step, seed: usize, color: Color) {
     if bound.width == 0 {
         return;
     }

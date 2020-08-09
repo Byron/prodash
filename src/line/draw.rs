@@ -1,4 +1,4 @@
-use crate::tree;
+use crate::{progress, tree, Progress};
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
@@ -8,7 +8,7 @@ use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
 pub struct State {
-    tree: Vec<(tree::Key, tree::Value)>,
+    tree: Vec<(tree::Key, progress::Value)>,
     messages: Vec<tree::Message>,
     for_next_copy: Option<tree::MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
@@ -197,7 +197,7 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
 }
 
 fn draw_progress_bar<'a>(
-    p: &tree::Progress,
+    p: &Progress,
     style: Style,
     mut blocks_available: u16,
     colored: bool,
@@ -237,8 +237,8 @@ fn draw_progress_bar<'a>(
     buf.push("]".into());
 }
 
-fn progress_style(p: &tree::Progress) -> Style {
-    use tree::ProgressState::*;
+fn progress_style(p: &Progress) -> Style {
+    use crate::progress::State::*;
     match p.state {
         Running => if let Some(fraction) = p.fraction() {
             if fraction > 0.8 {
@@ -257,7 +257,7 @@ fn progress_style(p: &tree::Progress) -> Style {
 
 fn format_progress<'a>(
     key: &tree::Key,
-    value: &'a tree::Value,
+    value: &'a progress::Value,
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,

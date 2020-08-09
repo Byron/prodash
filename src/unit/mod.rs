@@ -1,4 +1,4 @@
-use crate::tree::ProgressStep;
+use crate::progress::Step;
 use std::{fmt, ops::Deref, sync::Arc};
 
 #[cfg(feature = "unit-bytes")]
@@ -81,8 +81,8 @@ pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: 
 impl Unit {
     pub fn display(
         &self,
-        current_value: ProgressStep,
-        upper_bound: Option<ProgressStep>,
+        current_value: Step,
+        upper_bound: Option<Step>,
         elapsed: impl Into<Option<display::Throughput>>,
     ) -> display::UnitDisplay {
         display::UnitDisplay {
