@@ -131,19 +131,43 @@ pub enum Location {
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Mode {
-    percent: Option<Location>,
+    location: Location,
+    percent: bool,
+    throughput: bool,
 }
 
 impl Mode {
-    pub fn new() -> Self {
-        Mode { percent: None }
+    fn percent_location(&self) -> Option<Location> {
+        if self.percent {
+            Some(self.location)
+        } else {
+            None
+        }
     }
-    pub fn percentage_after_unit(mut self) -> Self {
-        self.percent = Some(Location::AfterUnit);
+    pub fn percentage() -> Self {
+        Mode {
+            percent: true,
+            throughput: false,
+            location: Location::AfterUnit,
+        }
+    }
+    pub fn throughput() -> Self {
+        Mode {
+            percent: false,
+            throughput: true,
+            location: Location::AfterUnit,
+        }
+    }
+    pub fn and_percentage(mut self) -> Self {
+        self.percent = true;
         self
     }
-    pub fn percentage_before_value(mut self) -> Self {
-        self.percent = Some(Location::BeforeValue);
+    pub fn and_throughput(mut self) -> Self {
+        self.throughput = true;
+        self
+    }
+    pub fn show_before_value(mut self) -> Self {
+        self.location = Location::BeforeValue;
         self
     }
 }
@@ -196,19 +220,12 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
         let unit: &dyn DisplayValue = self.parent.as_display_value();
         let mode = self.parent.mode;
 
-        let mode_and_fraction = mode.and_then(|mode| {
+        let percent_location_and_fraction = mode.and_then(|m| m.percent_location()).and_then(|location| {
             self.upper_bound
-                .map(|upper| (mode, ((self.current_value as f64 / upper as f64) * 100.0).floor()))
+                .map(|upper| (location, ((self.current_value as f64 / upper as f64) * 100.0).floor()))
         });
         if self.display.values() {
-            if let Some((
-                Mode {
-                    percent: Some(Location::BeforeValue),
-                    ..
-                },
-                fraction,
-            )) = mode_and_fraction
-            {
+            if let Some((Location::BeforeValue, fraction)) = percent_location_and_fraction {
                 unit.display_percentage(f, fraction)?;
                 f.write_char(' ')?;
             }
@@ -229,14 +246,7 @@ impl<'a> fmt::Display for UnitDisplay<'a> {
                 f.write_str(&buf)?;
             }
 
-            if let Some((
-                Mode {
-                    percent: Some(Location::AfterUnit),
-                    ..
-                },
-                fraction,
-            )) = mode_and_fraction
-            {
+            if let Some((Location::AfterUnit, fraction)) = percent_location_and_fraction {
                 f.write_char(' ')?;
                 unit.display_percentage(f, fraction)?;
             }
