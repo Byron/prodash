@@ -14,5 +14,4 @@ pub mod key;
 #[doc(inline)]
 pub use key::{Key, Level};
 
-mod progress;
-pub use progress::*;
+pub use crate::progress::*;
