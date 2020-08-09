@@ -64,7 +64,7 @@ impl MessageRingBuffer {
 
     pub fn copy_all(&self, out: &mut Vec<Message>) {
         out.clear();
-        if self.buf.len() == 0 {
+        if self.buf.is_empty() {
             return;
         }
         out.extend_from_slice(&self.buf[self.cursor % self.buf.len()..]);

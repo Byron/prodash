@@ -164,10 +164,8 @@ pub fn all(
             // Move cursor back to end of the portion we have actually drawn
             crosstermion::execute!(out, crosstermion::cursor::MoveUp(state.blocks_per_line.len() as u16))?;
             state.blocks_per_line.resize(lines_drawn, 0);
-        } else {
-            if lines_drawn > 0 {
-                crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
-            }
+        } else if lines_drawn > 0 {
+            crosstermion::execute!(out, crosstermion::cursor::MoveUp(lines_drawn as u16))?;
         }
     }
     Ok(())
@@ -228,7 +226,6 @@ fn draw_progress_bar<'a>(
             buf.push(
                 styled_brush.paint(
                     (p.step as usize..std::usize::MAX)
-                        .into_iter()
                         .take(blocks_available as usize)
                         .map(|idx| CHARS[idx % CHARS.len()])
                         .rev()

@@ -38,7 +38,7 @@ pub trait DisplayValue {
     }
     fn fraction_and_time_unit(&self, timespan: std::time::Duration) -> (Option<f64>, &'static str) {
         fn skip_one(v: f64) -> Option<f64> {
-            if v == 1.0 {
+            if (v - 1.0).abs() < f64::EPSILON {
                 None
             } else {
                 Some(v)

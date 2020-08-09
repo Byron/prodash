@@ -5,6 +5,9 @@ help:  ## Display this help
 
 ##@ Testing
 
+clippy: ## Run cargo-clippy
+	cargo clippy
+
 check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features
 	cargo check --no-default-features
@@ -21,7 +24,7 @@ check: ## build features in commmon combination to be sure it all stays together
 unit-test: ## Run all unit tests
 	cargo test --features unit-bytes,unit-human,unit-duration
 
-tests: check unit-test ## Run all tests we have
+tests: clippy check unit-test ## Run all tests we have
 
 bench: ## Run criterion based benchmark, works on stable Rust
 	cargo bench
