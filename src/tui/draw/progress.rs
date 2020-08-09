@@ -131,7 +131,7 @@ impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             Some(p) => match p.unit.as_ref() {
-                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at)),
+                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, None)),
                 None => match p.done_at {
                     Some(done_at) => write!(f, "{}/{}", p.step, done_at),
                     None => write!(f, "{}", p.step),

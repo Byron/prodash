@@ -6,7 +6,7 @@ mod dynamic {
         #[test]
         fn value_and_upper_bound_use_own_unit() {
             assert_eq!(
-                format!("{}", unit::dynamic(Duration).display(40, Some(300))),
+                format!("{}", unit::dynamic(Duration).display(40, Some(300), None)),
                 "40s of 5m"
             );
         }
@@ -29,10 +29,10 @@ mod dynamic {
                 Mode::with_percentage(),
             );
             assert_eq!(
-                format!("{}", unit.display(100_002, Some(7_500_000))),
+                format!("{}", unit.display(100_002, Some(7_500_000), None)),
                 "100.0k/7.5M objects [1%]"
             );
-            assert_eq!(format!("{}", unit.display(100_002, None)), "100.0k objects");
+            assert_eq!(format!("{}", unit.display(100_002, None, None)), "100.0k objects");
         }
     }
     mod range {
@@ -40,9 +40,9 @@ mod dynamic {
         #[test]
         fn value_and_upper_bound_with_percentage() {
             let unit = unit::dynamic_and_mode(Range::new("steps"), Mode::with_percentage());
-            assert_eq!(format!("{}", unit.display(0, Some(3))), "1 of 3 steps [0%]");
-            assert_eq!(format!("{}", unit.display(1, Some(3))), "2 of 3 steps [33%]");
-            assert_eq!(format!("{}", unit.display(2, Some(3))), "3 of 3 steps [66%]");
+            assert_eq!(format!("{}", unit.display(0, Some(3), None)), "1 of 3 steps [0%]");
+            assert_eq!(format!("{}", unit.display(1, Some(3), None)), "2 of 3 steps [33%]");
+            assert_eq!(format!("{}", unit.display(2, Some(3), None)), "3 of 3 steps [66%]");
         }
     }
     #[cfg(feature = "unit-bytes")]
@@ -54,14 +54,14 @@ mod dynamic {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::dynamic_and_mode(Bytes, Mode::with_percentage()).display(1002, Some(10_000_000_000))
+                    unit::dynamic_and_mode(Bytes, Mode::with_percentage()).display(1002, Some(10_000_000_000), None)
                 ),
                 "1.0KB/10.0GB [0%]"
             );
         }
         #[test]
         fn just_value() {
-            assert_eq!(format!("{}", unit::dynamic(Bytes).display(5540, None)), "5.5KB");
+            assert_eq!(format!("{}", unit::dynamic(Bytes).display(5540, None, None)), "5.5KB");
         }
     }
 }
@@ -76,7 +76,7 @@ mod label {
                     format!(
                         "{}",
                         unit::label_and_mode("items", Mode::with_percentage().show_before_value())
-                            .display(123, Some(400))
+                            .display(123, Some(400), None)
                             .values()
                     ),
                     "[30%] 123/400"
@@ -92,7 +92,7 @@ mod label {
                     format!(
                         "{}",
                         unit::label_and_mode("items", Mode::with_percentage())
-                            .display(123, Some(400))
+                            .display(123, Some(400), None)
                             .unit()
                     ),
                     "items [30%]"
@@ -100,22 +100,23 @@ mod label {
             }
         }
         use crate::unit::{self, Mode};
+        use std::time;
 
         #[test]
         fn display_current_over_time_shows_throughput() {
             let unit = unit::label_and_mode("items", Mode::with_percentage().and_throughput_per_second());
             assert_eq!(
-                format!("{}", unit.display(123, None)),
+                format!("{}", unit.display(123, None, None)),
                 "123 items",
                 "from one measurement, there can be no throughput"
             );
             assert_eq!(
-                format!("{}", unit.display(500, None)),
+                format!("{}", unit.display(500, None, time::Duration::from_millis(500))),
                 "500 items |1234/s|",
                 "a sample below the timespan enables an extrapolated value"
             );
             assert_eq!(
-                format!("{}", unit.display(700, None)),
+                format!("{}", unit.display(700, None, time::Duration::from_secs(1))),
                 "123 items |1234/s|",
                 "a sample above the timespan enables an interpolated value"
             );
@@ -126,7 +127,7 @@ mod label {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::with_percentage()).display(123, None)
+                    unit::label_and_mode("items", Mode::with_percentage()).display(123, None, None)
                 ),
                 "123 items"
             );
@@ -136,14 +137,18 @@ mod label {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::with_percentage()).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::with_percentage()).display(123, Some(500), None)
                 ),
                 "123/500 items [24%]"
             );
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::with_percentage().show_before_value()).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::with_percentage().show_before_value()).display(
+                        123,
+                        Some(500),
+                        None
+                    )
                 ),
                 "[24%] 123/500 items"
             );
@@ -154,12 +159,15 @@ mod label {
 
         #[test]
         fn display_current_value_no_upper_bound() {
-            assert_eq!(format!("{}", unit::label("items").display(123, None)), "123 items");
+            assert_eq!(
+                format!("{}", unit::label("items").display(123, None, None)),
+                "123 items"
+            );
         }
         #[test]
         fn display_current_value_with_upper_bound() {
             assert_eq!(
-                format!("{}", unit::label("items").display(123, Some(500))),
+                format!("{}", unit::label("items").display(123, Some(500), None)),
                 "123/500 items"
             );
         }

@@ -106,10 +106,16 @@ pub fn dynamic_and_mode(label: impl DisplayValue + Send + Sync + 'static, mode: 
 
 /// Display and utilities
 impl Unit {
-    pub fn display(&self, current_value: ProgressStep, upper_bound: Option<ProgressStep>) -> UnitDisplay {
+    pub fn display(
+        &self,
+        current_value: ProgressStep,
+        upper_bound: Option<ProgressStep>,
+        elapsed: impl Into<Option<std::time::Duration>>,
+    ) -> UnitDisplay {
         UnitDisplay {
             current_value,
             upper_bound,
+            elapsed: elapsed.into(),
             parent: self,
             display: WhatToDisplay::ValuesAndUnit,
         }
@@ -202,6 +208,7 @@ impl Mode {
 pub struct UnitDisplay<'a> {
     current_value: ProgressStep,
     upper_bound: Option<ProgressStep>,
+    elapsed: Option<std::time::Duration>,
     parent: &'a Unit,
     display: WhatToDisplay,
 }
