@@ -33,11 +33,8 @@ Please have a look at the [dashboard demo](https://github.com/Byron/crates-io-cl
 
 Run it with `cargo run --example dashboard` and see what else it can do by checking out `cargo run --example dashboard -- --help`.
 */
-mod config;
 pub mod tree;
-
-pub use config::TreeOptions;
-pub use tree::Root as Tree;
+pub use tree::{Options as TreeOptions, Root as Tree};
 
 #[cfg(feature = "tui-renderer")]
 pub mod tui;
