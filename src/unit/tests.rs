@@ -13,7 +13,7 @@ mod dynamic {
     }
     #[cfg(feature = "unit-human")]
     mod human {
-        use crate::unit::{self, human, Human, Mode};
+        use crate::unit::{self, display, human, Human};
 
         #[test]
         fn various_combinations() {
@@ -26,7 +26,7 @@ mod dynamic {
                     },
                     "objects",
                 ),
-                Mode::with_percentage(),
+                display::Mode::with_percentage(),
             );
             assert_eq!(
                 format!("{}", unit.display(100_002, Some(7_500_000), None)),
@@ -131,7 +131,7 @@ mod label {
                     "{}",
                     unit.display(700, None, display::Throughput::new(500, time::Duration::from_secs(1)))
                 ),
-                "123 items |500/s|",
+                "700 items |500/s|",
                 "a '1' in the timespan is not displayed"
             );
             assert_eq!(
@@ -147,15 +147,19 @@ mod label {
                     "{}",
                     unit.display(700, None, display::Throughput::new(500, time::Duration::from_secs(60)))
                 ),
-                "123 items |500/m|",
+                "700 items |500/m|",
                 "it also knows minutes"
+            );
+            let unit = unit::label_and_mode(
+                "items",
+                display::Mode::with_percentage().and_throughput().show_before_value(),
             );
             assert_eq!(
                 format!(
                     "{}",
                     unit.display(700, None, display::Throughput::new(500, time::Duration::from_secs(90)))
                 ),
-                "123 items |500/1.5m|",
+                "|500/1.5m| 700 items",
                 "it uses fractions on the biggest possible unit"
             );
             assert_eq!(
@@ -167,7 +171,7 @@ mod label {
                         display::Throughput::new(250, time::Duration::from_secs(30 * 60))
                     )
                 ),
-                "500 items |250/30m|",
+                "|250/30m| 500 items",
                 "sub-hour intervals are displayed with minute precision"
             );
             assert_eq!(
@@ -179,7 +183,7 @@ mod label {
                         display::Throughput::new(500, time::Duration::from_secs(60 * 60))
                     )
                 ),
-                "123 items |500/h|",
+                "|500/h| 700 items",
                 "it also knows hours"
             );
         }
