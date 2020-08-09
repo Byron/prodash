@@ -1,35 +1,54 @@
 use crate::{progress, tree, unit};
 use std::time::Duration;
 
+const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
+
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 struct State {
     desired: Duration,
+
     observed: Duration,
     aggregate_value_for_observed_duration: progress::Step,
     last_value: progress::Step,
+
+    last_update_duration: Duration,
+    precomputed_throughput: Option<progress::Step>,
 }
 
 impl State {
     fn new(value: progress::Step, elapsed: Duration) -> Self {
+        let once_a_second = Duration::from_secs(1);
         State {
-            desired: Duration::from_secs(1),
+            desired: once_a_second,
+
             observed: elapsed,
             aggregate_value_for_observed_duration: value,
             last_value: value,
+            last_update_duration: elapsed,
+
+            precomputed_throughput: None,
         }
     }
+
+    fn compute_throughput(&self) -> progress::Step {
+        ((self.aggregate_value_for_observed_duration as f64 / self.observed.as_secs_f64()) * self.desired.as_secs_f64())
+            as progress::Step
+    }
+
     fn update(&mut self, value: progress::Step, elapsed: Duration) -> Option<unit::display::Throughput> {
         self.aggregate_value_for_observed_duration += value.checked_sub(self.last_value).unwrap_or(0);
         self.observed += elapsed;
         self.last_value = value;
+        if self.observed - self.last_update_duration > THROTTLE_INTERVAL {
+            self.precomputed_throughput = Some(self.compute_throughput());
+            self.last_update_duration = self.observed;
+        }
         self.throughput()
     }
 
     fn throughput(&self) -> Option<unit::display::Throughput> {
-        Some(unit::display::Throughput {
-            value_change_in_timespan: ((self.aggregate_value_for_observed_duration as f64
-                / self.observed.as_secs_f64())
-                * self.desired.as_secs_f64()) as progress::Step,
+        self.precomputed_throughput.map(|tp| unit::display::Throughput {
+            value_change_in_timespan: tp,
             timespan: self.desired,
         })
     }
