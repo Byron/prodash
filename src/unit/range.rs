@@ -1,7 +1,7 @@
 use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
 
-#[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Range {
     pub name: &'static str,
 }

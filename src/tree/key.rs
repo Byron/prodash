@@ -9,7 +9,7 @@ pub type Level = u8; // a level in the hierarchy of key components
 pub struct Key(Option<item::Id>, Option<item::Id>, Option<item::Id>, Option<item::Id>);
 
 /// Determines if a sibling is above or below in the given level of hierarchy
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub enum SiblingLocation {
     Above,
     Below,
@@ -40,7 +40,7 @@ impl Default for SiblingLocation {
 }
 
 /// A type providing information about what's above and below `Tree` items.
-#[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Adjacency(
     pub SiblingLocation,
     pub SiblingLocation,

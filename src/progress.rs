@@ -5,7 +5,7 @@ use std::time::SystemTime;
 pub type Step = usize;
 
 /// Indicate whether a progress can or cannot be made.
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub enum State {
     /// Indicates a task is blocked and cannot indicate progress, optionally until the
     /// given time. The task cannot easily be interrupted.

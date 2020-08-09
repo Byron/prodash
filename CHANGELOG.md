@@ -20,6 +20,7 @@
   * `tree::ProgressState` → `progress::State`
   * `tree::Value` → `progress::Value`
   * `tree::Progress` → `Progress`
+* Remove `Hash` implementation for all public types except for `tree::Key`
 
 
 ## v7.1.1
