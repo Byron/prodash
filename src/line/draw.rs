@@ -3,7 +3,7 @@ use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
 };
-use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive, time::Duration};
+use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
@@ -17,8 +17,6 @@ pub struct State {
     last_progress_midpoint: Option<u16>,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
-    /// The elapsed time between draw requests. None on the first draw
-    pub elapsed: Option<Duration>,
     pub throughput: Option<tree::Throughput>,
 }
 
@@ -119,6 +117,9 @@ pub fn all(
     )?;
 
     if show_progress && config.output_is_terminal {
+        if let Some(tp) = state.throughput.as_mut() {
+            tp.update_elapsed();
+        }
         let level_range = config
             .level_filter
             .clone()
@@ -133,7 +134,6 @@ pub fn all(
         }
         let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(4);
         let mut max_midpoint = 0;
-        let elapsed = state.elapsed;
         for ((key, progress), ref mut blocks_in_last_iteration) in state
             .tree
             .iter()
@@ -150,7 +150,7 @@ pub fn all(
                     state
                         .throughput
                         .as_mut()
-                        .and_then(|tp| elapsed.and_then(|elapsed| tp.update_and_get(key, progress, elapsed))),
+                        .and_then(|tp| tp.update_and_get(key, progress)),
                     &mut tokens,
                 )
                 .unwrap_or(0),

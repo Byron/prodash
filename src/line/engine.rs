@@ -3,7 +3,7 @@ use std::{
     io,
     ops::RangeInclusive,
     sync::atomic::{AtomicBool, Ordering},
-    time::{Duration, SystemTime},
+    time::Duration,
 };
 
 #[derive(Clone)]
@@ -184,11 +184,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 std::thread::sleep(Duration::from_secs_f32(secs));
             });
 
-            let mut time_of_previous_draw_request = None::<SystemTime>;
             for event in event_recv {
-                let now = SystemTime::now();
-                state.elapsed = time_of_previous_draw_request.and_then(|then| now.duration_since(then).ok());
-                time_of_previous_draw_request = Some(now);
                 match event {
                     Event::Tick => {
                         draw::all(

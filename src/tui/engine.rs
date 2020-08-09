@@ -19,6 +19,14 @@ pub struct Options {
     ///
     /// *e.g.* 1.0/4.0 is one frame every 4 seconds.
     pub frames_per_second: f32,
+
+    /// If true, (default false), we will keep track of the previous progress state to derive
+    /// continuous throughput information from. Throughput will only show for units which have
+    /// explicitly enabled it, it is opt-in.
+    ///
+    /// This comes at the cost of additional memory and CPU time.
+    pub throughput: bool,
+
     /// If set, recompute the column width of the task tree only every given frame. Otherwise the width will be recomputed every frame.
     ///
     /// Use this if there are many short-running tasks with varying names paired with high refresh rates of multiple frames per second to
@@ -44,6 +52,7 @@ impl Default for Options {
         Options {
             title: "Progress Dashboard".into(),
             frames_per_second: 10.0,
+            throughput: false,
             recompute_column_width_every_nth_frame: None,
             window_size: None,
             stop_if_empty_progress: false,
@@ -129,6 +138,7 @@ pub fn render_with_input(
         frames_per_second,
         window_size,
         recompute_column_width_every_nth_frame,
+        throughput,
         stop_if_empty_progress,
     } = options;
     let mut terminal = new_terminal(AlternateRawScreen::try_from(out)?)?;

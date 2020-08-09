@@ -1,5 +1,5 @@
 use crate::{progress, tree, unit};
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
 
@@ -57,27 +57,30 @@ impl State {
 #[derive(Default)]
 pub struct Throughput {
     sorted_by_key: Vec<(tree::Key, State)>,
+    updated_at: Option<SystemTime>,
+    elapsed: Option<Duration>,
 }
 
 impl Throughput {
-    pub fn update_and_get(
-        &mut self,
-        key: &tree::Key,
-        value: &progress::Value,
-        elapsed: Duration,
-    ) -> Option<unit::display::Throughput> {
-        value
-            .progress
-            .as_ref()
-            .and_then(|progress| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
-                Ok(index) => self.sorted_by_key[index].1.update(progress.step, elapsed),
-                Err(index) => {
-                    let state = State::new(progress.step, elapsed);
-                    let tp = state.throughput();
-                    self.sorted_by_key.insert(index, (*key, state));
-                    tp
-                }
-            })
+    pub fn update_elapsed(&mut self) {
+        let now = SystemTime::now();
+        self.elapsed = self.updated_at.and_then(|then| now.duration_since(then).ok());
+        self.updated_at = Some(now);
+    }
+
+    pub fn update_and_get(&mut self, key: &tree::Key, value: &progress::Value) -> Option<unit::display::Throughput> {
+        value.progress.as_ref().and_then(|progress| {
+            self.elapsed
+                .and_then(|elapsed| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
+                    Ok(index) => self.sorted_by_key[index].1.update(progress.step, elapsed),
+                    Err(index) => {
+                        let state = State::new(progress.step, elapsed);
+                        let tp = state.throughput();
+                        self.sorted_by_key.insert(index, (*key, state));
+                        tp
+                    }
+                })
+        })
     }
     pub fn reconcile(&mut self, sorted_values: &[(tree::Key, progress::Value)]) {
         self.sorted_by_key
