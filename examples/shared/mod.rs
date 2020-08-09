@@ -63,7 +63,6 @@ pub fn launch_ambient_gui(
                 title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
                 frames_per_second: args.fps,
                 recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
-                redraw_only_on_state_change: true,
                 ..tui::Options::default()
             },
             futures_util::stream::select(

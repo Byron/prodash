@@ -32,11 +32,6 @@ pub struct Options {
     /// If unset, it will be retrieved from the current terminal.
     pub window_size: Option<Rect>,
 
-    /// If true (default: false), we will skip potentially expensive redraws if nothing would change. This doubles the amount of memory.
-    ///
-    /// This is particularly useful if most of the time, the actual change rate is lower than the refresh rate. Drawing is expensive.
-    pub redraw_only_on_state_change: bool,
-
     /// If true (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
     ///
     /// Please note that you should add at least one item to the `prodash::Tree` before launching the application or else
@@ -51,7 +46,6 @@ impl Default for Options {
             frames_per_second: 10.0,
             recompute_column_width_every_nth_frame: None,
             window_size: None,
-            redraw_only_on_state_change: false,
             stop_if_empty_progress: false,
         }
     }
@@ -135,7 +129,6 @@ pub fn render_with_input(
         frames_per_second,
         window_size,
         recompute_column_width_every_nth_frame,
-        redraw_only_on_state_change,
         stop_if_empty_progress,
     } = options;
     let mut terminal = new_terminal(AlternateRawScreen::try_from(out)?)?;
@@ -161,7 +154,6 @@ pub fn render_with_input(
 
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
-        let mut previous_state = None::<draw::State>;
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {
@@ -202,13 +194,6 @@ pub fn render_with_input(
                         }),
                     };
                 }
-            }
-            if !skip_redraw && redraw_only_on_state_change {
-                let new_prev_state = match previous_state.take() {
-                    Some(prev) if prev == state => Some(prev),
-                    None | Some(_) => Some(state.clone()),
-                };
-                previous_state = new_prev_state;
             }
             if !skip_redraw {
                 tick += 1;

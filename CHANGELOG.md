@@ -4,6 +4,7 @@
 
 * In `Progress::init(max, unit)` , `unit` now is `Option<Unit>`, existing code can be transformed using `progress.init(None, Some("label".into()))`.
 * **removed** `deep_eq()` method in `Root` tree
+* tui engine option `redraw_only_on_state_change` was removed without substitute
 
 ### New Features
 
