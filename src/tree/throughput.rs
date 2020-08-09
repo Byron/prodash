@@ -10,13 +10,20 @@ struct State {
 }
 
 impl State {
-    fn new(value: progress::Step) -> Self {
+    fn new(value: progress::Step, elapsed: Duration) -> Self {
         State {
             desired: Duration::from_secs(1),
-            observed: Default::default(),
-            aggregate_value_for_observed_duration: 0,
+            observed: elapsed,
+            aggregate_value_for_observed_duration: value,
             last_value: value,
         }
+    }
+    fn update(&mut self, value: progress::Step, elapsed: Duration) -> Option<unit::display::Throughput> {
+        self.throughput()
+    }
+
+    fn throughput(&self) -> Option<unit::display::Throughput> {
+        None
     }
 }
 
@@ -32,7 +39,18 @@ impl Throughput {
         value: &progress::Value,
         elapsed: Duration,
     ) -> Option<unit::display::Throughput> {
-        unimplemented!("update and get")
+        value
+            .progress
+            .as_ref()
+            .and_then(|progress| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
+                Ok(index) => self.sorted_by_key[index].1.update(progress.step, elapsed),
+                Err(index) => {
+                    let state = State::new(progress.step, elapsed);
+                    let tp = state.throughput();
+                    self.sorted_by_key.insert(index, (*key, state));
+                    tp
+                }
+            })
     }
     pub fn reconcile(&mut self, values: &[(tree::Key, progress::Value)]) {
         unimplemented!("reconcile")
