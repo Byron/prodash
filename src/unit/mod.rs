@@ -110,12 +110,12 @@ impl Unit {
         &self,
         current_value: ProgressStep,
         upper_bound: Option<ProgressStep>,
-        elapsed: impl Into<Option<std::time::Duration>>,
+        elapsed: impl Into<Option<Throughput>>,
     ) -> UnitDisplay {
         UnitDisplay {
             current_value,
             upper_bound,
-            elapsed: elapsed.into(),
+            throughput: elapsed.into(),
             parent: self,
             display: WhatToDisplay::ValuesAndUnit,
         }
@@ -139,7 +139,7 @@ pub enum Location {
 struct ThroughputState {
     desired: std::time::Duration,
     observed: std::time::Duration,
-    aggregate_value_for_observed_duration: std::cell::Cell<ProgressStep>,
+    aggregate_value_for_observed_duration: ProgressStep,
     last_value: Option<ProgressStep>,
 }
 
@@ -148,21 +148,31 @@ impl Default for ThroughputState {
         ThroughputState {
             desired: std::time::Duration::from_secs(1),
             observed: Default::default(),
-            aggregate_value_for_observed_duration: std::cell::Cell::new(0),
+            aggregate_value_for_observed_duration: 0,
             last_value: None,
         }
     }
 }
 
-impl ThroughputState {
-    fn update(&self, value: ProgressStep, elapsed: Option<std::time::Duration>) {}
+pub struct Throughput {
+    pub value_change_in_timespan: ProgressStep,
+    pub timespan: std::time::Duration,
 }
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+impl Throughput {
+    pub fn new(value_change_in_timespan: ProgressStep, timespan: std::time::Duration) -> Self {
+        Throughput {
+            value_change_in_timespan,
+            timespan,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Mode {
     location: Location,
     percent: bool,
-    throughput: Option<ThroughputState>,
+    throughput: bool,
 }
 
 impl Mode {
@@ -173,12 +183,6 @@ impl Mode {
             None
         }
     }
-
-    fn update_throughput(&self, value: ProgressStep, elapsed: Option<std::time::Duration>) {
-        if let Some(tp) = self.throughput.as_ref() {
-            tp.update(value, elapsed);
-        }
-    }
 }
 
 /// initialization and modification
@@ -186,14 +190,14 @@ impl Mode {
     pub fn with_percentage() -> Self {
         Mode {
             percent: true,
-            throughput: None,
+            throughput: false,
             location: Location::AfterUnit,
         }
     }
     pub fn with_throughput_per_second() -> Self {
         Mode {
             percent: false,
-            throughput: Some(ThroughputState::default()),
+            throughput: true,
             location: Location::AfterUnit,
         }
     }
@@ -201,16 +205,8 @@ impl Mode {
         self.percent = true;
         self
     }
-    pub fn and_throughput_per_second(mut self) -> Self {
-        self.throughput = Some(ThroughputState::default());
-        self
-    }
-    pub fn and_throughput_per(mut self, timespan: std::time::Duration) -> Self {
-        self.throughput = Some({
-            let mut t = ThroughputState::default();
-            t.desired = timespan;
-            t
-        });
+    pub fn and_throughput(mut self) -> Self {
+        self.throughput = true;
         self
     }
     pub fn show_before_value(mut self) -> Self {
@@ -222,7 +218,7 @@ impl Mode {
 pub struct UnitDisplay<'a> {
     current_value: ProgressStep,
     upper_bound: Option<ProgressStep>,
-    elapsed: Option<std::time::Duration>,
+    throughput: Option<Throughput>,
     parent: &'a Unit,
     display: WhatToDisplay,
 }
@@ -266,11 +262,8 @@ impl<'a> UnitDisplay<'a> {
 impl<'a> fmt::Display for UnitDisplay<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let unit: &dyn DisplayValue = self.parent.as_display_value();
-        let mode = self.parent.mode.as_ref();
+        let mode = self.parent.mode;
 
-        if let Some(mode) = mode {
-            mode.update_throughput(self.current_value, self.elapsed);
-        }
         let percent_location_and_fraction = mode.and_then(|m| m.percent_location()).and_then(|location| {
             self.upper_bound
                 .map(|upper| (location, ((self.current_value as f64 / upper as f64) * 100.0).floor()))

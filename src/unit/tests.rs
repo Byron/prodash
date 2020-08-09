@@ -99,26 +99,72 @@ mod label {
                 );
             }
         }
-        use crate::unit::{self, Mode};
+        use crate::unit::{self, Mode, Throughput};
         use std::time;
 
         #[test]
         fn display_current_over_time_shows_throughput() {
-            let unit = unit::label_and_mode("items", Mode::with_percentage().and_throughput_per_second());
+            let unit = unit::label_and_mode("items", Mode::with_percentage().and_throughput());
             assert_eq!(
                 format!("{}", unit.display(123, None, None)),
                 "123 items",
                 "from one measurement, there can be no throughput"
             );
             assert_eq!(
-                format!("{}", unit.display(500, None, time::Duration::from_millis(500))),
-                "500 items |1234/s|",
-                "a sample below the timespan enables an extrapolated value"
+                format!(
+                    "{}",
+                    unit.display(500, None, Throughput::new(250, time::Duration::from_millis(500)))
+                ),
+                "500 items |250/500ms|",
+                "sub-second intervals are displayed with millisecond precision"
             );
             assert_eq!(
-                format!("{}", unit.display(700, None, time::Duration::from_secs(1))),
-                "123 items |1234/s|",
-                "a sample above the timespan enables an interpolated value"
+                format!(
+                    "{}",
+                    unit.display(700, None, Throughput::new(500, time::Duration::from_secs(1)))
+                ),
+                "123 items |500/s|",
+                "a '1' in the timespan is not displayed"
+            );
+            assert_eq!(
+                format!(
+                    "{}",
+                    unit.display(500, None, Throughput::new(250, time::Duration::from_secs(30)))
+                ),
+                "500 items |250/30s|",
+                "sub-minute intervals are displayed with second precision"
+            );
+            assert_eq!(
+                format!(
+                    "{}",
+                    unit.display(700, None, Throughput::new(500, time::Duration::from_secs(60)))
+                ),
+                "123 items |500/m|",
+                "it also knows minutes"
+            );
+            assert_eq!(
+                format!(
+                    "{}",
+                    unit.display(700, None, Throughput::new(500, time::Duration::from_secs(90)))
+                ),
+                "123 items |500/1.5m|",
+                "it uses fractions on the biggest possible unit"
+            );
+            assert_eq!(
+                format!(
+                    "{}",
+                    unit.display(500, None, Throughput::new(250, time::Duration::from_secs(30 * 60)))
+                ),
+                "500 items |250/30m|",
+                "sub-hour intervals are displayed with minute precision"
+            );
+            assert_eq!(
+                format!(
+                    "{}",
+                    unit.display(700, None, Throughput::new(500, time::Duration::from_secs(60 * 60)))
+                ),
+                "123 items |500/h|",
+                "it also knows hours"
             );
         }
 
@@ -180,10 +226,10 @@ mod size {
 
     #[test]
     fn of_mode() {
-        assert_eq!(size_of::<Mode>(), 64);
+        assert_eq!(size_of::<Mode>(), 3);
     }
     #[test]
     fn of_unit() {
-        assert_eq!(size_of::<Unit>(), 88);
+        assert_eq!(size_of::<Unit>(), 32);
     }
 }

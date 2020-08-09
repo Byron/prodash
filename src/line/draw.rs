@@ -281,7 +281,7 @@ fn format_progress<'a>(
             let values_brush = brush.style(Style::new().bold().dimmed());
             match progress.unit.as_ref() {
                 Some(unit) => {
-                    let mut display = unit.display(progress.step, progress.done_at, elapsed);
+                    let mut display = unit.display(progress.step, progress.done_at, None);
                     buf.push(values_brush.paint(format!("{}", display.values())));
                     buf.push(" ".into());
                     buf.push(display.unit().to_string().into());

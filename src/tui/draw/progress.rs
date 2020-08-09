@@ -9,6 +9,7 @@ use crate::{
         },
         InterruptDrawInfo,
     },
+    unit::Throughput,
 };
 use humantime::format_duration;
 use std::{
@@ -125,13 +126,13 @@ pub(crate) fn headline(
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, bold);
 }
 
-struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<Duration>);
+struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<Throughput>);
 
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             Some(p) => match p.unit.as_ref() {
-                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, self.2)),
+                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, None)),
                 None => match p.done_at {
                     Some(done_at) => write!(f, "{}/{}", p.step, done_at),
                     None => write!(f, "{}", p.step),
@@ -164,7 +165,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
             progress @ Some(_) => {
                 use std::io::Write;
                 let mut w = GraphemeCountWriter::default();
-                write!(w, "{}", ProgressFormat(progress, 0, elapsed)).expect("never fails");
+                write!(w, "{}", ProgressFormat(progress, 0, None)).expect("never fails");
                 state.max(w.0)
             }
             None => state,
@@ -187,7 +188,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                 } else {
                     0
                 },
-                elapsed
+                None
             )
         );
 
