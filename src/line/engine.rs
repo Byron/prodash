@@ -172,7 +172,9 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                 std::thread::sleep(Duration::from_secs_f32(secs));
             });
 
+            let mut time_of_previous_draw_request = None::<std::time::SystemTime>;
             for event in event_recv {
+                state.elapsed = time_of_previous_draw_request.as_ref().and_then(|t| t.elapsed().ok());
                 match event {
                     Event::Tick => {
                         draw::all(
@@ -185,6 +187,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
                     }
                     Event::Quit => break,
                 }
+                time_of_previous_draw_request = Some(std::time::SystemTime::now())
             }
 
             if show_cursor {

@@ -17,6 +17,8 @@ pub struct State {
     last_progress_midpoint: Option<u16>,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
+    /// The elapsed time between draw requests. None on the first draw
+    pub elapsed: Option<std::time::Duration>,
 }
 
 pub struct Options {
@@ -143,6 +145,7 @@ pub fn all(
                     config.terminal_dimensions.0,
                     config.colored,
                     state.last_progress_midpoint,
+                    state.elapsed,
                     &mut tokens,
                 )
                 .unwrap_or(0),
@@ -261,6 +264,7 @@ fn format_progress<'a>(
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,
+    elapsed: Option<std::time::Duration>,
     buf: &mut Vec<ANSIString<'a>>,
 ) -> Option<u16> {
     let mut brush = color::Brush::new(colored);
@@ -277,7 +281,7 @@ fn format_progress<'a>(
             let values_brush = brush.style(Style::new().bold().dimmed());
             match progress.unit.as_ref() {
                 Some(unit) => {
-                    let mut display = unit.display(progress.step, progress.done_at, None);
+                    let mut display = unit.display(progress.step, progress.done_at, elapsed);
                     buf.push(values_brush.paint(format!("{}", display.values())));
                     buf.push(" ".into());
                     buf.push(display.unit().to_string().into());
