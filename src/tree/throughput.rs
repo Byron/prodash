@@ -36,7 +36,7 @@ impl State {
     }
 
     fn update(&mut self, value: progress::Step, elapsed: Duration) -> Option<unit::display::Throughput> {
-        self.aggregate_value_for_observed_duration += value.checked_sub(self.last_value).unwrap_or(0);
+        self.aggregate_value_for_observed_duration += value.saturating_sub(self.last_value);
         self.observed += elapsed;
         self.last_value = value;
         if self.observed - self.last_update_duration > THROTTLE_INTERVAL {
