@@ -26,7 +26,7 @@ mod dynamic {
                     },
                     "objects",
                 ),
-                Mode::percentage(),
+                Mode::with_percentage(),
             );
             assert_eq!(
                 format!("{}", unit.display(100_002, Some(7_500_000))),
@@ -39,7 +39,7 @@ mod dynamic {
         use crate::unit::{self, Mode, Range};
         #[test]
         fn value_and_upper_bound_with_percentage() {
-            let unit = unit::dynamic_and_mode(Range::new("steps"), Mode::percentage());
+            let unit = unit::dynamic_and_mode(Range::new("steps"), Mode::with_percentage());
             assert_eq!(format!("{}", unit.display(0, Some(3))), "1 of 3 steps [0%]");
             assert_eq!(format!("{}", unit.display(1, Some(3))), "2 of 3 steps [33%]");
             assert_eq!(format!("{}", unit.display(2, Some(3))), "3 of 3 steps [66%]");
@@ -54,7 +54,7 @@ mod dynamic {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::dynamic_and_mode(Bytes, Mode::percentage()).display(1002, Some(10_000_000_000))
+                    unit::dynamic_and_mode(Bytes, Mode::with_percentage()).display(1002, Some(10_000_000_000))
                 ),
                 "1.0KB/10.0GB [0%]"
             );
@@ -75,7 +75,7 @@ mod label {
                 assert_eq!(
                     format!(
                         "{}",
-                        unit::label_and_mode("items", Mode::percentage().show_before_value())
+                        unit::label_and_mode("items", Mode::with_percentage().show_before_value())
                             .display(123, Some(400))
                             .values()
                     ),
@@ -91,7 +91,7 @@ mod label {
                 assert_eq!(
                     format!(
                         "{}",
-                        unit::label_and_mode("items", Mode::percentage())
+                        unit::label_and_mode("items", Mode::with_percentage())
                             .display(123, Some(400))
                             .unit()
                     ),
@@ -102,11 +102,31 @@ mod label {
         use crate::unit::{self, Mode};
 
         #[test]
+        fn display_current_over_time_shows_throughput() {
+            let unit = unit::label_and_mode("items", Mode::with_percentage().and_throughput_per_second());
+            assert_eq!(
+                format!("{}", unit.display(123, None)),
+                "123 items",
+                "from one measurement, there can be no throughput"
+            );
+            assert_eq!(
+                format!("{}", unit.display(500, None)),
+                "500 items |1234/s|",
+                "a sample below the timespan enables an extrapolated value"
+            );
+            assert_eq!(
+                format!("{}", unit.display(700, None)),
+                "123 items |1234/s|",
+                "a sample above the timespan enables an interpolated value"
+            );
+        }
+
+        #[test]
         fn display_current_value_no_upper_bound_shows_no_percentage() {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::percentage()).display(123, None)
+                    unit::label_and_mode("items", Mode::with_percentage()).display(123, None)
                 ),
                 "123 items"
             );
@@ -116,14 +136,14 @@ mod label {
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::percentage()).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::with_percentage()).display(123, Some(500))
                 ),
                 "123/500 items [24%]"
             );
             assert_eq!(
                 format!(
                     "{}",
-                    unit::label_and_mode("items", Mode::percentage().show_before_value()).display(123, Some(500))
+                    unit::label_and_mode("items", Mode::with_percentage().show_before_value()).display(123, Some(500))
                 ),
                 "[24%] 123/500 items"
             );

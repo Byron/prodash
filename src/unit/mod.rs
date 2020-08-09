@@ -130,10 +130,29 @@ pub enum Location {
 }
 
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+struct ThroughputState {
+    per: std::time::Duration,
+    observed_timespan: std::time::Duration,
+    value_for_timespan: ProgressStep,
+    last_value: Option<ProgressStep>,
+}
+
+impl Default for ThroughputState {
+    fn default() -> Self {
+        ThroughputState {
+            per: std::time::Duration::from_secs(1),
+            observed_timespan: Default::default(),
+            value_for_timespan: 0,
+            last_value: None,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Mode {
     location: Location,
     percent: bool,
-    throughput: bool,
+    throughput: Option<ThroughputState>,
 }
 
 impl Mode {
@@ -144,17 +163,17 @@ impl Mode {
             None
         }
     }
-    pub fn percentage() -> Self {
+    pub fn with_percentage() -> Self {
         Mode {
             percent: true,
-            throughput: false,
+            throughput: None,
             location: Location::AfterUnit,
         }
     }
-    pub fn throughput() -> Self {
+    pub fn with_throughput_per_second() -> Self {
         Mode {
             percent: false,
-            throughput: true,
+            throughput: Some(ThroughputState::default()),
             location: Location::AfterUnit,
         }
     }
@@ -162,8 +181,16 @@ impl Mode {
         self.percent = true;
         self
     }
-    pub fn and_throughput(mut self) -> Self {
-        self.throughput = true;
+    pub fn and_throughput_per_second(mut self) -> Self {
+        self.throughput = Some(ThroughputState::default());
+        self
+    }
+    pub fn and_throughput_per(mut self, timespan: std::time::Duration) -> Self {
+        self.throughput = Some({
+            let mut t = ThroughputState::default();
+            t.per = timespan;
+            t
+        });
         self
     }
     pub fn show_before_value(mut self) -> Self {

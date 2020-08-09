@@ -30,7 +30,7 @@ fn work_for_a_long_time_blocking(root: Tree) {
     let mut bytes_max = root.add_child("download");
     bytes_max.init(
         Some(100_000_000),
-        Some(unit::dynamic_and_mode(unit::Bytes, unit::Mode::percentage())),
+        Some(unit::dynamic_and_mode(unit::Bytes, unit::Mode::with_percentage())),
     );
 
     let mut duration = root.add_child("duration unknown");
@@ -40,7 +40,7 @@ fn work_for_a_long_time_blocking(root: Tree) {
         Some(60 * 60 * 24),
         Some(unit::dynamic_and_mode(
             unit::Duration,
-            unit::Mode::percentage().show_before_value(),
+            unit::Mode::with_percentage().show_before_value(),
         )),
     );
 
@@ -56,7 +56,7 @@ fn work_for_a_long_time_blocking(root: Tree) {
         Some(7_542_241),
         Some(unit::dynamic_and_mode(
             unit::Human::new(formatter(), "items"),
-            unit::Mode::percentage(),
+            unit::Mode::with_percentage(),
         )),
     );
 
@@ -67,7 +67,7 @@ fn work_for_a_long_time_blocking(root: Tree) {
         Some(100),
         Some(unit::dynamic_and_mode(
             unit::Range::new("steps"),
-            unit::Mode::percentage(),
+            unit::Mode::with_percentage(),
         )),
     );
 
