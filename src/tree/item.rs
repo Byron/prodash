@@ -1,3 +1,4 @@
+use crate::tree::ProgressStep;
 use crate::{
     tree::{messages::MessageRingBuffer, Key, MessageLevel, Progress, ProgressState, Value},
     unit::Unit,
@@ -38,8 +39,6 @@ impl Drop for Item {
 }
 
 pub(crate) type Id = u16;
-/// The amount of steps a progress can make
-pub type ProgressStep = usize;
 
 impl Item {
     /// Initialize the Item for receiving progress information.
