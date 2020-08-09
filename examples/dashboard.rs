@@ -45,7 +45,7 @@ async fn work_forever(mut args: args::Options) -> Result {
         Some(never_ending.boxed())
     } else {
         Some(
-            shared::launch_ambient_gui(progress.clone(), &renderer, args)
+            shared::launch_ambient_gui(progress.clone(), &renderer, args, false)
                 .unwrap()
                 .boxed(),
         )

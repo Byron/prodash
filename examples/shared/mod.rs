@@ -22,6 +22,7 @@ pub fn launch_ambient_gui(
     progress: Tree,
     renderer: &str,
     args: args::Options,
+    throughput: bool,
 ) -> std::result::Result<smol::Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
@@ -50,7 +51,7 @@ pub fn launch_ambient_gui(
                     initial_delay: args.line_initial_delay.map(Duration::from_secs_f32),
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
-                    throughput: true,
+                    throughput,
                 },
             );
             handle.disconnect();
@@ -64,7 +65,7 @@ pub fn launch_ambient_gui(
                 title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
                 frames_per_second: args.fps,
                 recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
-                throughput: true,
+                throughput,
                 ..tui::Options::default()
             },
             futures_util::stream::select(

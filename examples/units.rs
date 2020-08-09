@@ -15,7 +15,7 @@ fn main() -> Result {
     let args: args::Options = argh::from_env();
     let root = Tree::default();
     let renderer = args.renderer.clone().unwrap_or("line".into());
-    let handle = shared::launch_ambient_gui(root.clone(), &renderer, args).unwrap();
+    let handle = shared::launch_ambient_gui(root.clone(), &renderer, args, true).unwrap();
     let work = async move {
         let mut unblock = blocking::Unblock::new(());
         unblock.with_mut(move |_| work_for_a_long_time_blocking(root)).await
