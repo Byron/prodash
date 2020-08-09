@@ -10,25 +10,6 @@ pub enum Location {
     AfterUnit,
 }
 
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
-struct ThroughputState {
-    desired: std::time::Duration,
-    observed: std::time::Duration,
-    aggregate_value_for_observed_duration: Step,
-    last_value: Option<Step>,
-}
-
-impl Default for ThroughputState {
-    fn default() -> Self {
-        ThroughputState {
-            desired: std::time::Duration::from_secs(1),
-            observed: Default::default(),
-            aggregate_value_for_observed_duration: 0,
-            last_value: None,
-        }
-    }
-}
-
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Throughput {
     pub value_change_in_timespan: Step,
@@ -78,7 +59,7 @@ impl Mode {
             location: Location::AfterUnit,
         }
     }
-    pub fn with_throughput_per_second() -> Self {
+    pub fn with_throughput() -> Self {
         Mode {
             percent: false,
             throughput: true,
