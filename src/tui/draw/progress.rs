@@ -56,7 +56,7 @@ pub fn pane(entries: &[(Key, Value)], mut bound: Rect, buf: &mut Buffer, state: 
 
     {
         let progress_area = rect::offset_x(bound, desired_max_tree_draw_width);
-        draw_progress(entries, buf, progress_area, state.task_offset);
+        draw_progress(entries, buf, progress_area, state.task_offset, state.elapsed);
     }
 
     if needs_overflow_line {
@@ -125,13 +125,13 @@ pub(crate) fn headline(
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, bold);
 }
 
-struct ProgressFormat<'a>(&'a Option<Progress>, u16);
+struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<Duration>);
 
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             Some(p) => match p.unit.as_ref() {
-                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, None)),
+                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, self.2)),
                 None => match p.done_at {
                     Some(done_at) => write!(f, "{}/{}", p.step, done_at),
                     None => write!(f, "{}", p.step),
@@ -153,7 +153,7 @@ fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
         .unwrap_or(false)
 }
 
-pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) {
+pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16, elapsed: Option<Duration>) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
     let max_progress_label_width = entries
         .iter()
@@ -164,7 +164,7 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
             progress @ Some(_) => {
                 use std::io::Write;
                 let mut w = GraphemeCountWriter::default();
-                write!(w, "{}", ProgressFormat(progress, 0)).expect("never fails");
+                write!(w, "{}", ProgressFormat(progress, 0, elapsed)).expect("never fails");
                 state.max(w.0)
             }
             None => state,
@@ -186,7 +186,8 @@ pub fn draw_progress(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, of
                     bound.width.saturating_sub(title_spacing)
                 } else {
                     0
-                }
+                },
+                elapsed
             )
         );
 

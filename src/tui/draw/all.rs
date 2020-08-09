@@ -29,6 +29,7 @@ pub struct State {
     pub maximize_info: bool,
     pub last_tree_column_width: Option<u16>,
     pub next_tree_column_width: Option<u16>,
+    pub elapsed: Option<Duration>,
 }
 
 pub(crate) fn all(

@@ -3,7 +3,7 @@ use crate::{tree::Root, tui::draw, tui::ticker};
 use futures_util::StreamExt;
 use std::{
     io::{self, Write},
-    time::Duration,
+    time::{Duration, SystemTime},
 };
 use tui::layout::Rect;
 
@@ -154,6 +154,7 @@ pub fn render_with_input(
 
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
+        let mut time_of_previous_draw_request = None::<std::time::SystemTime>;
         while let Some(event) = events.next().await {
             let mut skip_redraw = false;
             match event {
@@ -212,11 +213,13 @@ pub fn render_with_input(
                     progress.copy_messages(&mut messages);
                 }
 
+                state.elapsed = time_of_previous_draw_request.and_then(|t| t.elapsed().ok());
                 draw::all(&mut state, interrupt_mode, &entries, &messages, window_size, buf);
                 if tick == 1 || tick % store_task_size_every == 0 || state.last_tree_column_width.unwrap_or(0) == 0 {
                     state.next_tree_column_width = state.last_tree_column_width;
                 }
                 terminal.post_render().expect("post render to work");
+                time_of_previous_draw_request = Some(SystemTime::now());
             }
         }
         // Make sure the terminal responds right away when this future stops, to reset back to the 'non-alternate' buffer

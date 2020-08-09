@@ -3,7 +3,7 @@ use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
 };
-use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive};
+use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive, time::Duration};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
@@ -18,7 +18,7 @@ pub struct State {
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
     /// The elapsed time between draw requests. None on the first draw
-    pub elapsed: Option<std::time::Duration>,
+    pub elapsed: Option<Duration>,
 }
 
 pub struct Options {
@@ -264,7 +264,7 @@ fn format_progress<'a>(
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,
-    elapsed: Option<std::time::Duration>,
+    elapsed: Option<Duration>,
     buf: &mut Vec<ANSIString<'a>>,
 ) -> Option<u16> {
     let mut brush = color::Brush::new(colored);
