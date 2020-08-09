@@ -129,32 +129,36 @@ impl Unit {
     }
 }
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub enum Location {
     BeforeValue,
     AfterUnit,
 }
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 struct ThroughputState {
-    per: std::time::Duration,
-    observed_timespan: std::time::Duration,
-    value_for_timespan: ProgressStep,
+    desired: std::time::Duration,
+    observed: std::time::Duration,
+    aggregate_value_for_observed_duration: std::cell::Cell<ProgressStep>,
     last_value: Option<ProgressStep>,
 }
 
 impl Default for ThroughputState {
     fn default() -> Self {
         ThroughputState {
-            per: std::time::Duration::from_secs(1),
-            observed_timespan: Default::default(),
-            value_for_timespan: 0,
+            desired: std::time::Duration::from_secs(1),
+            observed: Default::default(),
+            aggregate_value_for_observed_duration: std::cell::Cell::new(0),
             last_value: None,
         }
     }
 }
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
+impl ThroughputState {
+    fn update(&self, value: ProgressStep, elapsed: Option<std::time::Duration>) {}
+}
+
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Mode {
     location: Location,
     percent: bool,
@@ -169,6 +173,16 @@ impl Mode {
             None
         }
     }
+
+    fn update_throughput(&self, value: ProgressStep, elapsed: Option<std::time::Duration>) {
+        if let Some(tp) = self.throughput.as_ref() {
+            tp.update(value, elapsed);
+        }
+    }
+}
+
+/// initialization and modification
+impl Mode {
     pub fn with_percentage() -> Self {
         Mode {
             percent: true,
@@ -194,7 +208,7 @@ impl Mode {
     pub fn and_throughput_per(mut self, timespan: std::time::Duration) -> Self {
         self.throughput = Some({
             let mut t = ThroughputState::default();
-            t.per = timespan;
+            t.desired = timespan;
             t
         });
         self
@@ -252,8 +266,11 @@ impl<'a> UnitDisplay<'a> {
 impl<'a> fmt::Display for UnitDisplay<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let unit: &dyn DisplayValue = self.parent.as_display_value();
-        let mode = self.parent.mode;
+        let mode = self.parent.mode.as_ref();
 
+        if let Some(mode) = mode {
+            mode.update_throughput(self.current_value, self.elapsed);
+        }
         let percent_location_and_fraction = mode.and_then(|m| m.percent_location()).and_then(|location| {
             self.upper_bound
                 .map(|upper| (location, ((self.current_value as f64 / upper as f64) * 100.0).floor()))

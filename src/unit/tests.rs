@@ -173,3 +173,17 @@ mod label {
         }
     }
 }
+
+mod size {
+    use crate::unit::{Mode, Unit};
+    use std::mem::size_of;
+
+    #[test]
+    fn of_mode() {
+        assert_eq!(size_of::<Mode>(), 64);
+    }
+    #[test]
+    fn of_unit() {
+        assert_eq!(size_of::<Unit>(), 88);
+    }
+}
