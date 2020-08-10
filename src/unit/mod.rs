@@ -94,7 +94,7 @@ impl Unit {
         }
     }
 
-    fn as_display_value(&self) -> &dyn DisplayValue {
+    pub fn as_display_value(&self) -> &dyn DisplayValue {
         match self.kind {
             Kind::Label(ref unit) => unit,
             Kind::Dynamic(ref unit) => unit.deref(),

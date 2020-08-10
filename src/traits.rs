@@ -22,24 +22,33 @@ pub trait Progress {
     /// to the progress tree (e.g. a headline).
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    fn init(&mut self, max: Option<usize>, unit: Option<Unit>);
+    fn init(&mut self, max: Option<progress::Step>, unit: Option<Unit>);
 
     /// Set the current progress to the given `step`. The cost of this call is negligible,
     /// making manual throttling *not* necessary.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    fn set(&mut self, step: usize);
+    fn set(&mut self, step: progress::Step);
 
-    /// Increment the current progress to the given `step`. The cost of this call is negligible,
-    /// making manual throttling *not* necessary.
-    ///
-    /// **Note**: that this call has no effect unless `init(…)` was called before.
-    fn inc_by(&mut self, step: usize);
+    /// Returns the (cloned) unit associated with this Progress
+    fn unit(&self) -> Option<Unit> {
+        None
+    }
+
+    /// Returns the maximum about of items we expect, as provided with the `init(…)` call
+    fn max(&self) -> Option<progress::Step> {
+        None
+    }
+
+    /// Returns the current step, as controlled by `inc*(…)` calls
+    fn step(&self) -> progress::Step;
+
+    /// Increment the current progress to the given `step`.
+    /// The cost of this call is negligible, making manual throttling *not* necessary.
+    fn inc_by(&mut self, step: progress::Step);
 
     /// Increment the current progress to the given 1. The cost of this call is negligible,
     /// making manual throttling *not* necessary.
-    ///
-    /// **Note**: that this call has no effect unless `init(…)` was called before.
     fn inc(&mut self) {
         self.inc_by(1)
     }
@@ -63,16 +72,37 @@ pub trait Progress {
         self.message(MessageLevel::Failure, message)
     }
     /// A shorthand to print throughput information
-    fn show_throughput(&mut self, start: Instant, total_items: usize, item_name: &str) {
+    fn show_throughput(&mut self, start: Instant) {
         let elapsed = start.elapsed().as_secs_f32();
-        self.info(format!(
-            "done {} {} in {:.02}s ({} {}/s)",
-            total_items,
-            item_name,
-            elapsed,
-            total_items as f32 / elapsed,
-            item_name
-        ));
+        let step = self.step();
+        let steps_per_second = (step as f32 / elapsed) as progress::Step;
+        self.info(match self.unit() {
+            Some(unit) => {
+                use std::fmt::Write;
+                let mut buf = String::with_capacity(128);
+                let unit = unit.as_display_value();
+                let push_unit = |buf: &mut String| {
+                    buf.push_str(" ");
+                    let len_before_unit = buf.len();
+                    unit.display_unit(buf, step).ok();
+                    if buf.len() == len_before_unit {
+                        buf.pop();
+                    }
+                };
+
+                buf.push_str("done ");
+                unit.display_current_value(&mut buf, step, None).ok();
+                push_unit(&mut buf);
+
+                buf.write_fmt(format_args!("in {:.02}s (", elapsed)).ok();
+                unit.display_current_value(&mut buf, steps_per_second, None).ok();
+                push_unit(&mut buf);
+                buf.push_str("/s");
+
+                buf
+            }
+            None => format!("done {} items in {:.02}s ({} items/s)", step, elapsed, steps_per_second),
+        });
     }
 }
 

@@ -85,6 +85,24 @@ impl Item {
         self.tree.get(&self.key).map(|r| r.value().name.to_owned())
     }
 
+    pub fn step(&self) -> Option<Step> {
+        self.tree
+            .get(&self.key)
+            .and_then(|r| r.value().progress.as_ref().map(|p| p.step))
+    }
+
+    pub fn max(&self) -> Option<Step> {
+        self.tree
+            .get(&self.key)
+            .and_then(|r| r.value().progress.as_ref().and_then(|p| p.done_at))
+    }
+
+    pub fn unit(&self) -> Option<Unit> {
+        self.tree
+            .get(&self.key)
+            .and_then(|r| r.value().progress.as_ref().and_then(|p| p.unit.clone()))
+    }
+
     /// Set the current progress to the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
@@ -223,6 +241,18 @@ impl crate::Progress for Item {
 
     fn set(&mut self, step: usize) {
         Item::set(self, step)
+    }
+
+    fn unit(&self) -> Option<Unit> {
+        Item::unit(self)
+    }
+
+    fn max(&self) -> Option<usize> {
+        Item::max(self)
+    }
+
+    fn step(&self) -> usize {
+        Item::step(self).unwrap_or(0)
     }
 
     fn inc_by(&mut self, step: usize) {

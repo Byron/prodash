@@ -71,6 +71,18 @@ impl Progress for Log {
         }
     }
 
+    fn unit(&self) -> Option<Unit> {
+        self.unit.clone()
+    }
+
+    fn max(&self) -> Option<usize> {
+        self.max
+    }
+
+    fn step(&self) -> usize {
+        self.step
+    }
+
     fn inc_by(&mut self, step: usize) {
         self.set(self.step + step)
     }

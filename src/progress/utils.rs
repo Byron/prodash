@@ -13,6 +13,10 @@ impl Progress for Discard {
 
     fn set(&mut self, _step: usize) {}
 
+    fn step(&self) -> usize {
+        0
+    }
+
     fn inc_by(&mut self, _step: usize) {}
 
     fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
@@ -48,6 +52,27 @@ where
         match self {
             Either::Left(l) => l.set(step),
             Either::Right(r) => r.set(step),
+        }
+    }
+
+    fn unit(&self) -> Option<Unit> {
+        match self {
+            Either::Left(l) => l.unit(),
+            Either::Right(r) => r.unit(),
+        }
+    }
+
+    fn max(&self) -> Option<usize> {
+        match self {
+            Either::Left(l) => l.max(),
+            Either::Right(r) => r.max(),
+        }
+    }
+
+    fn step(&self) -> usize {
+        match self {
+            Either::Left(l) => l.step(),
+            Either::Right(r) => r.step(),
         }
     }
 
@@ -105,6 +130,18 @@ where
 
     fn set(&mut self, step: usize) {
         self.0.set(step)
+    }
+
+    fn max(&self) -> Option<usize> {
+        self.0.max()
+    }
+
+    fn step(&self) -> usize {
+        self.0.step()
+    }
+
+    fn unit(&self) -> Option<Unit> {
+        self.0.unit()
     }
 
     fn inc_by(&mut self, step: usize) {
