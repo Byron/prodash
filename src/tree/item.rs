@@ -173,7 +173,7 @@ impl Item {
             {
                 let name = self.tree.get(&self.key).map(|v| v.name.to_owned()).unwrap_or_default();
 
-                #[cfg(feature = "log-renderer")]
+                #[cfg(feature = "progress-tree-log")]
                 match level {
                     MessageLevel::Failure => crate::warn!("{} → {}", name, message),
                     MessageLevel::Info | MessageLevel::Success => crate::info!("{} → {}", name, message),

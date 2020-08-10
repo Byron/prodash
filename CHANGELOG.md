@@ -12,6 +12,7 @@
   * `Key::adjecency(…)`
 * Add `Progress` trait to allow make progress generic
 * Add `progress::Discard` and `progress::DoOrDiscard` to make optional progress more convenient, especially when using the `Progress` trait.
+* Add `progress-tree` feature to gate the `dashmap` powered tree (enabled by default)
 
 ### Breaking
 
@@ -28,6 +29,7 @@
   * `tree::Progress` → `Progress`
 * Remove `Hash` implementation for all public types except for `tree::Key`
 * Move `tui` and `line` renderers into the `render` module
+* Rename `log-renderer` feature to `progress-tree-log`
 
 ## v7.1.1
 

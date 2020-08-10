@@ -37,7 +37,9 @@ required-features = [
 ]
 
 [features]
-default = ["log-renderer", "localtime"]
+default = ["progress-tree", "progress-tree-log", "localtime"]
+progress-tree = ["dashmap", "parking_lot"]
+progress-tree-log = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
 unit-duration = ["compound_duration"]
@@ -57,13 +59,12 @@ line-renderer = ["crosstermion/color", "humantime", "unicode-width"]
 line-renderer-crossterm = ["crosstermion/crossterm"]
 line-renderer-termion = ["crosstermion/termion"]
 
-log-renderer = ["log"]
 localtime = ["time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-dashmap = "3.4.3"
-parking_lot = "0.11.0"
+dashmap = { version = "3.4.3", optional = true, default-features = false }
+parking_lot = { version = "0.11.0", optional = true, default-features = false }
 
 # with-logging
 log = { version = "0.4.8", optional = true }

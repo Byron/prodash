@@ -6,7 +6,7 @@ help:  ## Display this help
 ##@ Testing
 
 clippy: ## Run cargo-clippy
-	cargo clippy
+	cargo clippy --all-features
 
 check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features

@@ -27,7 +27,7 @@ pub struct Message {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub(crate) struct MessageRingBuffer {
+pub struct MessageRingBuffer {
     pub(crate) buf: Vec<Message>,
     cursor: usize,
     total: usize,
