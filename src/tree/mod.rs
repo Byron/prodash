@@ -4,9 +4,6 @@ mod tests;
 mod root;
 pub use root::{Options, Root};
 
-mod messages;
-pub use messages::{Message, MessageCopyState, MessageLevel};
-
 mod item;
 pub use item::Item;
 

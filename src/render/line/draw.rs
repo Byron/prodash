@@ -1,4 +1,5 @@
 use crate::{
+    messages::{Message, MessageCopyState, MessageLevel},
     progress::{self, Progress},
     tree::{self},
     unit,
@@ -13,8 +14,8 @@ use unicode_width::UnicodeWidthStr;
 #[derive(Default)]
 pub struct State {
     tree: Vec<(tree::Key, progress::Value)>,
-    messages: Vec<tree::Message>,
-    for_next_copy: Option<tree::MessageCopyState>,
+    messages: Vec<Message>,
+    for_next_copy: Option<MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
     message_origin_size: VecDeque<usize>,
     /// The maximum progress midpoint (point till progress bar starts) seen at the last tick
@@ -42,8 +43,8 @@ fn messages(
     timestamp: bool,
 ) -> io::Result<()> {
     let mut brush = color::Brush::new(colored);
-    fn to_color(level: tree::MessageLevel) -> Color {
-        use tree::MessageLevel::*;
+    fn to_color(level: MessageLevel) -> Color {
+        use crate::messages::MessageLevel::*;
         match level {
             Info => Color::White,
             Success => Color::Green,
@@ -52,7 +53,7 @@ fn messages(
     }
     let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(6);
     let mut current_maximum = state.message_origin_size.iter().max().cloned().unwrap_or(0);
-    for tree::Message {
+    for Message {
         time,
         level,
         origin,

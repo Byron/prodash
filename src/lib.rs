@@ -50,6 +50,7 @@ pub mod unit;
 #[doc(inline)]
 pub use unit::Unit;
 
+pub mod messages;
 pub mod progress;
 
 mod traits;

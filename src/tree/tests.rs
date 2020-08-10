@@ -1,5 +1,5 @@
 mod message_buffer {
-    use crate::tree::{messages::MessageRingBuffer, Message, MessageLevel};
+    use crate::messages::{Message, MessageLevel, MessageRingBuffer};
 
     fn push(buf: &mut MessageRingBuffer, msg: impl Into<String>) {
         buf.push_overwrite(MessageLevel::Info, "test".into(), msg);
@@ -40,8 +40,8 @@ mod message_buffer {
 
     mod copy_new {
         use crate::{
-            tree::tests::message_buffer::assert_messages,
-            tree::{messages::MessageRingBuffer, tests::message_buffer::push, Message, MessageCopyState},
+            messages::{Message, MessageCopyState, MessageRingBuffer},
+            tree::tests::{message_buffer::assert_messages, message_buffer::push},
         };
 
         #[test]
