@@ -13,7 +13,7 @@ use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
 pub struct State {
-    tree: Vec<(tree::Key, progress::Task)>,
+    tree: Vec<(progress::Key, progress::Task)>,
     messages: Vec<Message>,
     for_next_copy: Option<MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
@@ -26,7 +26,7 @@ pub struct State {
 }
 
 pub struct Options {
-    pub level_filter: Option<RangeInclusive<tree::Level>>,
+    pub level_filter: Option<RangeInclusive<progress::key::Level>>,
     pub terminal_dimensions: (u16, u16),
     pub keep_running_if_progress_is_empty: bool,
     pub output_is_terminal: bool,
@@ -128,7 +128,7 @@ pub fn all(
         let level_range = config
             .level_filter
             .clone()
-            .unwrap_or(RangeInclusive::new(0, tree::Level::max_value()));
+            .unwrap_or(RangeInclusive::new(0, progress::key::Level::max_value()));
         let lines_to_be_drawn = state
             .tree
             .iter()
@@ -269,7 +269,7 @@ fn progress_style(p: &Value) -> Style {
 }
 
 fn format_progress<'a>(
-    key: &tree::Key,
+    key: &progress::Key,
     value: &'a progress::Task,
     column_count: u16,
     colored: bool,

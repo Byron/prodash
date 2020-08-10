@@ -1,7 +1,11 @@
 use crate::unit::Unit;
 use std::time::SystemTime;
 
+pub mod key;
 mod utils;
+#[doc(inline)]
+pub use key::Key;
+
 pub use utils::{Discard, DoOrDiscard, Either};
 
 /// The amount of steps a progress can make

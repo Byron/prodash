@@ -53,7 +53,7 @@ pub struct Options {
 
     /// for 'line' renderer: The first level to display, defaults to 0
     #[argh(option)]
-    pub line_start: Option<prodash::tree::Level>,
+    pub line_start: Option<prodash::progress::key::Level>,
 
     /// for 'line' renderer: Amount of columns we should draw into. If unset, the whole width of the terminal.
     #[argh(option)]
@@ -61,7 +61,7 @@ pub struct Options {
 
     /// for 'line' renderer: The first level to display, defaults to 1
     #[argh(option)]
-    pub line_end: Option<prodash::tree::Level>,
+    pub line_end: Option<prodash::progress::key::Level>,
 
     /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
     #[argh(switch)]

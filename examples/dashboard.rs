@@ -187,8 +187,8 @@ type Result = std::result::Result<(), Box<dyn Error + Send>>;
 
 use futures_util::{future::join_all, future::Either, FutureExt};
 use prodash::{
-    progress::Step,
-    tree::{Item, Key},
+    progress::{Key, Step},
+    tree::Item,
     Tree,
 };
 use rand::prelude::*;

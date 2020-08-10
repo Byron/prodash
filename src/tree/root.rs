@@ -1,7 +1,7 @@
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
-    progress::Task,
-    tree::{Item, Key},
+    progress::{Key, Task},
+    tree::Item,
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;

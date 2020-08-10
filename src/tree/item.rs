@@ -1,7 +1,6 @@
 use crate::{
     messages::{MessageLevel, MessageRingBuffer},
-    progress::{State, Step, Task, Value},
-    tree::Key,
+    progress::{key, Key, State, Step, Task, Value},
     unit::Unit,
 };
 use dashmap::DashMap;
@@ -28,7 +27,7 @@ use std::{ops::Deref, sync::Arc, time::SystemTime};
 #[derive(Debug)]
 pub struct Item {
     pub(crate) key: Key,
-    pub(crate) highest_child_id: Id,
+    pub(crate) highest_child_id: key::Id,
     pub(crate) tree: Arc<DashMap<Key, Task>>,
     pub(crate) messages: Arc<Mutex<MessageRingBuffer>>,
 }
@@ -38,8 +37,6 @@ impl Drop for Item {
         self.tree.remove(&self.key);
     }
 }
-
-pub(crate) type Id = u16;
 
 impl Item {
     /// Initialize the Item for receiving progress information.

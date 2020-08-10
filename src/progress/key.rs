@@ -1,12 +1,14 @@
-use crate::{progress::Task, tree::item};
+use crate::progress::Task;
 use std::ops::{Index, IndexMut};
 
 // NOTE: This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level
 pub type Level = u8; // a level in the hierarchy of key components
 
+pub(crate) type Id = u16;
+
 /// A type identifying a spot in the hierarchy of `Tree` items.
 #[derive(Copy, Clone, Default, Hash, Eq, PartialEq, Ord, PartialOrd, Debug)]
-pub struct Key(Option<item::Id>, Option<item::Id>, Option<item::Id>, Option<item::Id>);
+pub struct Key(Option<Id>, Option<Id>, Option<Id>, Option<Id>);
 
 /// Determines if a sibling is above or below in the given level of hierarchy
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
@@ -93,7 +95,7 @@ impl IndexMut<Level> for Adjacency {
 }
 
 impl Key {
-    pub fn add_child(self, child_id: item::Id) -> Key {
+    pub fn add_child(self, child_id: Id) -> Key {
         match self {
             Key(None, None, None, None) => Key(Some(child_id), None, None, None),
             Key(a, None, None, None) => Key(a, Some(child_id), None, None),
@@ -118,7 +120,7 @@ impl Key {
         }
     }
 
-    fn get(&self, level: Level) -> Option<&item::Id> {
+    fn get(&self, level: Level) -> Option<&Id> {
         match level {
             1 => self.0.as_ref(),
             2 => self.1.as_ref(),
@@ -162,7 +164,7 @@ impl Key {
             key: &Key,
             key_level: Level,
             current_level: Level,
-            _id_at_level: item::Id,
+            _id_at_level: Id,
         ) -> Option<usize> {
             iter.map(|(k, _)| k)
                 .take_while(|other| key.shares_parent_with(other, current_level.saturating_sub(1)))
@@ -177,10 +179,10 @@ impl Key {
                 .map(|(idx, _)| idx)
         };
 
-        let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: item::Id| {
+        let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: Id| {
             search(sorted[..from].iter().rev(), key, key_level, level, id_at_level)
         };
-        let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: item::Id| {
+        let downward_iter = |from: usize, key: &Key, level: Level, id_at_level: Id| {
             sorted
                 .get(from + 1..)
                 .and_then(|s| search(s.iter(), key, key_level, level, id_at_level))
@@ -227,7 +229,7 @@ impl Key {
 }
 
 impl Index<Level> for Key {
-    type Output = item::Id;
+    type Output = Id;
 
     fn index(&self, index: Level) -> &Self::Output {
         self.get(index).expect("key index in bound")

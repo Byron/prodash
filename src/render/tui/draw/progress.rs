@@ -1,5 +1,5 @@
 use crate::{
-    progress::{self, Step, Task, Value},
+    progress::{self, Key, Step, Task, Value},
     render::tui::{
         draw::State,
         utils::{
@@ -9,8 +9,7 @@ use crate::{
         InterruptDrawInfo,
     },
     time::format_now_datetime_seconds,
-    tree::{self, Key},
-    unit,
+    tree, unit,
 };
 use humantime::format_duration;
 use std::{
@@ -384,7 +383,7 @@ fn level_prefix(entries: &[(Key, Task)], entry_index: usize) -> String {
     let is_orphan = adj.level() != key_level;
     let mut buf = String::with_capacity(key_level as usize);
     for level in 1..=key_level {
-        use crate::tree::key::SiblingLocation::*;
+        use crate::progress::key::SiblingLocation::*;
         let is_child_level = level == key_level;
         if level != 1 {
             buf.push(' ');

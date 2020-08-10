@@ -1,4 +1,4 @@
-use crate::{render::line::draw, tree};
+use crate::{progress, render::line::draw, tree};
 use std::{
     io,
     ops::RangeInclusive,
@@ -41,7 +41,7 @@ pub struct Options {
     /// If set, specify all levels that should be shown. Otherwise all available levels are shown.
     ///
     /// This is useful to filter out high-noise lower level progress items in the tree.
-    pub level_filter: Option<RangeInclusive<tree::Level>>,
+    pub level_filter: Option<RangeInclusive<progress::key::Level>>,
 
     /// If set, progress will only actually be shown after the given duration. Log messages will always be shown without delay.
     ///

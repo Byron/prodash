@@ -115,10 +115,9 @@ mod message_buffer {
 }
 
 mod key_adjacency {
-    use crate::{
-        progress::Task,
-        tree::key::SiblingLocation::*,
-        tree::{key::Adjacency, Key},
+    use crate::progress::{
+        key::{Adjacency, SiblingLocation::*},
+        Key, Task,
     };
 
     fn to_kv(keys: &[Key]) -> Vec<(Key, Task)> {

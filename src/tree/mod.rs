@@ -9,8 +9,3 @@ pub use item::Item;
 
 mod throughput;
 pub use throughput::Throughput;
-
-pub mod key;
-
-#[doc(inline)]
-pub use key::{Key, Level};

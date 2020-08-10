@@ -16,8 +16,9 @@
 ### Breaking
 
 * In `Progress::init(max, unit)` , `unit` now is `Option<Unit>`, existing code can be transformed using `progress.init(None, Some("label".into()))`.
-* moved `tree::progress` into `progress` and renamed `Value` into `Task` and `Progress` into `Value`
-* moved `tree::messages` into `crates::messages`
+* moved`tree::progress` into `progress` and renamed `Value` into `Task` and `Progress` into `Value`
+* moved`tree::messages` into `crates::messages`
+* moved`tree::key` into `crates::progress::key`
 * **removed** `deep_eq()` method in `Root` tree
 * tui engine option `redraw_only_on_state_change` was removed without substitute
 * **Move and rename**
