@@ -2,7 +2,7 @@ use crate::{
     messages::{Message, MessageCopyState, MessageLevel},
     progress::{self, Value},
     tree::{self},
-    unit,
+    unit, Throughput,
 };
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
@@ -22,7 +22,7 @@ pub struct State {
     last_progress_midpoint: Option<u16>,
     /// The amount of blocks per line we have written last time.
     blocks_per_line: VecDeque<u16>,
-    pub throughput: Option<tree::Throughput>,
+    pub throughput: Option<Throughput>,
 }
 
 pub struct Options {

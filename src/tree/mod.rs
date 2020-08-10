@@ -6,6 +6,3 @@ pub use root::{Options, Root};
 
 mod item;
 pub use item::Item;
-
-mod throughput;
-pub use throughput::Throughput;

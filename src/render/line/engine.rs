@@ -1,4 +1,4 @@
-use crate::{progress, render::line::draw, tree};
+use crate::{progress, render::line::draw, tree, Throughput};
 use std::{
     io,
     ops::RangeInclusive,
@@ -174,7 +174,7 @@ pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, co
 
             let mut state = draw::State::default();
             if throughput {
-                state.throughput = Some(tree::Throughput::default());
+                state.throughput = Some(Throughput::default());
             }
             let secs = 1.0 / frames_per_second;
             let _ticker = std::thread::spawn(move || loop {

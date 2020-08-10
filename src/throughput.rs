@@ -1,7 +1,4 @@
-use crate::{
-    progress::{self, Value},
-    unit,
-};
+use crate::{progress, unit};
 use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
@@ -74,7 +71,7 @@ impl Throughput {
     pub fn update_and_get(
         &mut self,
         key: &progress::Key,
-        progress: Option<&Value>,
+        progress: Option<&progress::Value>,
     ) -> Option<unit::display::Throughput> {
         progress.and_then(|progress| {
             self.elapsed

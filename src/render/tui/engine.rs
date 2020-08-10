@@ -1,4 +1,4 @@
-use crate::{render::tui::draw, render::tui::ticker, tree, tree::Root};
+use crate::{render::tui::draw, render::tui::ticker, tree::Root, Throughput};
 
 use futures_util::StreamExt;
 use std::{
@@ -154,7 +154,7 @@ pub fn render_with_input(
             ..draw::State::default()
         };
         if throughput {
-            state.throughput = Some(tree::Throughput::default());
+            state.throughput = Some(Throughput::default());
         }
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());

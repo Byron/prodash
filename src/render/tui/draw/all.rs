@@ -6,7 +6,7 @@ use crate::{
         utils::{block_width, rect},
         InterruptDrawInfo, Line,
     },
-    tree,
+    Throughput,
 };
 use std::time::Duration;
 use tui::{
@@ -31,7 +31,7 @@ pub struct State {
     pub maximize_info: bool,
     pub last_tree_column_width: Option<u16>,
     pub next_tree_column_width: Option<u16>,
-    pub throughput: Option<tree::Throughput>,
+    pub throughput: Option<Throughput>,
 }
 
 pub(crate) fn all(

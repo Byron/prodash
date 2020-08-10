@@ -9,7 +9,7 @@ use crate::{
         InterruptDrawInfo,
     },
     time::format_now_datetime_seconds,
-    tree, unit,
+    unit, Throughput,
 };
 use humantime::format_duration;
 use std::{
@@ -173,7 +173,7 @@ pub fn draw_progress(
     buf: &mut Buffer,
     bound: Rect,
     offset: u16,
-    mut throughput: Option<&mut tree::Throughput>,
+    mut throughput: Option<&mut Throughput>,
 ) {
     let title_spacing = 2u16 + 1; // 2 on the left, 1 on the right
     let max_progress_label_width = entries

@@ -19,6 +19,7 @@
 * moved`tree::progress` into `progress` and renamed `Value` into `Task` and `Progress` into `Value`
 * moved`tree::messages` into `crates::messages`
 * moved`tree::key` into `crates::progress::key`
+* moved `tree::Throughput` into `crate::Throughput`
 * **removed** `deep_eq()` method in `Root` tree
 * tui engine option `redraw_only_on_state_change` was removed without substitute
 * **Move and rename**
