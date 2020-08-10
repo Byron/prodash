@@ -2,11 +2,10 @@ use crate::{progress, unit};
 use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
+const ONCE_A_SECOND: Duration = Duration::from_secs(1);
 
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 struct State {
-    desired: Duration,
-
     observed: Duration,
     aggregate_value_for_observed_duration: progress::Step,
     last_value: progress::Step,
@@ -17,10 +16,7 @@ struct State {
 
 impl State {
     fn new(value: progress::Step, elapsed: Duration) -> Self {
-        let once_a_second = Duration::from_secs(1);
         State {
-            desired: once_a_second,
-
             observed: elapsed,
             aggregate_value_for_observed_duration: value,
             last_value: value,
@@ -31,8 +27,8 @@ impl State {
     }
 
     fn compute_throughput(&self) -> progress::Step {
-        ((self.aggregate_value_for_observed_duration as f64 / self.observed.as_secs_f64()) * self.desired.as_secs_f64())
-            as progress::Step
+        ((self.aggregate_value_for_observed_duration as f64 / self.observed.as_secs_f64())
+            * ONCE_A_SECOND.as_secs_f64()) as progress::Step
     }
 
     fn update(&mut self, value: progress::Step, elapsed: Duration) -> Option<unit::display::Throughput> {
@@ -49,7 +45,7 @@ impl State {
     fn throughput(&self) -> Option<unit::display::Throughput> {
         self.precomputed_throughput.map(|tp| unit::display::Throughput {
             value_change_in_timespan: tp,
-            timespan: self.desired,
+            timespan: ONCE_A_SECOND,
         })
     }
 }
