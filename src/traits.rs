@@ -73,36 +73,46 @@ pub trait Progress {
     }
     /// A shorthand to print throughput information
     fn show_throughput(&mut self, start: Instant) {
-        let elapsed = start.elapsed().as_secs_f32();
         let step = self.step();
-        let steps_per_second = (step as f32 / elapsed) as progress::Step;
-        self.info(match self.unit() {
-            Some(unit) => {
-                use std::fmt::Write;
-                let mut buf = String::with_capacity(128);
-                let unit = unit.as_display_value();
-                let push_unit = |buf: &mut String| {
-                    buf.push_str(" ");
-                    let len_before_unit = buf.len();
-                    unit.display_unit(buf, step).ok();
-                    if buf.len() == len_before_unit {
-                        buf.pop();
-                    }
-                };
-
-                buf.push_str("done ");
-                unit.display_current_value(&mut buf, step, None).ok();
-                push_unit(&mut buf);
-
-                buf.write_fmt(format_args!("in {:.02}s (", elapsed)).ok();
-                unit.display_current_value(&mut buf, steps_per_second, None).ok();
-                push_unit(&mut buf);
-                buf.push_str("/s");
-
-                buf
+        match self.unit() {
+            Some(unit) => self.show_throughput_with(start, step, unit),
+            None => {
+                let elapsed = start.elapsed().as_secs_f32();
+                let steps_per_second = (step as f32 / elapsed) as progress::Step;
+                self.info(format!(
+                    "done {} items in {:.02}s ({} items/s)",
+                    step, elapsed, steps_per_second
+                ))
             }
-            None => format!("done {} items in {:.02}s ({} items/s)", step, elapsed, steps_per_second),
-        });
+        };
+    }
+
+    /// A shorthand to print throughput information, with the given step and unit
+    fn show_throughput_with(&mut self, start: Instant, step: progress::Step, unit: Unit) {
+        use std::fmt::Write;
+        let elapsed = start.elapsed().as_secs_f32();
+        let steps_per_second = (step as f32 / elapsed) as progress::Step;
+        let mut buf = String::with_capacity(128);
+        let unit = unit.as_display_value();
+        let push_unit = |buf: &mut String| {
+            buf.push_str(" ");
+            let len_before_unit = buf.len();
+            unit.display_unit(buf, step).ok();
+            if buf.len() == len_before_unit {
+                buf.pop();
+            }
+        };
+
+        buf.push_str("done ");
+        unit.display_current_value(&mut buf, step, None).ok();
+        push_unit(&mut buf);
+
+        buf.write_fmt(format_args!(" in {:.02}s (", elapsed)).ok();
+        unit.display_current_value(&mut buf, steps_per_second, None).ok();
+        push_unit(&mut buf);
+        buf.push_str("/s");
+
+        self.info(buf);
     }
 }
 
