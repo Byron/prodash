@@ -5,7 +5,9 @@ pub mod key;
 mod utils;
 
 #[cfg(feature = "progress-log")]
-pub mod log;
+mod log;
+#[cfg(feature = "progress-log")]
+pub use self::log::Log;
 
 #[doc(inline)]
 pub use key::Key;
