@@ -1,4 +1,4 @@
-use crate::{progress, render::line::draw, tree, Throughput};
+use crate::{progress, render::line::draw, Root, Throughput};
 use std::{
     io,
     ops::RangeInclusive,
@@ -131,7 +131,11 @@ enum Event {
     Quit,
 }
 
-pub fn render(mut out: impl io::Write + Send + 'static, progress: tree::Root, config: Options) -> JoinHandle {
+pub fn render(
+    mut out: impl io::Write + Send + 'static,
+    progress: impl Root + Send + 'static,
+    config: Options,
+) -> JoinHandle {
     let Options {
         output_is_terminal,
         colored,

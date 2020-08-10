@@ -1,8 +1,7 @@
 use crate::{
     messages::{Message, MessageCopyState, MessageLevel},
     progress::{self, Value},
-    tree::{self},
-    unit, Throughput,
+    unit, Root, Throughput,
 };
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
@@ -103,7 +102,7 @@ fn messages(
 
 pub fn all(
     out: &mut impl io::Write,
-    progress: &tree::Root,
+    progress: &impl Root,
     show_progress: bool,
     state: &mut State,
     config: &Options,
