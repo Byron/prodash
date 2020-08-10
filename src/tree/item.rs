@@ -1,6 +1,9 @@
 use crate::{
-    tree::progress::{Progress, State, Step, Value},
-    tree::{messages::MessageRingBuffer, Key, MessageLevel},
+    tree::{
+        messages::MessageRingBuffer,
+        progress::{Progress, State, Step, Value},
+        Key, MessageLevel,
+    },
     unit::Unit,
 };
 use dashmap::DashMap;

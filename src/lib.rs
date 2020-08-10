@@ -52,6 +52,8 @@ pub use unit::Unit;
 
 pub mod progress;
 
+mod traits;
+
 #[cfg(not(feature = "log-renderer"))]
 mod log {
     /// Stub
