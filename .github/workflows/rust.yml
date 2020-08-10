@@ -21,12 +21,12 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: check
-        args: --features=tui-renderer-termion --all --bins --tests --examples
+        args: --features=render-tui-termion --all --bins --tests --examples
     - name: "Check (crossterm)"
       uses: actions-rs/cargo@v1
       with:
         command: check
-        args: --features=tui-renderer-crossterm --all --bins --tests --examples
+        args: --features=render-tui-crossterm --all --bins --tests --examples
     - name: benchmarks
       run: make bench
 
@@ -44,9 +44,9 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --features=tui-renderer-crossterm --all --bins --tests --examples
+          args: --features=render-tui-crossterm --all --bins --tests --examples
       - name: "Test (crossterm)"
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features=tui-renderer-crossterm --all
+          args: --features=render-tui-crossterm --all

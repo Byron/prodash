@@ -15,12 +15,12 @@ doctest = true
 [[example]]
 name = "dashboard"
 path = "examples/dashboard.rs"
-required-features = ["tui-renderer", "tui-renderer-crossterm", "line-renderer", "line-renderer-crossterm", "ctrlc"]
+required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "ctrlc"]
 
 [[example]]
 name = "dashboard-termion"
 path = "examples/dashboard.rs"
-required-features = ["tui-renderer", "tui-renderer-termion", "line-renderer", "line-renderer-termion"]
+required-features = ["render-tui", "render-tui-termion", "render-line", "render-line-termion"]
 
 [[example]]
 name = "units"
@@ -29,10 +29,10 @@ required-features = [
     "unit-bytes",
     "unit-duration",
     "unit-human",
-    "tui-renderer",
-    "tui-renderer-crossterm",
-    "line-renderer",
-    "line-renderer-crossterm",
+    "render-tui",
+    "render-tui-crossterm",
+    "render-line",
+    "render-line-crossterm",
     "ctrlc"
 ]
 
@@ -44,9 +44,9 @@ progress-log = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
 unit-duration = ["compound_duration"]
-tui-renderer-termion = ["crosstermion/tui-react-termion"]
-tui-renderer-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
-tui-renderer = ["tui",
+render-tui-termion = ["crosstermion/tui-react-termion"]
+render-tui-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
+render-tui = ["tui",
     "unicode-segmentation",
     "unicode-width",
     "crosstermion/input-async",
@@ -56,9 +56,9 @@ tui-renderer = ["tui",
     "futures-core",
     "async-io",
     "humantime"]
-line-renderer = ["crosstermion/color", "humantime", "unicode-width"]
-line-renderer-crossterm = ["crosstermion/crossterm"]
-line-renderer-termion = ["crosstermion/termion"]
+render-line = ["crosstermion/color", "humantime", "unicode-width"]
+render-line-crossterm = ["crosstermion/crossterm"]
+render-line-termion = ["crosstermion/termion"]
 
 localtime = ["time"]
 
@@ -70,7 +70,7 @@ parking_lot = { version = "0.11.0", optional = true, default-features = false }
 # with-logging
 log = { version = "0.4.8", optional = true }
 
-# tui-renderer
+# render-tui
 tui = { version = "0.10.0", optional = true, default-features = false }
 tui-react = { version = "0.10.0", optional = true }
 futures-core = { version = "0.3.4", optional = true, default-features = false }
@@ -82,7 +82,7 @@ unicode-width = { version = "0.1.7", optional = true }
 crosstermion = { version = "0.3.0", optional = true, default-features = false }
 async-io = { version = "0.1.5", optional = true }
 
-# localtime support for tui-renderer
+# localtime support for render-tui
 time = { version = "0.2.9", optional = true, features = ["std"], default-features = false }
 
 # line renderer

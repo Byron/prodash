@@ -2,7 +2,7 @@
 * A module implementing a *terminal user interface* capable of visualizing all information stored in
 * [progress trees](../tree/struct.Root.html).
 *
-* **Please note** that it is behind the `tui-renderer` feature toggle, which is enabled by default.
+* **Please note** that it is behind the `render-tui` feature toggle, which is enabled by default.
 *
 * # Example
 *

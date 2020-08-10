@@ -88,9 +88,9 @@ pub(crate) enum InterruptDrawInfo {
     Deferred(bool),
 }
 
-#[cfg(not(any(feature = "tui-renderer-crossterm", feature = "tui-renderer-termion")))]
+#[cfg(not(any(feature = "render-tui-crossterm", feature = "render-tui-termion")))]
 compile_error!(
-    "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
+    "Please set either the 'render-tui-crossterm' or 'render-tui-termion' feature whne using the 'render-tui'"
 );
 
 use crosstermion::{

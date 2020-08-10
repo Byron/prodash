@@ -30,6 +30,7 @@
 * Remove `Hash` implementation for all public types except for `tree::Key`
 * Move `tui` and `line` renderers into the `render` module
 * Rename `log-renderer` feature to `progress-tree-log`
+* Rename `tui-renderer*` into `render-tui*` and `line-renderer*` into `render-line*`
 
 ## v7.1.1
 
@@ -50,7 +51,7 @@
 
 ## v7.0.2
 
-* **line-renderer** `JoinHandle` will 
+* **render-line** `JoinHandle` will 
   * now send a signal to perform a render before shutting down to capture the final state
   * wait for the render thread to complete the aforementioned actions on drop. You can still override this behaviour through
    `disconnect()` or `forget()`.
@@ -58,14 +59,14 @@
 
 ## v7.0.1 - Prevent cursor movement if no progress bar is drawn
 
-## v7.0.0 - Add new line-renderer, change feature flag names
+## v7.0.0 - Add new render-line, change feature flag names
 
 ### New Features
 
 * **line**
   * There is a new line renderer as neat trade off between bare logs and full-blown tui. It will work best with 'simple' and not
     too dynamically changing progress trees.
-  * Activate it with the `line-renderer` + one of `line-renderer-crossterm` or `line-renderer-termion` feature flags.
+  * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 * **tree**
   * New methods in **Root*
     * `copy_new_messages(…)` method, copying only messages seen since last time it was called
@@ -77,21 +78,21 @@
     * **TuiOptions** -> **Options**
     * `render_with_input` now takes the Write stream as argument, instead of defaulting to `std::io::stdout()`
 * **Feature Flags**
-    * **with-crossterm** -> **tui-renderer-crossterm**
-    * **with-termion** -> **tui-renderer-termion**
+    * **with-crossterm** -> **render-tui-crossterm**
+    * **with-termion** -> **render-tui-termion**
 
 ## v6.0.0 - Factor terminal input into the new `crosstermion` crate
 
 Due to this work, the default features changed, which is a breaking change for those who relied on it.
-Now when using the `tui-renderer`, one will also have to specify either the `with-crossbeam` or `tui-renderer-termion` feature.
+Now when using the `render-tui`, one will also have to specify either the `with-crossbeam` or `render-tui-termion` feature.
 
 ## v5.0.0 - Support for windows by using Crossbeam by default
 
 A first low-effort move to the latest version should be to set the dependency to
-`default-features = false, features = ["tui-renderer", "tui-renderer-termion", "localtime", "log-renderer"]`
+`default-features = false, features = ["render-tui", "render-tui-termion", "localtime", "log-renderer"]`
 to get the same configuration as before.
 
-To try crossbeam, use `with-crossbeam` instead of `tui-renderer-termion`.
+To try crossbeam, use `with-crossbeam` instead of `render-tui-termion`.
 
 If you have been using the event stream to send your own keys, swap `termion::event::Key` with `prodash::tui::input::Key`.
 

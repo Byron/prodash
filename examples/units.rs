@@ -1,12 +1,12 @@
 #![deny(unsafe_code)]
 
-#[cfg(not(feature = "tui-renderer"))]
+#[cfg(not(feature = "render-tui"))]
 compile_error!(
-    "The `tui-renderer` feature must be set, along with either `tui-renderer-crossterm` or `tui-renderer-termion`"
+    "The `render-tui` feature must be set, along with either `render-tui-crossterm` or `render-tui-termion`"
 );
-#[cfg(not(any(feature = "tui-renderer-crossterm", feature = "tui-renderer-termion")))]
+#[cfg(not(any(feature = "render-tui-crossterm", feature = "render-tui-termion")))]
 compile_error!(
-    "Please set either the 'tui-renderer-crossterm' or 'tui-renderer-termion' feature whne using the 'tui-renderer'"
+    "Please set either the 'render-tui-crossterm' or 'render-tui-termion' feature whne using the 'render-tui'"
 );
 
 fn main() -> Result {

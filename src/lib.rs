@@ -16,7 +16,7 @@ The **terminal user interface** seems to be the least transparent part, but can 
 
 By default, a TUI is provided to visualize all state. Have a look at [the example provided in the tui module](./tui/index.html).
 
-**Please note** that it is behind the `tui-renderer` feature toggle, which is enabled by default.
+**Please note** that it is behind the `render-tui` feature toggle, which is enabled by default.
 
 # Logging
 

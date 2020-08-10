@@ -1,5 +1,5 @@
-#[cfg(feature = "tui-renderer")]
+#[cfg(feature = "render-tui")]
 pub mod tui;
 
-#[cfg(feature = "line-renderer")]
+#[cfg(feature = "render-line")]
 pub mod line;

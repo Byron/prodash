@@ -19,27 +19,27 @@ Or run the demo application like so `cd prodash && cargo run --example dashboard
 This crate comes with various cargo features to tailor it to your needs.
 
 * **progress-tree** _(default)_
-  * Provide a `Progress` and `Root` trait implementation for use with the `line-renderer` and `tui-renderer` backed by `dashmap`.
+  * Provide a `Progress` and `Root` trait implementation for use with the `render-line` and `render-tui` backed by `dashmap`.
   * **progress-tree-log** _(default)_
     * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
       `tree::Item::message(…)` and friends. No actual progress is written.
-    * May interfere with `tui-renderer` or `line-renderer`, or any renderer outputting to the console.
+    * May interfere with `render-tui` or `render-line`, or any renderer outputting to the console.
 * **progress-log**
   * A `Progress` implementation which logs messages and progress using the `log` crate
 * **local-time** _(default)_
-  * If set, timestamps in the message pane of the `tui-renderer` will be using the local time, not UTC
-  * If set, timestamps of the log messages of the `line-renderer` will be using the local time, not UTC
-  * Has no effect without the `tui-renderer` or `line-renderer` respectively
-* **line-renderer**
+  * If set, timestamps in the message pane of the `render-tui` will be using the local time, not UTC
+  * If set, timestamps of the log messages of the `render-line` will be using the local time, not UTC
+  * Has no effect without the `render-tui` or `render-line` respectively
+* **render-line**
   * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
-  * It's like the tui-renderer, but with far less dependencies and less visual fidelity - all it needs is to move
+  * It's like the render-tui, but with far less dependencies and less visual fidelity - all it needs is to move
     the cursor a little while drawing characters and block graphics.
   * Support for [clicolors spec](https://bixense.com/clicolors/) and [no-color spec](https://no-color.org)
   * Supports initial delay that won't affect log messages, showing progress only when needed, automatically.
   * Requires one of these additional feature flags to be set to be functional
     * **one required** _(mutually exclusive)_
-       * **line-renderer-crossterm** - use the _crossterm_ backend, useful for working on windows
-       * **line-renderer-termion** - use the _termion_ backend, useful for lean unix-only builds
+       * **render-line-crossterm** - use the _crossterm_ backend, useful for working on windows
+       * **render-line-termion** - use the _termion_ backend, useful for lean unix-only builds
   * _Optional features_
        * **ctrlc**
           * If set, and the `hide_cursor` line renderer option is set, the cursor will be hidden **and** *SIG_INT* and *SIG_TERM* handlers will be 
@@ -47,19 +47,19 @@ This crate comes with various cargo features to tailor it to your needs.
             to give the renderer a chance to undo the terminal changes. Failing to do so will leave the cusor hidden once the program has already
             finished.
           * Comes at the cost of an extra thread and additional dependencies.
-* **tui-renderer**
+* **render-tui**
   * Provide a terminal user interface visualizing every detail of the current progress state. It treats the terminal
     as a matrix display.
   * Requires one of these additional feature flags to be set to be functional
     ** _(one required, mutually exclusive)_
-       * **tui-renderer-crossterm**
+       * **render-tui-crossterm**
          * Use the `crossterm` crate as terminal backend
          * Works everywhere natively, but has more dependencies
-         * You can set additional features like this `cargo build --features tui-renderer-crossterm,crossterm/event-stream`
-       * **tui-renderer-termion**
+         * You can set additional features like this `cargo build --features render-tui-crossterm,crossterm/event-stream`
+       * **render-tui-termion**
          * Use the `termion` crate as terminal backend 
          * It has less dependencies but works only on `unix` systems
-         * to get this, disable default features and chose at least `tui-renderer` and `tui-renderer-termion`.
+         * to get this, disable default features and chose at least `render-tui` and `render-tui-termion`.
 * **unit-bytes**
   * Supports dynamic byte display using the tiny `bytesize` crate.
 * **unit-human**
