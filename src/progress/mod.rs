@@ -4,7 +4,7 @@ use std::time::SystemTime;
 pub mod key;
 mod utils;
 
-#[cfg(feature = "log-progress")]
+#[cfg(feature = "progress-log")]
 pub mod log;
 
 #[doc(inline)]
