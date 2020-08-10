@@ -64,9 +64,8 @@ impl Progress for Log {
             > EMIT_LOG_EVERY_S
         {
             self.last_set = Some(now);
-            match (self.max, self.unit) {
-                (Some(max), Some(unit)) => log::info!("{} → {} / {} {}", self.name, step, max, unit),
-                (None, Some(unit)) => log::info!("{} → {} {}", self.name, step, unit),
+            match (self.max, &self.unit) {
+                (max, Some(unit)) => log::info!("{} → {}", self.name, unit.display(step, max, None)),
                 (Some(max), None) => log::info!("{} → {} / {}", self.name, step, max),
                 (None, None) => log::info!("{} → {}", self.name, step),
             }

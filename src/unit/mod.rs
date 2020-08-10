@@ -83,12 +83,12 @@ impl Unit {
         &self,
         current_value: Step,
         upper_bound: Option<Step>,
-        elapsed: impl Into<Option<display::Throughput>>,
+        throughput: impl Into<Option<display::Throughput>>,
     ) -> display::UnitDisplay {
         display::UnitDisplay {
             current_value,
             upper_bound,
-            throughput: elapsed.into(),
+            throughput: throughput.into(),
             parent: self,
             display: display::What::ValuesAndUnit,
         }
