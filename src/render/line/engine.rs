@@ -229,7 +229,10 @@ fn possibly_hide_cursor(
 
     #[cfg(feature = "ctrlc")]
     if hide_cursor {
-        hide_cursor = ctrlc::set_handler(move || drop(quit_send.send(Event::Quit).ok())).is_ok();
+        hide_cursor = ctrlc::set_handler(move || {
+            quit_send.send(Event::Quit).ok();
+        })
+        .is_ok();
     }
 
     if hide_cursor {
