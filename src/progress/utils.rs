@@ -105,9 +105,17 @@ where
     }
 }
 
-impl<T> DoOrDiscard<T> {
+impl<T: Progress> DoOrDiscard<T> {
     pub fn into_inner(self) -> Option<T> {
         match self {
+            DoOrDiscard(Either::Left(p)) => Some(p),
+            DoOrDiscard(Either::Right(_)) => None,
+        }
+    }
+
+    pub fn take(&mut self) -> Option<T> {
+        let this = std::mem::replace(self, DoOrDiscard::from(None));
+        match this {
             DoOrDiscard(Either::Left(p)) => Some(p),
             DoOrDiscard(Either::Right(_)) => None,
         }
@@ -132,16 +140,16 @@ where
         self.0.set(step)
     }
 
+    fn unit(&self) -> Option<Unit> {
+        self.0.unit()
+    }
+
     fn max(&self) -> Option<usize> {
         self.0.max()
     }
 
     fn step(&self) -> usize {
         self.0.step()
-    }
-
-    fn unit(&self) -> Option<Unit> {
-        self.0.unit()
     }
 
     fn inc_by(&mut self, step: usize) {
