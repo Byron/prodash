@@ -23,7 +23,9 @@ This crate comes with various cargo features to tailor it to your needs.
   * **progress-tree-log** _(default)_
     * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
       `tree::Item::message(…)` and friends. No actual progress is written.
-    * May interfere with `tui-renderer` or `line-renderer`
+    * May interfere with `tui-renderer` or `line-renderer`, or any renderer outputting to the console.
+* **log-progress**
+  * A `Progress` implementation which logs messages and progress using the `log` crate
 * **local-time** _(default)_
   * If set, timestamps in the message pane of the `tui-renderer` will be using the local time, not UTC
   * If set, timestamps of the log messages of the `line-renderer` will be using the local time, not UTC

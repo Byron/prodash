@@ -40,6 +40,7 @@ required-features = [
 default = ["progress-tree", "progress-tree-log", "localtime"]
 progress-tree = ["dashmap", "parking_lot"]
 progress-tree-log = ["log"]
+log-progress = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
 unit-duration = ["compound_duration"]

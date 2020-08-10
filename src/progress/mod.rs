@@ -3,6 +3,10 @@ use std::time::SystemTime;
 
 pub mod key;
 mod utils;
+
+#[cfg(feature = "log-progress")]
+pub mod log;
+
 #[doc(inline)]
 pub use key::Key;
 
