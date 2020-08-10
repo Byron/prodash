@@ -1,6 +1,6 @@
 use crate::{
     messages::{Message, MessageCopyState, MessageLevel},
-    progress::{self, Progress},
+    progress::{self, Value},
     tree::{self},
     unit,
 };
@@ -13,7 +13,7 @@ use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
 pub struct State {
-    tree: Vec<(tree::Key, progress::Value)>,
+    tree: Vec<(tree::Key, progress::Task)>,
     messages: Vec<Message>,
     for_next_copy: Option<MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
@@ -210,7 +210,7 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
 }
 
 fn draw_progress_bar<'a>(
-    p: &Progress,
+    p: &Value,
     style: Style,
     mut blocks_available: u16,
     colored: bool,
@@ -250,7 +250,7 @@ fn draw_progress_bar<'a>(
     buf.push("]".into());
 }
 
-fn progress_style(p: &Progress) -> Style {
+fn progress_style(p: &Value) -> Style {
     use crate::progress::State::*;
     match p.state {
         Running => if let Some(fraction) = p.fraction() {
@@ -270,7 +270,7 @@ fn progress_style(p: &Progress) -> Style {
 
 fn format_progress<'a>(
     key: &tree::Key,
-    value: &'a progress::Value,
+    value: &'a progress::Task,
     column_count: u16,
     colored: bool,
     midpoint: Option<u16>,

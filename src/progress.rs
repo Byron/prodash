@@ -25,7 +25,7 @@ impl Default for State {
 
 /// Progress associated with some item in the progress tree.
 #[derive(Clone, Default, Debug)]
-pub struct Progress {
+pub struct Value {
     /// The amount of progress currently made
     pub step: Step,
     /// The step at which no further progress has to be made.
@@ -38,7 +38,7 @@ pub struct Progress {
     pub state: State,
 }
 
-impl Progress {
+impl Value {
     /// Returns a number between `Some(0.0)` and `Some(1.0)`, or `None` if the progress is unbounded.
     ///
     /// A task half done would return `Some(0.5)`.
@@ -49,9 +49,9 @@ impl Progress {
 
 /// The value associated with a spot in the hierarchy.
 #[derive(Clone, Default, Debug)]
-pub struct Value {
+pub struct Task {
     /// The name of the `Item` or task.
     pub name: String,
     /// The progress itself, unless this value belongs to an `Item` serving as organizational unit.
-    pub progress: Option<Progress>,
+    pub progress: Option<Value>,
 }

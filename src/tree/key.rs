@@ -1,4 +1,4 @@
-use crate::{progress::Value, tree::item};
+use crate::{progress::Task, tree::item};
 use std::ops::{Index, IndexMut};
 
 // NOTE: This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level
@@ -148,7 +148,7 @@ impl Key {
     ///
     /// It's vital that the invariant of `sorted` to actually be sorted by key is upheld
     /// for the result to be reliable.
-    pub fn adjacency(sorted: &[(Key, Value)], index: usize) -> Adjacency {
+    pub fn adjacency(sorted: &[(Key, Task)], index: usize) -> Adjacency {
         use SiblingLocation::*;
         let key = &sorted[index].0;
         let key_level = key.level();
@@ -158,7 +158,7 @@ impl Key {
         }
 
         fn search<'a>(
-            iter: impl Iterator<Item = &'a (Key, Value)>,
+            iter: impl Iterator<Item = &'a (Key, Task)>,
             key: &Key,
             key_level: Level,
             current_level: Level,

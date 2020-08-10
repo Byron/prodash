@@ -1,6 +1,6 @@
 use crate::{
     messages::Message,
-    progress::Value,
+    progress::Task,
     render::tui::{
         draw,
         utils::{block_width, rect},
@@ -37,7 +37,7 @@ pub struct State {
 pub(crate) fn all(
     state: &mut State,
     interrupt_mode: InterruptDrawInfo,
-    entries: &[(Key, Value)],
+    entries: &[(Key, Task)],
     messages: &[Message],
     bound: Rect,
     buf: &mut Buffer,

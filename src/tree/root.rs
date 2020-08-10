@@ -1,6 +1,6 @@
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
-    progress::Value,
+    progress::Task,
     tree::{Item, Key},
 };
 use dashmap::DashMap;
@@ -49,7 +49,7 @@ impl Root {
 
     /// Copy the entire progress tree into the given `out` vector, so that
     /// it can be traversed from beginning to end in order of hierarchy.
-    pub fn sorted_snapshot(&self, out: &mut Vec<(Key, Value)>) {
+    pub fn sorted_snapshot(&self, out: &mut Vec<(Key, Task)>) {
         out.clear();
         out.extend(self.inner.lock().tree.iter().map(|r| (*r.key(), r.value().clone())));
         out.sort_by_key(|t| t.0);

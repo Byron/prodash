@@ -116,22 +116,22 @@ mod message_buffer {
 
 mod key_adjacency {
     use crate::{
-        progress::Value,
+        progress::Task,
         tree::key::SiblingLocation::*,
         tree::{key::Adjacency, Key},
     };
 
-    fn to_kv(keys: &[Key]) -> Vec<(Key, Value)> {
-        let mut v: Vec<_> = keys.iter().map(|k| (k.to_owned(), Value::default())).collect();
+    fn to_kv(keys: &[Key]) -> Vec<(Key, Task)> {
+        let mut v: Vec<_> = keys.iter().map(|k| (k.to_owned(), Task::default())).collect();
         v.sort_by_key(|v| v.0);
         v
     }
 
-    fn root_with_two_children() -> Vec<(Key, Value)> {
+    fn root_with_two_children() -> Vec<(Key, Task)> {
         let r = Key::default();
         to_kv(&[r.add_child(1), r.add_child(2)][..])
     }
-    fn root_with_two_children_with_two_children() -> Vec<(Key, Value)> {
+    fn root_with_two_children_with_two_children() -> Vec<(Key, Task)> {
         let r = Key::default();
         let p1 = r.add_child(1);
         let p2 = r.add_child(2);
@@ -147,14 +147,14 @@ mod key_adjacency {
         )
     }
 
-    fn root_with_three_levels() -> Vec<(Key, Value)> {
+    fn root_with_three_levels() -> Vec<(Key, Task)> {
         let r = Key::default();
         let p1 = r.add_child(1);
         let p2 = p1.add_child(2);
         to_kv(&[p1, p2, p2.add_child(1)][..])
     }
 
-    fn root_with_three_levels_two_siblings_on_level_2() -> Vec<(Key, Value)> {
+    fn root_with_three_levels_two_siblings_on_level_2() -> Vec<(Key, Task)> {
         let r = Key::default();
         let p1 = r.add_child(1);
         let p11 = p1.add_child(1);
@@ -268,7 +268,7 @@ mod key_adjacency {
         let mut entries = root_with_two_children();
         entries.insert(
             1,
-            (Key::default().add_child(0).add_child(0).add_child(1), Value::default()),
+            (Key::default().add_child(0).add_child(0).add_child(1), Task::default()),
         );
         entries.sort_by_key(|v| v.0);
         assert_eq!(

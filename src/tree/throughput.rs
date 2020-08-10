@@ -1,5 +1,5 @@
 use crate::{
-    progress::{self, Progress},
+    progress::{self, Value},
     tree, unit,
 };
 use std::time::{Duration, SystemTime};
@@ -71,11 +71,7 @@ impl Throughput {
         self.updated_at = Some(now);
     }
 
-    pub fn update_and_get(
-        &mut self,
-        key: &tree::Key,
-        progress: Option<&Progress>,
-    ) -> Option<unit::display::Throughput> {
+    pub fn update_and_get(&mut self, key: &tree::Key, progress: Option<&Value>) -> Option<unit::display::Throughput> {
         progress.and_then(|progress| {
             self.elapsed
                 .and_then(|elapsed| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
@@ -89,7 +85,7 @@ impl Throughput {
                 })
         })
     }
-    pub fn reconcile(&mut self, sorted_values: &[(tree::Key, progress::Value)]) {
+    pub fn reconcile(&mut self, sorted_values: &[(tree::Key, progress::Task)]) {
         self.sorted_by_key
             .retain(|(key, _)| sorted_values.binary_search_by_key(key, |e| e.0).is_ok());
     }

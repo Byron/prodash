@@ -1,6 +1,6 @@
 use crate::{
     messages::{MessageLevel, MessageRingBuffer},
-    progress::{Progress, State, Step, Value},
+    progress::{State, Step, Task, Value},
     tree::Key,
     unit::Unit,
 };
@@ -29,7 +29,7 @@ use std::{ops::Deref, sync::Arc, time::SystemTime};
 pub struct Item {
     pub(crate) key: Key,
     pub(crate) highest_child_id: Id,
-    pub(crate) tree: Arc<DashMap<Key, Value>>,
+    pub(crate) tree: Arc<DashMap<Key, Task>>,
     pub(crate) messages: Arc<Mutex<MessageRingBuffer>>,
 }
 
@@ -57,7 +57,7 @@ impl Item {
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
     pub fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
-            r.value_mut().progress = Some(Progress {
+            r.value_mut().progress = Some(Value {
                 done_at: max,
                 unit,
                 ..Default::default()
@@ -65,7 +65,7 @@ impl Item {
         };
     }
 
-    fn alter_progress(&mut self, f: impl FnMut(&mut Progress)) {
+    fn alter_progress(&mut self, f: impl FnMut(&mut Value)) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
             // NOTE: since we wrap around, if there are more tasks than we can have IDs for,
             // and if all these tasks are still alive, two progress trees may see the same ID
@@ -151,7 +151,7 @@ impl Item {
         let child_key = self.key.add_child(self.highest_child_id);
         self.tree.insert(
             child_key,
-            Value {
+            Task {
                 name: name.into(),
                 progress: None,
             },

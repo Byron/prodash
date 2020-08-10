@@ -1,5 +1,5 @@
 use crate::{
-    progress::{self, Progress, Step, Value},
+    progress::{self, Step, Task, Value},
     render::tui::{
         draw::State,
         utils::{
@@ -26,7 +26,7 @@ use tui_react::fill_background;
 
 const MIN_TREE_WIDTH: u16 = 20;
 
-pub fn pane(entries: &[(Key, progress::Value)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
+pub fn pane(entries: &[(Key, progress::Task)], mut bound: Rect, buf: &mut Buffer, state: &mut State) {
     state.task_offset = sanitize_offset(state.task_offset, entries.len(), bound.height);
     let needs_overflow_line =
         if entries.len() > bound.height as usize || (state.task_offset).min(entries.len() as u16) > 0 {
@@ -93,7 +93,7 @@ pub fn pane(entries: &[(Key, progress::Value)], mut bound: Rect, buf: &mut Buffe
 }
 
 pub(crate) fn headline(
-    entries: &[(Key, Value)],
+    entries: &[(Key, Task)],
     interrupt_mode: InterruptDrawInfo,
     duration_per_frame: Duration,
     buf: &mut Buffer,
@@ -101,7 +101,7 @@ pub(crate) fn headline(
 ) {
     let (num_running_tasks, num_blocked_tasks, num_groups) = entries.iter().fold(
         (0, 0, 0),
-        |(mut running, mut blocked, mut groups), (_key, Value { progress, .. })| {
+        |(mut running, mut blocked, mut groups), (_key, Task { progress, .. })| {
             match progress.as_ref().map(|p| p.state) {
                 Some(progress::State::Running) => running += 1,
                 Some(progress::State::Blocked(_, _)) | Some(progress::State::Halted(_, _)) => blocked += 1,
@@ -141,7 +141,7 @@ pub(crate) fn headline(
     draw_text_with_ellipsis_nowrap(rect::snap_to_right(bound, block_width(&text) + 1), buf, text, bold);
 }
 
-struct ProgressFormat<'a>(&'a Option<Progress>, u16, Option<unit::display::Throughput>);
+struct ProgressFormat<'a>(&'a Option<Value>, u16, Option<unit::display::Throughput>);
 
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -158,7 +158,7 @@ impl<'a> fmt::Display for ProgressFormat<'a> {
     }
 }
 
-fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
+fn has_child(entries: &[(Key, Task)], index: usize) -> bool {
     entries
         .get(index + 1)
         .and_then(|(other_key, other_val)| {
@@ -170,7 +170,7 @@ fn has_child(entries: &[(Key, Value)], index: usize) -> bool {
 }
 
 pub fn draw_progress(
-    entries: &[(Key, Value)],
+    entries: &[(Key, Task)],
     buf: &mut Buffer,
     bound: Rect,
     offset: u16,
@@ -181,7 +181,7 @@ pub fn draw_progress(
         .iter()
         .skip(offset as usize)
         .take(bound.height as usize)
-        .map(|(_, Value { progress, .. })| progress)
+        .map(|(_, Task { progress, .. })| progress)
         .fold(0, |state, progress| match progress {
             progress @ Some(_) => {
                 use std::io::Write;
@@ -192,7 +192,7 @@ pub fn draw_progress(
             None => state,
         });
 
-    for (line, (entry_index, (key, Value { progress, name: title }))) in entries
+    for (line, (entry_index, (key, Task { progress, name: title }))) in entries
         .iter()
         .enumerate()
         .skip(offset as usize)
@@ -352,7 +352,7 @@ fn draw_progress_bar_fn(
     (fractional_progress_rect, Style::default().bg(color).fg(Color::Black))
 }
 
-pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
+pub fn draw_tree(entries: &[(Key, Task)], buf: &mut Buffer, bound: Rect, offset: u16) -> u16 {
     let mut max_prefix_len = 0;
     for (line, (entry_index, entry)) in entries
         .iter()
@@ -377,7 +377,7 @@ pub fn draw_tree(entries: &[(Key, Value)], buf: &mut Buffer, bound: Rect, offset
     max_prefix_len
 }
 
-fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
+fn level_prefix(entries: &[(Key, Task)], entry_index: usize) -> String {
     let adj = Key::adjacency(entries, entry_index);
     let key = entries[entry_index].0;
     let key_level = key.level();
@@ -431,7 +431,7 @@ fn level_prefix(entries: &[(Key, Value)], entry_index: usize) -> String {
 }
 
 pub fn draw_overflow(
-    entries: &[(Key, Value)],
+    entries: &[(Key, Task)],
     buf: &mut Buffer,
     bound: Rect,
     label_offset: u16,
