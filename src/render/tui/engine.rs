@@ -1,4 +1,4 @@
-use crate::{render::tui::draw, render::tui::ticker, tree::Root, Throughput};
+use crate::{render::tui::draw, render::tui::ticker, Root, Throughput};
 
 use futures_util::StreamExt;
 use std::{
@@ -129,7 +129,7 @@ pub enum Event {
 /// Failure may occour if there is no terminal to draw into.
 pub fn render_with_input(
     out: impl std::io::Write,
-    progress: Root,
+    progress: impl Root,
     options: Options,
     events: impl futures_core::Stream<Item = Event> + Send,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
@@ -242,7 +242,7 @@ pub fn render_with_input(
 /// An easy-to-use version of `render_with_input(…)` that does not allow state manipulation via an event stream.
 pub fn render(
     out: impl std::io::Write,
-    progress: Root,
+    progress: impl Root,
     config: Options,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
     render_with_input(out, progress, config, futures_lite::stream::pending())
