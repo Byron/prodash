@@ -1,4 +1,4 @@
-use crate::{progress::Value, tree::item};
+use crate::{tree::item, tree::progress::Value};
 use std::ops::{Index, IndexMut};
 
 // NOTE: This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level

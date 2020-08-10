@@ -14,5 +14,9 @@ mod throughput;
 pub use throughput::Throughput;
 
 pub mod key;
+pub mod progress;
+#[doc(inline)]
+pub use progress::Progress;
+
 #[doc(inline)]
 pub use key::{Key, Level};

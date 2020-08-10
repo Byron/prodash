@@ -116,8 +116,8 @@ mod message_buffer {
 
 mod key_adjacency {
     use crate::{
-        progress::Value,
         tree::key::SiblingLocation::*,
+        tree::progress::Value,
         tree::{key::Adjacency, Key},
     };
 

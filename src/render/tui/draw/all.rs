@@ -1,12 +1,10 @@
 use crate::{
-    progress::Value,
     render::tui::{
         draw,
         utils::{block_width, rect},
         InterruptDrawInfo, Line,
     },
-    tree,
-    tree::{Key, Message},
+    tree::{self, progress::Value, Key, Message},
 };
 use std::time::Duration;
 use tui::{

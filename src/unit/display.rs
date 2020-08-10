@@ -1,5 +1,5 @@
 use crate::{
-    progress::Step,
+    tree::progress::Step,
     unit::{DisplayValue, Unit},
 };
 use std::fmt::{self, Write};

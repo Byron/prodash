@@ -1,4 +1,7 @@
-use crate::{progress, tree, unit, Progress};
+use crate::{
+    tree::{self, progress, Progress},
+    unit,
+};
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,

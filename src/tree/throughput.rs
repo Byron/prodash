@@ -1,4 +1,4 @@
-use crate::{progress, tree, unit, Progress};
+use crate::{tree, tree::progress, tree::Progress, unit};
 use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);

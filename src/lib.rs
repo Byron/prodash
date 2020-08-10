@@ -51,8 +51,6 @@ pub mod unit;
 pub use unit::Unit;
 
 pub mod progress;
-#[doc(inline)]
-pub use progress::Progress;
 
 #[cfg(not(feature = "log-renderer"))]
 mod log {

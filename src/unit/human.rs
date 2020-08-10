@@ -1,4 +1,4 @@
-use crate::{progress::Step, unit::DisplayValue};
+use crate::{tree::progress::Step, unit::DisplayValue};
 pub use human_format::{Formatter, Scales};
 use std::fmt;
 

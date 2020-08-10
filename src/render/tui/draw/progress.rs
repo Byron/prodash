@@ -1,5 +1,4 @@
 use crate::{
-    progress::{self, Step, Value},
     render::tui::{
         draw::State,
         utils::{
@@ -9,8 +8,12 @@ use crate::{
         InterruptDrawInfo,
     },
     time::format_now_datetime_seconds,
-    tree::{self, Key},
-    unit, Progress,
+    tree::{
+        self,
+        progress::{self, Step, Value},
+        Key, Progress,
+    },
+    unit,
 };
 use humantime::format_duration;
 use std::{

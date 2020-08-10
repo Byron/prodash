@@ -1,5 +1,5 @@
 use crate::{
-    progress::{Progress, State, Step, Value},
+    tree::progress::{Progress, State, Step, Value},
     tree::{messages::MessageRingBuffer, Key, MessageLevel},
     unit::Unit,
 };
