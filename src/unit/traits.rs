@@ -1,4 +1,4 @@
-use crate::{tree::progress::Step, unit::display};
+use crate::{progress::Step, unit::display};
 use std::fmt;
 
 pub trait DisplayValue {

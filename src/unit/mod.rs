@@ -1,4 +1,4 @@
-use crate::tree::progress::Step;
+use crate::progress::Step;
 use std::{fmt, ops::Deref, sync::Arc};
 
 #[cfg(feature = "unit-bytes")]

@@ -1,5 +1,6 @@
 use crate::{
-    tree::{self, progress, Progress},
+    progress::{self, Progress},
+    tree::{self},
     unit,
 };
 use crosstermion::{

@@ -1,4 +1,4 @@
-use crate::{tree::progress::Step, unit::DisplayValue};
+use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
 
 #[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]
