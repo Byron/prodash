@@ -93,7 +93,7 @@ impl IndexMut<Level> for Adjacency {
 }
 
 impl Key {
-    pub(crate) fn add_child(self, child_id: item::Id) -> Key {
+    pub fn add_child(self, child_id: item::Id) -> Key {
         match self {
             Key(None, None, None, None) => Key(Some(child_id), None, None, None),
             Key(a, None, None, None) => Key(a, Some(child_id), None, None),

@@ -67,13 +67,6 @@ impl Root {
         self.inner.lock().messages.lock().copy_new(out, prev)
     }
 
-    /// Return the amount of messages currently stored as well as the maximum amount we can ever store (i.e. capacity)
-    pub fn message_buffer_usage(&self) -> (usize, usize) {
-        let inner = self.inner.lock();
-        let guard = inner.messages.lock();
-        (guard.buf.len(), guard.buf.capacity())
-    }
-
     /// Duplicate all content and return it.
     ///
     /// This is an expensive operation, whereas `clone()` is not as it is shallow.
