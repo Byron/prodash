@@ -1,6 +1,6 @@
 use criterion::*;
 
-use prodash::{tree::MessageLevel, Tree, TreeOptions};
+use prodash::{messages::MessageLevel, Tree, TreeOptions};
 
 fn usage(c: &mut Criterion) {
     fn small_tree() -> Tree {
