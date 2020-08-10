@@ -1,4 +1,4 @@
-use crate::{messages::MessageLevel, Unit};
+use crate::{messages::MessageLevel, progress, Unit};
 use std::time::Instant;
 
 pub trait Progress {
@@ -78,18 +78,19 @@ pub trait Progress {
 
 use crate::messages::{Message, MessageCopyState};
 
-trait Root {
+/// The top level of a progress task hiearchy, with `progress::Task`s identified with `progress::Key`s
+pub trait Root {
     /// Returns the maximum amount of messages we can keep before overwriting older ones.
     fn messages_capacity(&self) -> usize;
 
     /// Returns the current amount of tasks underneath the root, transitively.
     /// **Note** that this is at most a guess as tasks can be added and removed in parallel.
     fn num_tasks(&self) -> usize;
-    //
-    // /// Copy the entire progress tree into the given `out` vector, so that
-    // /// it can be traversed from beginning to end in order of hierarchy.
-    // /// The `out` vec will be cleared automatically.
-    // fn sorted_snapshot(&self, out: &mut Vec<(progress::Key, progress::Task)>);
+
+    /// Copy the entire progress tree into the given `out` vector, so that
+    /// it can be traversed from beginning to end in order of hierarchy.
+    /// The `out` vec will be cleared automatically.
+    fn sorted_snapshot(&self, out: &mut Vec<(progress::Key, progress::Task)>);
 
     /// Copy all messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.

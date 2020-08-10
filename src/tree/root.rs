@@ -125,3 +125,25 @@ impl From<Options> for Root {
         }
     }
 }
+
+impl crate::Root for Root {
+    fn messages_capacity(&self) -> usize {
+        self.messages_capacity()
+    }
+
+    fn num_tasks(&self) -> usize {
+        self.num_tasks()
+    }
+
+    fn sorted_snapshot(&self, out: &mut Vec<(Key, Task)>) {
+        self.sorted_snapshot(out)
+    }
+
+    fn copy_messages(&self, out: &mut Vec<Message>) {
+        self.copy_messages(out)
+    }
+
+    fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
+        self.copy_new_messages(out, prev)
+    }
+}

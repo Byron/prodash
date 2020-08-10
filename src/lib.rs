@@ -54,11 +54,10 @@ pub mod messages;
 pub mod progress;
 
 mod traits;
+pub use traits::{Progress, Root};
 
 mod throughput;
 pub use crate::throughput::Throughput;
-
-pub use traits::Progress;
 
 #[cfg(not(feature = "log-renderer"))]
 mod log {
