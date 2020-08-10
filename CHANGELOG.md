@@ -21,6 +21,7 @@
   * `tree::Value` → `progress::Value`
   * `tree::Progress` → `Progress`
 * Remove `Hash` implementation for all public types except for `tree::Key`
+* Move `tui` and `line` renderers into the `render` module
 
 
 ## v7.1.1

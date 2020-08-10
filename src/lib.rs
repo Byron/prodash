@@ -36,11 +36,7 @@ Run it with `cargo run --example dashboard` and see what else it can do by check
 pub mod tree;
 pub use tree::{Options as TreeOptions, Root as Tree};
 
-#[cfg(feature = "tui-renderer")]
-pub mod tui;
-
-#[cfg(feature = "line-renderer")]
-pub mod line;
+pub mod render;
 
 #[cfg(feature = "log-renderer")]
 pub use log::info;

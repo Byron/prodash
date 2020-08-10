@@ -1,4 +1,4 @@
-use crate::{tree, tree::Root, tui::draw, tui::ticker};
+use crate::{render::tui::draw, render::tui::ticker, tree, tree::Root};
 
 use futures_util::StreamExt;
 use std::{

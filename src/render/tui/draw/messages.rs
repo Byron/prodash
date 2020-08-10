@@ -1,7 +1,7 @@
 use crate::{
+    render::tui::utils::{block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE},
     time::{format_time_for_messages, DATE_TIME_HMS},
     tree::{Message, MessageLevel},
-    tui::utils::{block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE},
 };
 use std::time::SystemTime;
 use tui::{

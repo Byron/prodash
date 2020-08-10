@@ -1,4 +1,4 @@
-use crate::{line::draw, tree};
+use crate::{render::line::draw, tree};
 use std::{
     io,
     ops::RangeInclusive,

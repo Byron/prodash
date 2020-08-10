@@ -1,8 +1,6 @@
 use crate::{
     progress::{self, Step, Value},
-    time::format_now_datetime_seconds,
-    tree::{self, Key},
-    tui::{
+    render::tui::{
         draw::State,
         utils::{
             block_width, draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, rect, sanitize_offset,
@@ -10,6 +8,8 @@ use crate::{
         },
         InterruptDrawInfo,
     },
+    time::format_now_datetime_seconds,
+    tree::{self, Key},
     unit, Progress,
 };
 use humantime::format_duration;

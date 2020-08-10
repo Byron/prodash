@@ -1,8 +1,9 @@
 use futures_util::{future::FutureExt, stream::StreamExt};
 use prodash::{
-    line, tui,
-    tui::Line,
-    tui::{ticker, Event, Interrupt},
+    render::{
+        line,
+        tui::{self, ticker, Event, Interrupt, Line},
+    },
     Tree,
 };
 use rand::{seq::SliceRandom, thread_rng, Rng};

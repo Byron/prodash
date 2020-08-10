@@ -1,4 +1,4 @@
-use crate::tui::{
+use crate::render::tui::{
     utils::{block_width, draw_text_with_ellipsis_nowrap, rect},
     Line,
 };
