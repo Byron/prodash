@@ -12,7 +12,7 @@ pub use self::log::Log;
 #[doc(inline)]
 pub use key::Key;
 
-pub use utils::{Discard, DoOrDiscard, Either};
+pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
 
 /// The amount of steps a progress can make
 pub type Step = usize;

@@ -160,3 +160,55 @@ where
         self.0.message(level, message)
     }
 }
+
+use std::time::Instant;
+
+pub struct ThroughputOnDrop<T: Progress>(T, Instant);
+
+impl<T: Progress> ThroughputOnDrop<T> {
+    pub fn new(inner: T) -> Self {
+        ThroughputOnDrop(inner, Instant::now())
+    }
+}
+
+impl<T: Progress> Progress for ThroughputOnDrop<T> {
+    type SubProgress = T::SubProgress;
+
+    fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
+        self.0.add_child(name)
+    }
+
+    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
+        self.0.init(max, unit)
+    }
+
+    fn set(&mut self, step: usize) {
+        self.0.set(step)
+    }
+
+    fn unit(&self) -> Option<Unit> {
+        self.0.unit()
+    }
+
+    fn max(&self) -> Option<usize> {
+        self.0.max()
+    }
+
+    fn step(&self) -> usize {
+        self.0.step()
+    }
+
+    fn inc_by(&mut self, step: usize) {
+        self.0.inc_by(step)
+    }
+
+    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+        self.0.message(level, message)
+    }
+}
+
+impl<T: Progress> Drop for ThroughputOnDrop<T> {
+    fn drop(&mut self) {
+        self.0.show_throughput(self.1)
+    }
+}
