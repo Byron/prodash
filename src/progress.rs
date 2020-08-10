@@ -67,7 +67,7 @@ impl Progress for Discard {
         Discard
     }
 
-    fn init(&mut self, _max: Option<usize>, _unit: Option<&'static str>) {}
+    fn init(&mut self, _max: Option<usize>, _unit: Option<Unit>) {}
 
     fn set(&mut self, _step: usize) {}
 
@@ -95,7 +95,7 @@ where
         }
     }
 
-    fn init(&mut self, max: Option<usize>, unit: Option<&'static str>) {
+    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         match self {
             Either::Left(l) => l.init(max, unit),
             Either::Right(r) => r.init(max, unit),
@@ -156,7 +156,7 @@ where
         DoOrDiscard(self.0.add_child(name))
     }
 
-    fn init(&mut self, max: Option<usize>, unit: Option<&'static str>) {
+    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         self.0.init(max, unit)
     }
 

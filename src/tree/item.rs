@@ -220,8 +220,8 @@ impl crate::Progress for Item {
         Item::add_child(self, name)
     }
 
-    fn init(&mut self, max: Option<usize>, unit: Option<&'static str>) {
-        Item::init(self, max, unit.map(|u| u.into()))
+    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
+        Item::init(self, max, unit)
     }
 
     fn set(&mut self, step: usize) {

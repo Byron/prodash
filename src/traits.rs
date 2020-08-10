@@ -1,4 +1,4 @@
-use crate::messages::MessageLevel;
+use crate::{messages::MessageLevel, Unit};
 use std::time::Instant;
 
 pub trait Progress {
@@ -16,13 +16,13 @@ pub trait Progress {
     /// If `max` is `None`, the progress is unbounded. Use this if the amount of work cannot accurately
     /// be determined in advance.
     ///
-    /// If `unit` is `Some(…)`, it is used for display purposes only. It should be using the plural.
+    /// If `unit` is `Some(…)`, it is used for display purposes only. See `prodash::Unit` for more information.
     ///
     /// If this method is never called, this `Progress` instance will serve as organizational unit, useful to add more structure
     /// to the progress tree (e.g. a headline).
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    fn init(&mut self, max: Option<usize>, unit: Option<&'static str>);
+    fn init(&mut self, max: Option<usize>, unit: Option<Unit>);
 
     /// Set the current progress to the given `step`. The cost of this call is negligible,
     /// making manual throttling *not* necessary.
