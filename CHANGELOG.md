@@ -1,3 +1,5 @@
+## v8.0.1 - Add missing trailing paranthesis in throughput display
+
 ## v8.0.0
 
 ### New Features

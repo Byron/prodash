@@ -110,7 +110,7 @@ pub trait Progress {
         buf.write_fmt(format_args!(" in {:.02}s (", elapsed)).ok();
         unit.display_current_value(&mut buf, steps_per_second, None).ok();
         push_unit(&mut buf);
-        buf.push_str("/s");
+        buf.push_str("/s)");
 
         self.info(buf);
     }
