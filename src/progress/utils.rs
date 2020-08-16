@@ -19,6 +19,12 @@ impl Progress for Discard {
 
     fn inc_by(&mut self, _step: usize) {}
 
+    fn set_name(&mut self, _name: impl Into<String>) {}
+
+    fn name(&self) -> Option<String> {
+        None
+    }
+
     fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
 }
 
@@ -80,6 +86,20 @@ where
         match self {
             Either::Left(l) => l.inc_by(step),
             Either::Right(r) => r.inc_by(step),
+        }
+    }
+
+    fn set_name(&mut self, name: impl Into<String>) {
+        match self {
+            Either::Left(l) => l.set_name(name),
+            Either::Right(r) => r.set_name(name),
+        }
+    }
+
+    fn name(&self) -> Option<String> {
+        match self {
+            Either::Left(l) => l.name(),
+            Either::Right(r) => r.name(),
         }
     }
 
@@ -156,6 +176,14 @@ where
         self.0.inc_by(step)
     }
 
+    fn set_name(&mut self, name: impl Into<String>) {
+        self.0.set_name(name);
+    }
+
+    fn name(&self) -> Option<String> {
+        self.0.name()
+    }
+
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
     }
@@ -200,6 +228,14 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
 
     fn inc_by(&mut self, step: usize) {
         self.0.inc_by(step)
+    }
+
+    fn set_name(&mut self, name: impl Into<String>) {
+        self.0.set_name(name)
+    }
+
+    fn name(&self) -> Option<String> {
+        self.0.name()
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {

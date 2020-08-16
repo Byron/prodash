@@ -53,6 +53,14 @@ pub trait Progress {
         self.inc_by(1)
     }
 
+    /// Set the name of the instance, altering the value given when crating it with `add_child(…)`
+    /// The progress is allowed to discard it.
+    fn set_name(&mut self, name: impl Into<String>);
+
+    /// Get the name of the instance as given when creating it with `add_child(…)`
+    /// The progress is allowed to not be named, thus there is no guarantee that a previously set names 'sticks'.
+    fn name(&self) -> Option<String>;
+
     /// Create a `message` of the given `level` and store it with the progress tree.
     ///
     /// Use this to provide additional,human-readable information about the progress

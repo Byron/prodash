@@ -1,3 +1,9 @@
+## v9.0.0
+
+### Breaking
+
+* add `set_name(…)` and `name()` to `Progress` trait.
+
 ## v8.0.1 - Add missing trailing paranthesis in throughput display
 
 ## v8.0.0

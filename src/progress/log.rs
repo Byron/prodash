@@ -12,6 +12,7 @@ pub struct Log {
 }
 
 const EMIT_LOG_EVERY_S: f32 = 0.5;
+const SEP: &str = "::";
 
 impl Log {
     pub fn new(name: impl Into<String>, max_level: Option<usize>) -> Self {
@@ -32,7 +33,7 @@ impl Progress for Log {
 
     fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
         Log {
-            name: format!("{}::{}", self.name, Into::<String>::into(name)),
+            name: format!("{}{}{}", self.name, SEP, Into::<String>::into(name)),
             current_level: self.current_level + 1,
             max_level: self.max_level,
             step: 0,
@@ -85,6 +86,20 @@ impl Progress for Log {
 
     fn inc_by(&mut self, step: usize) {
         self.set(self.step + step)
+    }
+
+    fn set_name(&mut self, name: impl Into<String>) {
+        let name = name.into();
+        self.name = self
+            .name
+            .split("::")
+            .next()
+            .map(|parent| format!("{}{}{}", parent.to_owned(), SEP, name))
+            .unwrap_or(name);
+    }
+
+    fn name(&self) -> Option<String> {
+        self.name.split(SEP).skip(1).next().map(ToOwned::to_owned)
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {

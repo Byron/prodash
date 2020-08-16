@@ -259,6 +259,14 @@ impl crate::Progress for Item {
         self.inc_by(step)
     }
 
+    fn set_name(&mut self, name: impl Into<String>) {
+        Item::set_name(self, name)
+    }
+
+    fn name(&self) -> Option<String> {
+        Item::name(self)
+    }
+
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         Item::message(self, level, message)
     }
