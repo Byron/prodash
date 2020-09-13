@@ -1,3 +1,7 @@
+## v10.0.1
+
+* upgrade dependencies to latest versions
+
 ## v10.0.0
 
 ### Breaking

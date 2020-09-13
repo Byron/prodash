@@ -28,7 +28,9 @@ impl<T> Task<T> {
         static EXECUTOR: Lazy<Executor> = Lazy::new(|| {
             thread::spawn(|| {
                 let (p, u) = parking::pair();
-                let ticker = EXECUTOR.ticker(move || drop(u.unpark()));
+                let ticker = EXECUTOR.ticker(move || {
+                    u.unpark();
+                });
 
                 loop {
                     if let Ok(false) = catch_unwind(|| ticker.tick()) {
