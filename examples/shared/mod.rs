@@ -56,7 +56,7 @@ pub fn launch_ambient_gui(
                 },
             );
             handle.disconnect();
-            blocking::unblock!(handle.wait());
+            blocking::unblock(move || handle.wait()).await;
         }
         .boxed(),
         "tui" => tui::render_with_input(

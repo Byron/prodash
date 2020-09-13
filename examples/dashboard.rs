@@ -26,9 +26,9 @@ async fn work_forever(mut args: args::Options) -> Result {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
         smol::Task::spawn(async move {
-            async_io::Timer::new(Duration::from_millis(500)).await;
+            async_io::Timer::after(Duration::from_millis(500)).await;
             sp.fail("engine failure");
-            async_io::Timer::new(Duration::from_millis(750)).await;
+            async_io::Timer::after(Duration::from_millis(750)).await;
             sp.done("warmup complete");
         })
         .detach();
@@ -139,7 +139,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
         if thread_rng().gen_bool(if changing_names { 0.5 } else { 0.01 }) {
             progress.set_name(WORK_NAMES.choose(&mut thread_rng()).unwrap().to_string());
         }
-        async_io::Timer::new(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
+        async_io::Timer::after(Duration::from_millis((delay_ms as f32 / speed) as u64)).await;
     }
     if thread_rng().gen_bool(0.95) {
         progress.done(*DONE_MESSAGES.choose(&mut thread_rng()).unwrap());
@@ -165,7 +165,7 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_n
             ));
             handles.push(handle);
 
-            async_io::Timer::new(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
+            async_io::Timer::after(Duration::from_millis((SPAWN_DELAY_MS as f32 / speed) as u64)).await;
         }
         if level + 1 != max_level {
             let tmp = level_progress.add_child(format!("Level {}", level + 1));
