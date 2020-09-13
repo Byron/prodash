@@ -1,3 +1,11 @@
+## v10.0.0
+
+### Breaking
+
+* Enforce `Send + 'static` bounds for `Progress` trait.
+   * This way it's clear that Progress is supposed to work in a threaded environment, which is the environment they are used in most often.
+   * On the call site, this avoids having to specify these trait bounds explicitly.
+
 ## v9.0.0
 
 ### Breaking

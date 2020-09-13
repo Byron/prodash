@@ -1,7 +1,7 @@
 use crate::{messages::MessageLevel, progress, Unit};
 use std::time::Instant;
 
-pub trait Progress {
+pub trait Progress: Send + 'static {
     type SubProgress: Progress;
 
     /// Adds a new child, whose parent is this instance, with the given name.

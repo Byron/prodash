@@ -2,7 +2,7 @@
 //! Copied from https://github.com/stjepang/smol/blob/b3005d942040f68f30ad84b6f8f1621ebaf9d753/src/lib.rs#L149
 
 #![forbid(unsafe_code)]
-#![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+#![warn(missing_docs, missing_debug_implementations)]
 
 use std::{
     future::Future,
