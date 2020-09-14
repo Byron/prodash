@@ -1,3 +1,7 @@
+#### v0.3.2
+
+* Remove `futures-util` dependency in favor of `futures-lite`
+
 #### v0.2.0
 
 * remove native support for `flume` and `crossbeam-channel` for key input in favor of `std::sync::mpsc::Receiver`s :).

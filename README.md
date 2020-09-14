@@ -78,8 +78,6 @@ This crate comes with various cargo features to tailor it to your needs.
 
 In order for the build-time improvements to become effective, we need…
 
-* **crosstermion**
-  * `StreamExt::filter_map(…)`
 * **prodash::tui::engine**
   * `stream::select_all(…)`
   * `StreamExt::map(…)`

@@ -124,15 +124,13 @@ mod _impl {
     /// Requires the `input-async` feature.
     #[cfg(feature = "input-async-crossterm")]
     pub fn key_input_stream() -> impl futures_core::stream::Stream<Item = super::Key> {
-        use futures_util::StreamExt;
+        use futures_lite::StreamExt;
         use std::convert::TryFrom;
         crossterm::event::EventStream::new()
-            .filter_map(|r| futures_lite::future::ready(r.ok()))
-            .filter_map(|e| {
-                futures_lite::future::ready(match e {
-                    crossterm::event::Event::Key(key) => super::Key::try_from(key).ok(),
-                    _ => None,
-                })
+            .filter_map(|r| r.ok())
+            .filter_map(|e| match e {
+                crossterm::event::Event::Key(key) => super::Key::try_from(key).ok(),
+                _ => None,
             })
     }
 }
@@ -153,7 +151,7 @@ mod _impl {
             for key in io::stdin().keys() {
                 let key: Result<super::Key, _> = key?.try_into();
                 if let Ok(key) = key {
-                    if futures_executor::block_on(key_send.send(key)).is_err() {
+                    if futures_lite::future::block_on(key_send.send(key)).is_err() {
                         break;
                     }
                 }
