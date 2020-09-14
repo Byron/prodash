@@ -1,6 +1,6 @@
 use crate::{render::tui::draw, render::tui::ticker, Root, Throughput};
 
-use futures_util::StreamExt;
+use futures_lite::StreamExt;
 use std::{
     io::{self, Write},
     time::Duration,
