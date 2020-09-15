@@ -131,7 +131,7 @@ pub fn render_with_input(
     out: impl std::io::Write,
     progress: impl Root,
     options: Options,
-    events: impl futures_core::Stream<Item = Event> + Send,
+    events: impl futures_core::Stream<Item = Event> + Send + Unpin,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
     let Options {
         title,
@@ -159,11 +159,10 @@ pub fn render_with_input(
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
         let mut entries = Vec::with_capacity(progress.num_tasks());
         let mut messages = Vec::with_capacity(progress.messages_capacity());
-        let mut events = futures_util::stream::select_all(vec![
-            ticker(duration_per_frame).map(|_| Event::Tick).boxed(),
-            key_receive.map(Event::Input).boxed(),
-            events.boxed(),
-        ]);
+        let mut events = ticker(duration_per_frame)
+            .map(|_| Event::Tick)
+            .or(key_receive.map(Event::Input))
+            .or(events);
 
         let mut tick = 0usize;
         let store_task_size_every = recompute_column_width_every_nth_frame.unwrap_or(1).max(1);
