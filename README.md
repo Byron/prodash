@@ -74,17 +74,6 @@ This crate comes with various cargo features to tailor it to your needs.
 * a terminal user interface for visualization, with keyboard controls and dynamic re-sizing
 * unicode and multi-width character support
 
-## Transition to futures-lite
-
-In order for the build-time improvements to become effective, we need…
-
-* **prodash -> example -> dashboard**
-  * `stream::select(…)` 
-  * `future::select(…)`
-  * `future::join_all(…)`
-  * `FutureExt::boxed(…)`
-
-
 ## Limitations
 
 * the *line renderer* is inherently limited in the amount of progress it can display without visual artifacts.

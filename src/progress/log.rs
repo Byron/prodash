@@ -99,7 +99,7 @@ impl Progress for Log {
     }
 
     fn name(&self) -> Option<String> {
-        self.name.split(SEP).skip(1).next().map(ToOwned::to_owned)
+        self.name.split(SEP).nth(1).map(ToOwned::to_owned)
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
