@@ -1,3 +1,7 @@
+## v10.0.2
+
+* Remove `futures-util` dependency
+
 ## v10.0.1
 
 * upgrade dependencies to latest versions
