@@ -70,14 +70,14 @@ parking_lot = { version = "0.11.0", optional = true, default-features = false }
 log = { version = "0.4.8", optional = true }
 
 # render-tui
-tui = { version = "0.10.0", optional = true, default-features = false }
-tui-react = { version = "0.10.0", optional = true }
+tui = { version = "0.12.0", optional = true, default-features = false }
+tui-react = { version = "0.12.0", optional = true }
 futures-core = { version = "0.3.4", optional = true, default-features = false }
 futures-lite = { version = "1.5.0", optional = true }
 humantime = { version = "2.0.0", optional = true }
 unicode-segmentation = { version = "1.6.0", optional = true }
 unicode-width = { version = "0.1.7", optional = true }
-crosstermion = { version = "0.3.0", optional = true, default-features = false }
+crosstermion = { version = "0.4.0", optional = true, default-features = false }
 async-io = { version = "1.0.0", optional = true }
 
 # localtime support for render-tui
