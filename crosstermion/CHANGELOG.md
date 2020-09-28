@@ -1,3 +1,7 @@
+#### v0.4.0
+
+* upgrade to TUI 0.12
+
 #### v0.3.2
 
 * Remove `futures-util` dependency in favor of `futures-lite`
