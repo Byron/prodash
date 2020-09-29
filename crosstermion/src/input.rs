@@ -21,6 +21,21 @@ pub enum Key {
     Esc,
 }
 
+#[cfg(any(feature = "crossterm", feature = "termion"))]
+enum Action<T> {
+    Continue,
+    Result(Result<T, std::io::Error>),
+}
+
+#[cfg(any(feature = "crossterm", feature = "termion"))]
+fn continue_on_interrupt<T>(result: Result<T, std::io::Error>) -> Action<T> {
+    match result {
+        Ok(v) => Action::Result(Ok(v)),
+        Err(err) if err.kind() == std::io::ErrorKind::Interrupted => Action::Continue,
+        Err(err) => Action::Result(Err(err)),
+    }
+}
+
 mod convert {
     #[cfg(any(feature = "crossterm", feature = "termion"))]
     use super::Key;
@@ -94,6 +109,8 @@ mod convert {
 
 #[cfg(feature = "crossterm")]
 mod _impl {
+    use crate::input::{continue_on_interrupt, Action};
+
     /// Return a receiver of user input events to avoid blocking the main thread.
     pub fn key_input_channel() -> std::sync::mpsc::Receiver<super::Key> {
         use std::convert::TryInto;
@@ -101,7 +118,12 @@ mod _impl {
         let (key_send, key_receive) = std::sync::mpsc::sync_channel(0);
         std::thread::spawn(move || -> Result<(), std::io::Error> {
             loop {
-                let event = crossterm::event::read().map_err(crate::crossterm_utils::into_io_error)?;
+                let event = match continue_on_interrupt(
+                    crossterm::event::read().map_err(crate::crossterm_utils::into_io_error),
+                ) {
+                    Action::Continue => continue,
+                    Action::Result(res) => res?,
+                };
                 match event {
                     crossterm::event::Event::Key(key) => {
                         let key: Result<super::Key, _> = key.try_into();
@@ -137,6 +159,8 @@ mod _impl {
 
 #[cfg(all(feature = "termion", not(feature = "crossterm")))]
 mod _impl {
+    use crate::input::{continue_on_interrupt, Action};
+
     /// Return a stream of user input events.
     ///
     /// Requires feature `futures-channel`
@@ -149,7 +173,10 @@ mod _impl {
         // This brings blocking key-handling into the async world
         std::thread::spawn(move || -> Result<(), io::Error> {
             for key in io::stdin().keys() {
-                let key: Result<super::Key, _> = key?.try_into();
+                let key: Result<super::Key, _> = match continue_on_interrupt(key) {
+                    Action::Continue => continue,
+                    Action::Result(res) => res?.try_into(),
+                };
                 if let Ok(key) = key {
                     if futures_lite::future::block_on(key_send.send(key)).is_err() {
                         break;
@@ -168,7 +195,10 @@ mod _impl {
         let (key_send, key_receive) = std::sync::mpsc::sync_channel(0);
         std::thread::spawn(move || -> Result<(), io::Error> {
             for key in io::stdin().keys() {
-                let key: Result<super::Key, _> = key?.try_into();
+                let key: Result<super::Key, _> = match continue_on_interrupt(key) {
+                    Action::Continue => continue,
+                    Action::Result(res) => res?.try_into(),
+                };
                 if let Ok(key) = key {
                     if key_send.send(key).is_err() {
                         break;
