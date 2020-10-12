@@ -12,7 +12,7 @@ It's easy to integrate thanks to a pragmatic API, and comes with a terminal user
 
 Be sure to read the documentation at https://docs.rs/prodash, it contains various examples on how to get started.
 
-Or run the demo application like so `cd prodash && cargo run --example dashboard`.
+Or run the demo application like so `cd prodash && cargo run --features render-tui,render-tui-crossterm,render-line,render-line-crossterm,ctrlc --example dashboard`.
 
 ## Feature Toggles
 
