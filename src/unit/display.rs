@@ -96,16 +96,10 @@ pub(crate) enum What {
 
 impl What {
     fn values(&self) -> bool {
-        match self {
-            What::Values | What::ValuesAndUnit => true,
-            _ => false,
-        }
+        matches!(self, What::Values | What::ValuesAndUnit)
     }
     fn unit(&self) -> bool {
-        match self {
-            What::Unit | What::ValuesAndUnit => true,
-            _ => false,
-        }
+        matches!(self, What::Unit | What::ValuesAndUnit)
     }
 }
 
