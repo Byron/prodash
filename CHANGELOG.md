@@ -1,3 +1,7 @@
+## v11.0.0
+
+* Upgrade to TUI v0.13 and crossterm v0.18
+
 ## v10.0.2
 
 * Remove `futures-util` dependency
