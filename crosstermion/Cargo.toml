@@ -1,6 +1,6 @@
 [package]
 name = "crosstermion"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "The unification of crossterm and termion behind a common facade for use with feature flags"
 edition = "2018"
@@ -28,13 +28,13 @@ tui-crossterm-backend = ["tui/crossterm"]
 
 
 [dependencies]
-crossterm = { version = "0.18.0", optional = true, default-features = false }
+crossterm = { version = "0.19.0", optional = true, default-features = false }
 termion = { version = "1.5.5", optional = true, default-features = false }
 futures-channel = { version = "0.3.5", optional = true, default-features = false, features = ["std", "sink"] }
 futures-core = { version = "0.3.5", optional = true, default-features = false }
 futures-lite = { version = "1.4.0", optional = true }
-tui = { version = "0.13.0", optional = true, default-features = false }
-tui-react = { version = "0.13.0", optional = true, default-features = false }
+tui = { version = "0.14.0", optional = true, default-features = false }
+tui-react = { version = "0.14.0", optional = true, default-features = false }
 ansi_term = { version = "0.12.1", optional = true, default-features = false }
 async-channel = { version = "1.1.1", optional = true }
 
