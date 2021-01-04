@@ -103,7 +103,7 @@ pub trait Progress: Send + 'static {
         let mut buf = String::with_capacity(128);
         let unit = unit.as_display_value();
         let push_unit = |buf: &mut String| {
-            buf.push_str(" ");
+            buf.push(' ');
             let len_before_unit = buf.len();
             unit.display_unit(buf, step).ok();
             if buf.len() == len_before_unit {
