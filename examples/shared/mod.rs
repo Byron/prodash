@@ -11,6 +11,8 @@ use std::{ops::RangeInclusive, time::Duration};
 
 pub mod args;
 pub mod smol;
+mod spawn;
+pub use spawn::{spawn, Task};
 
 enum Direction {
     Shrink,
@@ -24,7 +26,7 @@ pub fn launch_ambient_gui(
     renderer: &str,
     args: args::Options,
     throughput: bool,
-) -> std::result::Result<smol::Task<()>, std::io::Error> {
+) -> std::result::Result<Task<()>, std::io::Error> {
     let mut ticks: usize = 0;
     let mut interruptible = true;
     let render_fut = match renderer {
@@ -93,7 +95,7 @@ pub fn launch_ambient_gui(
         .boxed(),
         _ => panic!("Unknown renderer: '{}'", renderer),
     };
-    let handle = smol::Task::spawn(render_fut.map(|_| ()));
+    let handle = spawn(render_fut.map(|_| ()));
     Ok(handle)
 }
 
