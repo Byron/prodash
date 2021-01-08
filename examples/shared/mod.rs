@@ -118,21 +118,24 @@ fn generate_statistics() -> Vec<Line> {
         Line::Title("Statistics".into()),
         Line::Text(format!(
             "lines of unsafe code: {}",
-            thread_rng().gen_range(0usize, 1_000_000)
+            thread_rng().gen_range(0usize..=1_000_000)
         )),
         Line::Text(format!(
             "wasted space in crates: {} Kb",
-            thread_rng().gen_range(100usize, 1_000_000)
+            thread_rng().gen_range(100usize..=1_000_000)
         )),
         Line::Text(format!(
             "unused dependencies: {} crates",
-            thread_rng().gen_range(100usize, 1_000)
+            thread_rng().gen_range(100usize..=1_000)
         )),
         Line::Text(format!(
             "average #dependencies: {} crates",
-            thread_rng().gen_range(0usize, 500)
+            thread_rng().gen_range(0usize..=500)
         )),
-        Line::Text(format!("bloat in code: {} Kb", thread_rng().gen_range(100usize, 5_000))),
+        Line::Text(format!(
+            "bloat in code: {} Kb",
+            thread_rng().gen_range(100usize..=5_000)
+        )),
     ]);
     lines
 }
