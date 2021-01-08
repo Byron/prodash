@@ -3,13 +3,13 @@ mod localtime {
     use std::time::SystemTime;
 
     pub fn format_now_datetime_seconds() -> String {
-        time::OffsetDateTime::try_now_local()
-            .expect("time with local time offset")
+        let t = time::OffsetDateTime::now_utc();
+        t.to_offset(time::UtcOffset::try_local_offset_at(t).unwrap_or(time::UtcOffset::UTC))
             .format("%F %T")
     }
     pub fn format_time_for_messages(time: SystemTime) -> String {
         time::OffsetDateTime::from(time)
-            .to_offset(time::UtcOffset::try_current_local_offset().expect("UTC with local offset to always work"))
+            .to_offset(time::UtcOffset::try_current_local_offset().unwrap_or(time::UtcOffset::UTC))
             .format("%T")
     }
 }
