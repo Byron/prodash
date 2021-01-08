@@ -25,7 +25,7 @@ async fn work_forever(mut args: args::Options) -> Result {
     {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
-        smol::Task::spawn(async move {
+        spawn(async move {
             async_io::Timer::after(Duration::from_millis(500)).await;
             sp.fail("engine failure");
             async_io::Timer::after(Duration::from_millis(750)).await;
@@ -41,7 +41,7 @@ async fn work_forever(mut args: args::Options) -> Result {
     let work_min = args.pooled_work_min;
     let work_max = args.pooled_work_max;
     let mut gui_handle = if renderer == "log" {
-        let never_ending = smol::Task::spawn(futures_lite::future::pending::<()>());
+        let never_ending = spawn(futures_lite::future::pending::<()>());
         Some(never_ending.boxed())
     } else {
         Some(
@@ -65,7 +65,7 @@ async fn work_forever(mut args: args::Options) -> Result {
             work_min
         };
         let pooled_work = (0..num_chunks).map(|_| {
-            smol::Task::spawn(new_chunk_of_work(
+            spawn(new_chunk_of_work(
                 NestingLevel(thread_rng().gen_range(0..=Key::max_level())),
                 progress.clone(),
                 speed,
@@ -158,7 +158,7 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_n
         // one-off ambient tasks
         let num_tasks = max_level as usize * 2;
         for id in 0..num_tasks {
-            let handle = smol::Task::spawn(work_item(
+            let handle = spawn(work_item(
                 level_progress.add_child(format!("{} {}", WORK_NAMES.choose(&mut thread_rng()).unwrap(), id + 1)),
                 speed,
                 changing_names,
@@ -248,4 +248,4 @@ const CHANCE_TO_SHOW_ETA: f64 = 0.5;
 
 mod shared;
 use shared::args;
-use shared::smol;
+use shared::spawn;

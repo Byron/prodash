@@ -10,7 +10,6 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 use std::{ops::RangeInclusive, time::Duration};
 
 pub mod args;
-pub mod smol;
 mod spawn;
 pub use spawn::{spawn, Task};
 

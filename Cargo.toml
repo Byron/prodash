@@ -102,8 +102,6 @@ futures-util = { version = "0.3.4", default-features = false }
 argh = "0.1.3"
 futures = "0.3.5"
 atty = "0.2.14"
-multitask = "0.2.0"
-parking = "2.0.0"
 blocking = "1.0.0"
 once_cell = "1.4.0"
 async-executor = "1.1.0"

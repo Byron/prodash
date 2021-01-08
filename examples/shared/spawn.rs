@@ -5,7 +5,6 @@ use std::thread;
 
 use async_executor::Executor;
 pub use async_executor::Task;
-use async_io::block_on;
 use futures_lite::future;
 use once_cell::sync::Lazy;
 
@@ -14,7 +13,7 @@ pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static
         thread::Builder::new()
             .name("smol-one".into())
             .spawn(|| loop {
-                catch_unwind(|| block_on(GLOBAL.run(future::pending::<()>()))).ok();
+                catch_unwind(|| async_io::block_on(GLOBAL.run(future::pending::<()>()))).ok();
             })
             .expect("cannot spawn executor thread");
 
