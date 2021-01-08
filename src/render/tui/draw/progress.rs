@@ -275,7 +275,7 @@ fn add_block_eta(state: progress::State, progress_text: &mut String) {
         progress::State::Blocked(reason, maybe_eta) | progress::State::Halted(reason, maybe_eta) => {
             progress_text.push_str(" [");
             progress_text.push_str(reason);
-            progress_text.push_str("]");
+            progress_text.push(']');
             if let Some(eta) = maybe_eta {
                 let now = SystemTime::now();
                 if eta > now {
