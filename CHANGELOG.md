@@ -1,3 +1,11 @@
+## v12.0.1
+
+* upgrade dependencies
+
+## v12.0.0
+
+* Upgrade to TUI v0.14
+
 ## v11.0.0
 
 * Upgrade to TUI v0.13 and crossterm v0.18
