@@ -2,11 +2,18 @@
 mod localtime {
     use std::time::SystemTime;
 
+    /// Return a string representing the current date and time as localtime.
+    ///
+    /// Available with the `localtime` feature toggle.
     pub fn format_now_datetime_seconds() -> String {
         let t = time::OffsetDateTime::now_utc();
         t.to_offset(time::UtcOffset::try_local_offset_at(t).unwrap_or(time::UtcOffset::UTC))
             .format("%F %T")
     }
+
+    /// Return a string representing the current time as localtime.
+    ///
+    /// Available with the `localtime` feature toggle.
     pub fn format_time_for_messages(time: SystemTime) -> String {
         time::OffsetDateTime::from(time)
             .to_offset(time::UtcOffset::try_current_local_offset().unwrap_or(time::UtcOffset::UTC))
@@ -14,6 +21,7 @@ mod localtime {
     }
 }
 
+/// An `hours:minute:seconds` format.
 pub const DATE_TIME_HMS: usize = "00:51:45".len();
 
 #[cfg(not(feature = "localtime"))]
@@ -22,6 +30,9 @@ mod utc {
     use std::time::SystemTime;
     const DATE_TIME_YMD: usize = "2020-02-13T".len();
 
+    /// Return a string representing the current date and time as UTC.
+    ///
+    /// Available without the `localtime` feature toggle.
     pub fn format_time_for_messages(time: SystemTime) -> String {
         String::from_utf8_lossy(
             &humantime::format_rfc3339_seconds(time).to_string().as_bytes()
@@ -30,6 +41,9 @@ mod utc {
         .into_owned()
     }
 
+    /// Return a string representing the current time as UTC.
+    ///
+    /// Available without the `localtime` feature toggle.
     pub fn format_now_datetime_seconds() -> String {
         String::from_utf8_lossy(
             &humantime::format_rfc3339_seconds(std::time::SystemTime::now())

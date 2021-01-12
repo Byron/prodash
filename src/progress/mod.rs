@@ -1,16 +1,17 @@
 use crate::unit::Unit;
 use std::time::SystemTime;
 
+///
 pub mod key;
+#[doc(inline)]
+pub use key::Key;
+
 mod utils;
 
 #[cfg(feature = "progress-log")]
 mod log;
 #[cfg(feature = "progress-log")]
 pub use self::log::Log;
-
-#[doc(inline)]
-pub use key::Key;
 
 pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
 

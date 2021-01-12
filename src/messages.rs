@@ -26,6 +26,7 @@ pub struct Message {
     pub message: String,
 }
 
+/// A ring buffer for messages.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct MessageRingBuffer {
     pub(crate) buf: Vec<Message>,
@@ -34,6 +35,7 @@ pub struct MessageRingBuffer {
 }
 
 impl MessageRingBuffer {
+    /// Create a new instance the ability to hold `capacity` amount of messages.
     pub fn with_capacity(capacity: usize) -> MessageRingBuffer {
         MessageRingBuffer {
             buf: Vec::with_capacity(capacity),
@@ -42,10 +44,7 @@ impl MessageRingBuffer {
         }
     }
 
-    fn has_capacity(&self) -> bool {
-        self.buf.len() < self.buf.capacity()
-    }
-
+    /// Push a `message` from `origin` at severity `level` into the buffer, possibly overwriting the last message added.
     pub fn push_overwrite(&mut self, level: MessageLevel, origin: String, message: impl Into<String>) {
         let msg = Message {
             time: SystemTime::now(),
@@ -62,6 +61,7 @@ impl MessageRingBuffer {
         self.total = self.total.wrapping_add(1);
     }
 
+    /// Copy all messages currently contained in the buffer to `out`.
     pub fn copy_all(&self, out: &mut Vec<Message>) {
         out.clear();
         if self.buf.is_empty() {
@@ -73,9 +73,11 @@ impl MessageRingBuffer {
         }
     }
 
-    pub fn copy_new(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
+    /// Copy all new messages into `out` that where received since the last time this method was called provided
+    /// its `previous` return value.
+    pub fn copy_new(&self, out: &mut Vec<Message>, previous: Option<MessageCopyState>) -> MessageCopyState {
         out.clear();
-        match prev {
+        match previous {
             Some(MessageCopyState { cursor, buf_len, total }) => {
                 if self.total.saturating_sub(total) >= self.buf.capacity() {
                     self.copy_all(out);
@@ -107,6 +109,10 @@ impl MessageRingBuffer {
             buf_len: self.buf.len(),
             total: self.total,
         }
+    }
+
+    fn has_capacity(&self) -> bool {
+        self.buf.len() < self.buf.capacity()
     }
 }
 

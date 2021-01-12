@@ -1,4 +1,6 @@
-#![deny(unsafe_code)]
+#![forbid(unsafe_code)]
+#![deny(missing_docs)]
+
 /*!
 Prodash is a dashboard for displaying the progress of concurrent application.
 
@@ -34,11 +36,13 @@ Please have a look at the [dashboard demo](https://github.com/Byron/crates-io-cl
 Run it with `cargo run --example dashboard` and see what else it can do by checking out `cargo run --example dashboard -- --help`.
 */
 #[cfg(feature = "progress-tree")]
+///
 pub mod tree;
 #[cfg(feature = "progress-tree")]
 #[doc(inline)]
 pub use tree::{Options as TreeOptions, Root as Tree};
 
+///
 pub mod render;
 
 #[cfg(feature = "progress-tree-log")]
@@ -47,13 +51,17 @@ pub use log::info;
 pub use log::warn;
 
 #[cfg(any(feature = "humantime", feature = "time"))]
+///
 pub mod time;
 
+///
 pub mod unit;
 #[doc(inline)]
 pub use unit::Unit;
 
+///
 pub mod messages;
+///
 pub mod progress;
 
 mod traits;

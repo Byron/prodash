@@ -1,6 +1,10 @@
 use crate::{messages::MessageLevel, Progress, Unit};
 use std::time::Duration;
 
+/// A [`Progress`] implementation which displays progress as it happens without the use of a renderer.
+///
+/// Note that this incurs considerable performance cost as each progress calls ends up getting the system time
+/// to see if progress information should actually be emitted.
 pub struct Log {
     name: String,
     max: Option<usize>,
@@ -15,6 +19,7 @@ const EMIT_LOG_EVERY_S: f32 = 0.5;
 const SEP: &str = "::";
 
 impl Log {
+    /// Create a new instance from `name` while displaying progress information only up to `max_level`.
     pub fn new(name: impl Into<String>, max_level: Option<usize>) -> Self {
         Log {
             name: name.into(),

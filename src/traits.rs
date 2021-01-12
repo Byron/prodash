@@ -1,7 +1,9 @@
 use crate::{messages::MessageLevel, progress, Unit};
 use std::time::Instant;
 
+/// A trait for describing hierarchical process.
 pub trait Progress: Send + 'static {
+    /// The type of progress returned by [`add_child()`][Progress::add_child()].
     type SubProgress: Progress;
 
     /// Adds a new child, whose parent is this instance, with the given name.

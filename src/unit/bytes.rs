@@ -1,6 +1,7 @@
 use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
 
+/// A marker for formatting numbers as bytes in renderers.
 #[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Bytes;
 

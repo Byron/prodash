@@ -85,18 +85,21 @@ impl Item {
         self.tree.get(&self.key).map(|r| r.value().name.to_owned())
     }
 
+    /// Returns the current step, as controlled by `inc*(…)` calls
     pub fn step(&self) -> Option<Step> {
         self.tree
             .get(&self.key)
             .and_then(|r| r.value().progress.as_ref().map(|p| p.step))
     }
 
+    /// Returns the maximum about of items we expect, as provided with the `init(…)` call
     pub fn max(&self) -> Option<Step> {
         self.tree
             .get(&self.key)
             .and_then(|r| r.value().progress.as_ref().and_then(|p| p.done_at))
     }
 
+    /// Returns the (cloned) unit associated with this Progress
     pub fn unit(&self) -> Option<Unit> {
         self.tree
             .get(&self.key)

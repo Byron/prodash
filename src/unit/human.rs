@@ -2,13 +2,17 @@ use crate::{progress::Step, unit::DisplayValue};
 pub use human_format::{Formatter, Scales};
 use std::fmt;
 
+/// A helper for formatting numbers in a format easily read by humans in renderers, as in `2.54 million objects`
 #[derive(Debug)]
 pub struct Human {
+    /// The name of the represented unit, like 'items' or 'objects'.
     pub name: &'static str,
+    /// The formatter to format the actual numbers.
     pub formatter: Formatter,
 }
 
 impl Human {
+    /// A convenience method to create a new new instance and its `formatter` and `name` fields.
     pub fn new(formatter: Formatter, name: &'static str) -> Self {
         Human { formatter, name }
     }

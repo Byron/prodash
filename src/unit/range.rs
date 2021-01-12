@@ -1,12 +1,15 @@
 use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
 
+/// A helper for formatting numbers representing ranges in renderers as in `2 of 5 steps`.
 #[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]
 pub struct Range {
+    /// The name of the unit to be appended to the range.
     pub name: &'static str,
 }
 
 impl Range {
+    /// A convenience method to create a new instance of `name`.
     pub fn new(name: &'static str) -> Self {
         Range { name }
     }

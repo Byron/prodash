@@ -69,6 +69,7 @@ impl State {
     }
 }
 
+/// A utility to compute throughput of a set of progress values usually available to a renderer.
 #[derive(Default)]
 pub struct Throughput {
     sorted_by_key: Vec<(progress::Key, State)>,
@@ -77,12 +78,16 @@ pub struct Throughput {
 }
 
 impl Throughput {
+    /// Called at the beginning of the drawing of a renderer to remember at which time progress values are
+    /// going to be updated with [`update_and_get(…)`][Throughput::update_and_get()].
     pub fn update_elapsed(&mut self) {
         let now = SystemTime::now();
         self.elapsed = self.updated_at.and_then(|then| now.duration_since(then).ok());
         self.updated_at = Some(now);
     }
 
+    /// Lookup or create the progress value at `key` and set its current `progress`, returning its computed
+    /// throughput.
     pub fn update_and_get(
         &mut self,
         key: &progress::Key,
@@ -101,6 +106,11 @@ impl Throughput {
                 })
         })
     }
+
+    /// Compare the keys in `sorted_values` with our internal state and remove all missing tasks from it.
+    ///
+    /// This should be called after [`update_and_get(…)`][Throughput::update_and_get()] to pick up removed/finished
+    /// progress.
     pub fn reconcile(&mut self, sorted_values: &[(progress::Key, progress::Task)]) {
         self.sorted_by_key
             .retain(|(key, _)| sorted_values.binary_search_by_key(key, |e| e.0).is_ok());

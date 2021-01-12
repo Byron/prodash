@@ -1,5 +1,6 @@
 use crate::{messages::MessageLevel, Progress, Unit};
 
+/// An implementation of [`Progress`] which discards all calls.
 pub struct Discard;
 
 impl Progress for Discard {
@@ -28,6 +29,12 @@ impl Progress for Discard {
     fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
 }
 
+/// An implementation of [`Progress`] showing either one or the other implementation.
+///
+/// Useful in conjunction with [`Discard`] and a working implementation, making it as a form of `Option<Progress>` which
+/// can be passed to methods requiring `impl Progress`.
+/// See [`DoOrDiscard`] for an incarnation of this.
+#[allow(missing_docs)]
 pub enum Either<L, R> {
     Left(L),
     Right(R),
@@ -111,6 +118,7 @@ where
     }
 }
 
+/// An implementation of `Progress` which can be created easily from `Option<impl Progress>`.
 pub struct DoOrDiscard<T>(Either<T, Discard>);
 
 impl<T> From<Option<T>> for DoOrDiscard<T>
@@ -126,6 +134,7 @@ where
 }
 
 impl<T: Progress> DoOrDiscard<T> {
+    /// Obtain either the original [`Progress`] implementation or `None`.
     pub fn into_inner(self) -> Option<T> {
         match self {
             DoOrDiscard(Either::Left(p)) => Some(p),
@@ -133,6 +142,7 @@ impl<T: Progress> DoOrDiscard<T> {
         }
     }
 
+    /// Take out the implementation of [`Progress`] and replace it with [`Discard`].
     pub fn take(&mut self) -> Option<T> {
         let this = std::mem::replace(self, DoOrDiscard::from(None));
         match this {
@@ -191,9 +201,11 @@ where
 
 use std::time::Instant;
 
+/// Emit a message with throughput information when the instance is dropped.
 pub struct ThroughputOnDrop<T: Progress>(T, Instant);
 
 impl<T: Progress> ThroughputOnDrop<T> {
+    /// Create a new instance by providing the `inner` [`Progress`] implementation.
     pub fn new(inner: T) -> Self {
         ThroughputOnDrop(inner, Instant::now())
     }

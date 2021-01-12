@@ -6,6 +6,7 @@ use std::{
     time::Duration,
 };
 
+/// Options used for configuring a [line renderer][render()].
 #[derive(Clone)]
 pub struct Options {
     /// If true, _(default true)_, we assume the output stream belongs to a terminal.
@@ -131,6 +132,9 @@ enum Event {
     Quit,
 }
 
+/// Write a line-based representation of `progress` to `out` which is assumed to be a terminal.
+///
+/// Configure it with `config`, see the [`Options`] for details.
 pub fn render(
     mut out: impl io::Write + Send + 'static,
     progress: impl Root + Send + 'static,

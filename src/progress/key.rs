@@ -1,8 +1,11 @@
 use crate::progress::Task;
 use std::ops::{Index, IndexMut};
 
-// NOTE: This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level
-pub type Level = u8; // a level in the hierarchy of key components
+/// a level in the hierarchy of key components
+///
+/// _NOTE:_ This means we will show weird behaviour if there are more than 2^16 tasks at the same time on a level
+/// as multiple progress handles will manipulate the same state.
+pub type Level = u8;
 
 pub(crate) type Id = u16;
 
@@ -12,6 +15,7 @@ pub struct Key(Option<Id>, Option<Id>, Option<Id>, Option<Id>);
 
 /// Determines if a sibling is above or below in the given level of hierarchy
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[allow(missing_docs)]
 pub enum SiblingLocation {
     Above,
     Below,
@@ -51,6 +55,7 @@ pub struct Adjacency(
 );
 
 impl Adjacency {
+    /// Return the level at which this sibling is located in the hierarchy.
     pub fn level(&self) -> Level {
         use SiblingLocation::*;
         match self {
@@ -61,6 +66,7 @@ impl Adjacency {
             Adjacency(_a, _b, _c, _d) => 4,
         }
     }
+    /// Get a reference to the sibling location at `level`.
     pub fn get(&self, level: Level) -> Option<&SiblingLocation> {
         Some(match level {
             1 => &self.0,
@@ -70,6 +76,7 @@ impl Adjacency {
             _ => return None,
         })
     }
+    /// Get a mutable reference to the sibling location at `level`.
     pub fn get_mut(&mut self, level: Level) -> Option<&mut SiblingLocation> {
         Some(match level {
             1 => &mut self.0,
@@ -95,6 +102,7 @@ impl IndexMut<Level> for Adjacency {
 }
 
 impl Key {
+    /// Return the key to the child identified by `child_id` located in a new nesting level below `self`.
     pub fn add_child(self, child_id: Id) -> Key {
         match self {
             Key(None, None, None, None) => Key(Some(child_id), None, None, None),
@@ -120,6 +128,7 @@ impl Key {
         }
     }
 
+    /// Return the identifier for the item at `level`.
     fn get(&self, level: Level) -> Option<&Id> {
         match level {
             1 => self.0.as_ref(),
@@ -130,6 +139,7 @@ impl Key {
         }
     }
 
+    /// Return true if the item identified by `other` shares the parent at `parent_level`.
     pub fn shares_parent_with(&self, other: &Key, parent_level: Level) -> bool {
         if parent_level < 1 {
             return true;
