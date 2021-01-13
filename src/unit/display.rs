@@ -4,7 +4,7 @@ use crate::{
 };
 use std::fmt::{self, Write};
 
-/// The location at which [`Thoughput`] or [`UnitDisplays`][UnitDisplay] should be placed.
+/// The location at which [`Throughput`] or [`UnitDisplays`][UnitDisplay] should be placed.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 #[allow(missing_docs)]
 pub enum Location {
