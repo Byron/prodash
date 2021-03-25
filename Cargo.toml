@@ -8,6 +8,7 @@ include = ["src/**/*", "README.md", "LICENSE.md", "CHANGELOG.md"]
 license = "MIT"
 repository = "https://github.com/Byron/prodash"
 readme = "README.md"
+resolver = "2"
 
 [lib]
 doctest = true
