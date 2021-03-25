@@ -187,7 +187,7 @@ impl Key {
                     }
                 })
                 .map(|(idx, _)| idx)
-        };
+        }
 
         let upward_iter = |from: usize, key: &Key, level: Level, id_at_level: Id| {
             search(sorted[..from].iter().rev(), key, key_level, level, id_at_level)
