@@ -1,7 +1,7 @@
 ![Rust](https://github.com/Byron/prodash/workflows/Rust/badge.svg)
 [![Crates.io](https://img.shields.io/crates/v/prodash.svg)](https://crates.io/crates/prodash)
 
-**prodash** is a dashboard for displaying progress of concurrent applications.
+**prodash** allows to integrate progress reporting into concurrent applications and provides renderers for displaying it in various ways.
 
 It's easy to integrate thanks to a pragmatic API, and comes with a terminal user interface by default.
 
