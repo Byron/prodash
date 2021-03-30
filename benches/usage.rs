@@ -9,7 +9,7 @@ fn usage(c: &mut Criterion) {
             message_buffer_capacity: 2,
         }
         .create()
-    };
+    }
     c.benchmark_group("Tree::add_child")
         .throughput(Throughput::Elements(4))
         .bench_function("add children to build a tree of tasks and clear them (in drop)", |b| {
