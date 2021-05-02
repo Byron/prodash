@@ -112,6 +112,3 @@ async-io = "1.1.0"
 name = "usage"
 path = "benches/usage.rs"
 harness = false
-
-[workspace]
-members = ["crosstermion"]

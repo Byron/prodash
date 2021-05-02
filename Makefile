@@ -19,7 +19,6 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features render-line,render-line-crossterm,render-tui,render-tui-crossterm,ctrlc --example dashboard
 	cargo check --features unit-bytes,unit-duration,unit-human,render-tui,render-tui-crossterm,render-line,render-line-crossterm,ctrlc --example units
 	cargo check
-	$(MAKE) -C crosstermion check
 
 unit-test: ## Run all unit tests
 	cargo test --features unit-bytes,unit-human,unit-duration
