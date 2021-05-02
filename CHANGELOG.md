@@ -1,3 +1,7 @@
+## v13.0.0
+
+* Upgrade to TUI v0.15
+
 ## v12.0.1
 
 * upgrade dependencies
