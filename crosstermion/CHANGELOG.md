@@ -1,3 +1,7 @@
+#### v0.7.0
+
+* upgrade to TUI 0.15
+
 #### v0.4.0
 
 * upgrade to TUI 0.12
