@@ -1,3 +1,8 @@
+## v13.1.0
+
+* With the `render-line-autoconfigure` feature toggle, the new
+  `Options::default().auto_configure(…)` method allows to adapt to the terminal/non-terminal autmatically.
+
 ## v13.0.1
 
 * The line renderer won't try to hide the cursor if the output isn't a terminal.
