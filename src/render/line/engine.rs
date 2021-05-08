@@ -153,12 +153,12 @@ pub fn render(
         throughput,
     } = config;
     let config = draw::Options {
-        output_is_terminal,
+        level_filter,
         terminal_dimensions,
+        keep_running_if_progress_is_empty,
+        output_is_terminal,
         colored,
         timestamp,
-        keep_running_if_progress_is_empty,
-        level_filter,
         hide_cursor,
     };
 

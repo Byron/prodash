@@ -14,7 +14,7 @@ pub struct Human {
 impl Human {
     /// A convenience method to create a new new instance and its `formatter` and `name` fields.
     pub fn new(formatter: Formatter, name: &'static str) -> Self {
-        Human { formatter, name }
+        Human { name, formatter }
     }
     fn format_bytes(&self, w: &mut dyn fmt::Write, value: Step) -> fmt::Result {
         let string = self.formatter.format(value as f64);
