@@ -30,7 +30,7 @@ pub fn launch_ambient_gui(
     let mut interruptible = true;
     let render_fut = match renderer {
         "line" => async move {
-            let output_is_terminal = atty::is(atty::Stream::Stdout);
+            let output_is_terminal = atty::is(atty::Stream::Stderr);
             let mut handle = line::render(
                 std::io::stderr(),
                 progress,
@@ -60,38 +60,45 @@ pub fn launch_ambient_gui(
             blocking::unblock(move || handle.wait()).await;
         }
         .boxed(),
-        "tui" => tui::render_with_input(
-            std::io::stdout(),
-            progress,
-            tui::Options {
-                title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
-                frames_per_second: args.fps,
-                recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
-                throughput,
-                ..tui::Options::default()
-            },
-            futures_util::stream::select(
-                window_resize_stream(args.animate_terminal_size),
-                ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
-                    ticks += 1;
-                    if ticks % 2 == 0 {
-                        let is_interruptible = interruptible;
-                        interruptible = !interruptible;
-                        return if is_interruptible {
-                            Event::SetInterruptMode(Interrupt::Instantly)
-                        } else {
-                            Event::SetInterruptMode(Interrupt::Deferred)
-                        };
-                    }
-                    if thread_rng().gen_bool(0.5) {
-                        Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
-                    } else {
-                        Event::SetInformation(generate_statistics())
-                    }
-                }),
-            ),
-        )?
-        .boxed(),
+        "tui" => {
+            if atty::isnt(atty::Stream::Stdout) {
+                eprintln!("Need a terminal on stdout to draw progress TUI");
+                futures_lite::future::ready(()).boxed()
+            } else {
+                tui::render_with_input(
+                    std::io::stdout(),
+                    progress,
+                    tui::Options {
+                        title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
+                        frames_per_second: args.fps,
+                        recompute_column_width_every_nth_frame: args.recompute_column_width_every_nth_frame,
+                        throughput,
+                        ..tui::Options::default()
+                    },
+                    futures_util::stream::select(
+                        window_resize_stream(args.animate_terminal_size),
+                        ticker(Duration::from_secs_f32((1.0 / args.fps).max(1.0))).map(move |_| {
+                            ticks += 1;
+                            if ticks % 2 == 0 {
+                                let is_interruptible = interruptible;
+                                interruptible = !interruptible;
+                                return if is_interruptible {
+                                    Event::SetInterruptMode(Interrupt::Instantly)
+                                } else {
+                                    Event::SetInterruptMode(Interrupt::Deferred)
+                                };
+                            }
+                            if thread_rng().gen_bool(0.5) {
+                                Event::SetTitle(TITLES.choose(&mut thread_rng()).unwrap().to_string())
+                            } else {
+                                Event::SetInformation(generate_statistics())
+                            }
+                        }),
+                    ),
+                )?
+                .boxed()
+            }
+        }
         _ => panic!("Unknown renderer: '{}'", renderer),
     };
     let handle = spawn(render_fut.map(|_| ()));
