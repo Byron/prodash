@@ -1,3 +1,7 @@
+## v13.0.1
+
+* The line renderer won't try to hide the cursor if the output isn't a terminal.
+
 ## v13.0.0
 
 * Upgrade to TUI v0.15
