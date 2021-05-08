@@ -1,3 +1,7 @@
+## v13.1.1
+
+* Fix compile error (and protect from that regression) if `render-line-autoconfigure` was enabled.
+
 ## v13.1.0
 
 * With the `render-line-autoconfigure` feature toggle, the new

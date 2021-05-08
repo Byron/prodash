@@ -94,6 +94,7 @@ impl Options {
         self.output_is_terminal = atty::is(output.into());
         self.colored = self.output_is_terminal && crosstermion::color::allowed();
         self.terminal_dimensions = crosstermion::terminal::size().unwrap_or((80, 20));
+        #[cfg(feature = "ctrlc")]
         self.auto_hide_cursor();
         self
     }
