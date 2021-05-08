@@ -163,7 +163,7 @@ pub fn render(
     };
 
     let (event_send, event_recv) = std::sync::mpsc::sync_channel::<Event>(1);
-    let show_cursor = possibly_hide_cursor(&mut out, event_send.clone(), hide_cursor);
+    let show_cursor = possibly_hide_cursor(&mut out, event_send.clone(), hide_cursor && output_is_terminal);
     static SHOW_PROGRESS: AtomicBool = AtomicBool::new(false);
 
     let handle = std::thread::spawn({

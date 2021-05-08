@@ -76,7 +76,7 @@ fn messages(
                     .style(color.dimmed().on(Color::Yellow))
                     .paint(crate::time::format_time_for_messages(*time)),
             );
-            tokens.push(Style::new().paint(" "));
+            tokens.push(Style::default().paint(" "));
         } else {
             tokens.push("".into());
         };
