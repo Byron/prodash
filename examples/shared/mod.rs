@@ -30,22 +30,12 @@ pub fn launch_ambient_gui(
     let mut interruptible = true;
     let render_fut = match renderer {
         "line" => async move {
-            let output_is_terminal = atty::is(atty::Stream::Stderr);
             let mut handle = line::render(
                 std::io::stderr(),
                 progress,
                 line::Options {
-                    output_is_terminal,
-                    #[cfg(feature = "ctrlc")]
-                    hide_cursor: true,
-                    #[cfg(not(feature = "ctrlc"))]
-                    hide_cursor: false,
-                    terminal_dimensions: crosstermion::terminal::size()
-                        .ok()
-                        .map(|(w, h)| args.line_column_count.map(|width| (width, h)).unwrap_or((w, h)))
-                        .unwrap_or((80, 20)),
+                    terminal_dimensions: args.line_column_count.map(|width| (width, 20)).unwrap_or((80, 20)),
                     timestamp: args.line_timestamp,
-                    colored: !args.no_line_color && output_is_terminal && crosstermion::color::allowed(),
                     level_filter: Some(RangeInclusive::new(
                         args.line_start.unwrap_or(1),
                         args.line_end.unwrap_or(2),
@@ -54,7 +44,9 @@ pub fn launch_ambient_gui(
                     frames_per_second: args.fps,
                     keep_running_if_progress_is_empty: true,
                     throughput,
-                },
+                    ..Default::default()
+                }
+                .auto_configure(line::StreamKind::Stderr),
             );
             handle.disconnect();
             blocking::unblock(move || handle.wait()).await;

@@ -41,6 +41,9 @@ This crate comes with various cargo features to tailor it to your needs.
        * **render-line-crossterm** - use the _crossterm_ backend, useful for working on windows
        * **render-line-termion** - use the _termion_ backend, useful for lean unix-only builds
   * _Optional features_
+       * **render-line-autoconfigure**
+         * If enabled, calls to `render::line::Options::auto_configure()` will configure the display based on whether or not we are in a terminal
+           and set its color mode based on what's possible or desired.
        * **ctrlc**
           * If set, and the `hide_cursor` line renderer option is set, the cursor will be hidden **and** *SIG_INT* and *SIG_TERM* handlers will be 
             installed to reset the cursor on exit. Otherwise you have to make sure to call `shutdown_and_wait()` on the `JoinHandle` returned

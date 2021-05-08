@@ -73,7 +73,7 @@ pub struct Options {
     #[argh(option, short = 'R')]
     pub renderer: Option<String>,
 
-    /// if set, coloring of the line renderer is forcefully disabled
+    /// has not effect - use the NO_COLOR environment variable instead.
     #[argh(switch)]
     pub no_line_color: bool,
 }

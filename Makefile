@@ -16,7 +16,7 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --features render-line,render-line-termion
 	cargo check --features render-line,render-line-crossterm
 	cargo check --features render-line,render-line-termion,render-tui,render-tui-termion --example dashboard-termion
-	cargo check --features render-line,render-line-crossterm,render-tui,render-tui-crossterm,ctrlc --example dashboard
+	cargo check --features render-line,render-line-crossterm,render-tui,render-tui-crossterm,ctrlc,render-line-autoconfigure --example dashboard
 	cargo check --features unit-bytes,unit-duration,unit-human,render-tui,render-tui-crossterm,render-line,render-line-crossterm,ctrlc --example units
 	cargo check
 

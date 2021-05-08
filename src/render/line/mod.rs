@@ -7,4 +7,4 @@ compile_error!("Please choose either one of these features: 'render-line-crosste
 mod draw;
 mod engine;
 
-pub use engine::*;
+pub use engine::{render, JoinHandle, Options, StreamKind};

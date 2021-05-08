@@ -15,7 +15,7 @@ doctest = true
 [[example]]
 name = "dashboard"
 path = "examples/dashboard.rs"
-required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "ctrlc"]
+required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "ctrlc", "render-line-autoconfigure"]
 
 [[example]]
 name = "dashboard-termion"
@@ -58,6 +58,7 @@ render-tui = ["tui",
 render-line = ["crosstermion/color", "humantime", "unicode-width"]
 render-line-crossterm = ["crosstermion/crossterm"]
 render-line-termion = ["crosstermion/termion"]
+render-line-autoconfigure = ["atty"]
 
 localtime = ["time"]
 
@@ -86,6 +87,7 @@ time = { version = "=0.2.22", optional = true, features = ["std"], default-featu
 
 # line renderer
 ctrlc = { version = "3.1.4", optional = true, default-features = false, features = ['termination'] }
+atty = { version = "0.2.14", optional = true }
 
 # units
 bytesize = { version = "1.0.1", optional = true }

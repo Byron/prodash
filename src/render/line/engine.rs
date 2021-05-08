@@ -15,6 +15,7 @@ pub struct Options {
     pub output_is_terminal: bool,
 
     /// If true, _(default: true)_ we will display color. You should use `output_is_terminal && crosstermion::should_colorize()`
+    /// to determine this value.
     ///
     /// Please note that you can enforce color even if the output stream is not connected to a terminal by setting
     /// this field to true.
@@ -60,6 +61,51 @@ pub struct Options {
     /// Please note that you should add at least one item to the `prodash::Tree` before launching the application or else
     /// risk a race causing nothing to be rendered at all.
     pub keep_running_if_progress_is_empty: bool,
+}
+
+/// The kind of stream to use for auto-configuration.
+pub enum StreamKind {
+    /// Standard output
+    Stdout,
+    /// Standard error
+    Stderr,
+}
+
+#[cfg(feature = "render-line-autoconfigure")]
+impl From<StreamKind> for atty::Stream {
+    fn from(s: StreamKind) -> Self {
+        match s {
+            StreamKind::Stdout => atty::Stream::Stdout,
+            StreamKind::Stderr => atty::Stream::Stderr,
+        }
+    }
+}
+
+/// Convenience
+impl Options {
+    /// Automatically configure (and overwrite) the following fields based on terminal configuration.
+    ///
+    /// * output_is_terminal
+    /// * colored
+    /// * terminal_dimensions
+    /// * hide-cursor (based on presence of 'ctrlc' feature.
+    #[cfg(feature = "render-line-autoconfigure")]
+    pub fn auto_configure(mut self, output: StreamKind) -> Self {
+        self.output_is_terminal = atty::is(output.into());
+        self.colored = self.output_is_terminal && crosstermion::color::allowed();
+        self.terminal_dimensions = crosstermion::terminal::size().unwrap_or((80, 20));
+        self.auto_hide_cursor();
+        self
+    }
+    #[cfg(all(feature = "render-line-autoconfigure", feature = "ctrlc"))]
+    fn auto_hide_cursor(&mut self) {
+        self.hide_cursor = true;
+    }
+    #[cfg(not(feature = "render-line-autoconfigure"))]
+    /// No-op - only available with the `render-line-autoconfigure` feature toggle.
+    pub fn auto_configure(self, _output: StreamKind) -> Self {
+        self
+    }
 }
 
 impl Default for Options {
