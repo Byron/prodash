@@ -1,3 +1,8 @@
+## v14.0.0
+
+* Swap `ctrlc` crate with `signal-hook` which is a must in library crates. `ctrlc` is only for applications
+  who can control the single handler that it installs entirely.
+
 ## v13.1.1
 
 * Fix compile error (and protect from that regression) if `render-line-autoconfigure` was enabled.
