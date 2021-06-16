@@ -1,5 +1,4 @@
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
+#![deny(unsafe_code, missing_docs)]
 
 /*!
 Prodash is a dashboard for displaying the progress of concurrent application.

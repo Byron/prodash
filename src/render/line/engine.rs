@@ -30,7 +30,7 @@ pub struct Options {
     /// If true, _(default: false)_, the cursor will be hidden for a more visually appealing display.
     ///
     /// Please note that you must make sure the line renderer is properly shut down to restore the previous cursor
-    /// settings. See the `ctrlc` documentation in the README for more information.
+    /// settings. See the `signal-hook` documentation in the README for more information.
     pub hide_cursor: bool,
 
     /// If true, (default false), we will keep track of the previous progress state to derive
@@ -88,17 +88,17 @@ impl Options {
     /// * output_is_terminal
     /// * colored
     /// * terminal_dimensions
-    /// * hide-cursor (based on presence of 'ctrlc' feature.
+    /// * hide-cursor (based on presence of 'signal-hook' feature.
     #[cfg(feature = "render-line-autoconfigure")]
     pub fn auto_configure(mut self, output: StreamKind) -> Self {
         self.output_is_terminal = atty::is(output.into());
         self.colored = self.output_is_terminal && crosstermion::color::allowed();
         self.terminal_dimensions = crosstermion::terminal::size().unwrap_or((80, 20));
-        #[cfg(feature = "ctrlc")]
+        #[cfg(feature = "signal-hook")]
         self.auto_hide_cursor();
         self
     }
-    #[cfg(all(feature = "render-line-autoconfigure", feature = "ctrlc"))]
+    #[cfg(all(feature = "render-line-autoconfigure", feature = "signal-hook"))]
     fn auto_hide_cursor(&mut self) {
         self.hide_cursor = true;
     }
@@ -210,56 +210,84 @@ pub fn render(
     };
 
     let (event_send, event_recv) = std::sync::mpsc::sync_channel::<Event>(1);
-    let show_cursor = possibly_hide_cursor(&mut out, event_send.clone(), hide_cursor && output_is_terminal);
+    let show_cursor = possibly_hide_cursor(&mut out, hide_cursor && output_is_terminal);
     static SHOW_PROGRESS: AtomicBool = AtomicBool::new(false);
-
-    let handle = std::thread::spawn({
-        let tick_send = event_send.clone();
-        move || {
-            {
-                let initial_delay = initial_delay.unwrap_or_else(Duration::default);
-                SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
-                if !SHOW_PROGRESS.load(Ordering::Relaxed) {
-                    std::thread::spawn(move || {
-                        std::thread::sleep(initial_delay);
-                        SHOW_PROGRESS.store(true, Ordering::Relaxed);
-                    });
-                }
+    #[cfg(feature = "signal-hook")]
+    static TERM_SIGNAL_RECEIVED: AtomicBool = AtomicBool::new(false);
+    #[cfg(feature = "signal-hook")]
+    {
+        for sig in signal_hook::consts::TERM_SIGNALS {
+            // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
+            #[allow(unsafe_code)]
+            unsafe {
+                signal_hook::low_level::register(*sig, || TERM_SIGNAL_RECEIVED.store(true, Ordering::SeqCst)).ok();
             }
-
-            let mut state = draw::State::default();
-            if throughput {
-                state.throughput = Some(Throughput::default());
-            }
-            let secs = 1.0 / frames_per_second;
-            let _ticker = std::thread::spawn(move || loop {
-                if tick_send.send(Event::Tick).is_err() {
-                    break;
-                }
-                std::thread::sleep(Duration::from_secs_f32(secs));
-            });
-
-            for event in event_recv {
-                match event {
-                    Event::Tick => {
-                        draw::all(
-                            &mut out,
-                            &progress,
-                            SHOW_PROGRESS.load(Ordering::Relaxed),
-                            &mut state,
-                            &config,
-                        )?;
-                    }
-                    Event::Quit => break,
-                }
-            }
-
-            if show_cursor {
-                crosstermion::execute!(out, crosstermion::cursor::Show).ok();
-            }
-            Ok(())
         }
-    });
+    }
+
+    let handle = std::thread::Builder::new()
+        .name("render-line-eventloop".into())
+        .spawn({
+            let tick_send = event_send.clone();
+            move || {
+                {
+                    let initial_delay = initial_delay.unwrap_or_else(Duration::default);
+                    SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
+                    if !SHOW_PROGRESS.load(Ordering::Relaxed) {
+                        std::thread::Builder::new()
+                            .name("render-line-progress-delay".into())
+                            .spawn(move || {
+                                std::thread::sleep(initial_delay);
+                                SHOW_PROGRESS.store(true, Ordering::Relaxed);
+                            })
+                            .ok();
+                    }
+                }
+
+                let mut state = draw::State::default();
+                if throughput {
+                    state.throughput = Some(Throughput::default());
+                }
+                let secs = 1.0 / frames_per_second;
+                let _ticker = std::thread::Builder::new()
+                    .name("render-line-ticker".into())
+                    .spawn(move || loop {
+                        #[cfg(feature = "signal-hook")]
+                        {
+                            if TERM_SIGNAL_RECEIVED.load(Ordering::SeqCst) {
+                                tick_send.send(Event::Quit).ok();
+                                break;
+                            }
+                        }
+                        if tick_send.send(Event::Tick).is_err() {
+                            break;
+                        }
+                        std::thread::sleep(Duration::from_secs_f32(secs));
+                    })
+                    .expect("starting a thread works");
+
+                for event in event_recv {
+                    match event {
+                        Event::Tick => {
+                            draw::all(
+                                &mut out,
+                                &progress,
+                                SHOW_PROGRESS.load(Ordering::Relaxed),
+                                &mut state,
+                                &config,
+                            )?;
+                        }
+                        Event::Quit => break,
+                    }
+                }
+
+                if show_cursor {
+                    crosstermion::execute!(out, crosstermion::cursor::Show).ok();
+                }
+                Ok(())
+            }
+        })
+        .expect("starting a thread works");
 
     JoinHandle {
         inner: Some(handle),
@@ -268,24 +296,9 @@ pub fn render(
     }
 }
 
-// Not all configurations actually need it to be mut, but those with the 'ctrlc' feature do
+// Not all configurations actually need it to be mut, but those with the 'signal-hook' feature do
 #[allow(unused_mut)]
-fn possibly_hide_cursor(
-    out: &mut impl io::Write,
-    quit_send: std::sync::mpsc::SyncSender<Event>,
-    mut hide_cursor: bool,
-) -> bool {
-    #[cfg(not(feature = "ctrlc"))]
-    drop(quit_send);
-
-    #[cfg(feature = "ctrlc")]
-    if hide_cursor {
-        hide_cursor = ctrlc::set_handler(move || {
-            quit_send.send(Event::Quit).ok();
-        })
-        .is_ok();
-    }
-
+fn possibly_hide_cursor(out: &mut impl io::Write, mut hide_cursor: bool) -> bool {
     if hide_cursor {
         crosstermion::execute!(out, crosstermion::cursor::Hide).is_ok()
     } else {
