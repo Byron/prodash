@@ -20,7 +20,8 @@ fn main() -> Result {
         let mut unblock = blocking::Unblock::new(());
         unblock.with_mut(move |_| work_for_a_long_time_blocking(root)).await
     };
-    futures_lite::future::block_on(futures_util::future::select(handle, work.boxed()));
+    futures_lite::pin!(work);
+    futures_lite::future::block_on(futures_util::future::select(handle, work));
     Ok(())
 }
 
@@ -116,6 +117,5 @@ type Result = std::result::Result<(), Box<dyn Error + Send + 'static>>;
 mod shared;
 use shared::args;
 
-use futures_lite::FutureExt;
 use prodash::{unit, Tree};
 use std::error::Error;
