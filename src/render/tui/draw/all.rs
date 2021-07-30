@@ -59,7 +59,7 @@ pub(crate) fn all(
 
     let border_width = 1;
     draw::progress::headline(
-        &entries,
+        entries,
         interrupt_mode,
         state.duration_per_frame,
         buf,
@@ -79,7 +79,7 @@ pub(crate) fn all(
         state.messages_fullscreen,
     );
 
-    draw::progress::pane(&entries, progress_pane, buf, state);
+    draw::progress::pane(entries, progress_pane, buf, state);
     if let Some(messages_pane) = messages_pane {
         draw::messages::pane(
             messages,

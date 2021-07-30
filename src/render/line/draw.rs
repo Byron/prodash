@@ -7,7 +7,7 @@ use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
 };
-use std::{collections::VecDeque, io, iter::FromIterator, ops::RangeInclusive};
+use std::{collections::VecDeque, io, ops::RangeInclusive};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
@@ -189,7 +189,7 @@ fn newline_with_overdraw(
     tokens: &[ANSIString<'_>],
     blocks_in_last_iteration: u16,
 ) -> io::Result<u16> {
-    let current_block_count = block_count_sans_ansi_codes(&tokens);
+    let current_block_count = block_count_sans_ansi_codes(tokens);
     if blocks_in_last_iteration > current_block_count {
         // fill to the end of line to overwrite what was previously there
         writeln!(
@@ -282,7 +282,7 @@ fn format_progress<'a>(
     buf.push(Style::new().paint(format!("{:>level$}", "", level = key.level() as usize)));
     match value.progress.as_ref() {
         Some(progress) => {
-            let style = progress_style(&progress);
+            let style = progress_style(progress);
             buf.push(brush.style(Color::Cyan.bold()).paint(&value.name));
             buf.push(" ".into());
 
@@ -306,10 +306,7 @@ fn format_progress<'a>(
             let actual_midpoint = if let Some(midpoint) = midpoint {
                 let padding = midpoint.saturating_sub(desired_midpoint);
                 if padding > 0 {
-                    buf.insert(
-                        pre_unit,
-                        String::from_iter(std::iter::repeat(' ').take(padding as usize)).into(),
-                    );
+                    buf.insert(pre_unit, " ".repeat(padding as usize).into());
                 }
                 block_count_sans_ansi_codes(buf.as_slice())
             } else {
@@ -317,7 +314,7 @@ fn format_progress<'a>(
             };
             let blocks_left = column_count.saturating_sub(actual_midpoint);
             if blocks_left > 0 {
-                draw_progress_bar(&progress, style, blocks_left, colored, buf);
+                draw_progress_bar(progress, style, blocks_left, colored, buf);
             }
             Some(desired_midpoint)
         }
