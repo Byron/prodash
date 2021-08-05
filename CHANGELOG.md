@@ -1,3 +1,7 @@
+## v15.0.0
+
+* Upgrade to TUI v0.16
+
 ## v14.0.0
 
 * Swap `ctrlc` crate with `signal-hook` which is a must in library crates. `ctrlc` is only for applications
