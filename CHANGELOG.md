@@ -7,6 +7,7 @@
 ### Breaking
 
 - rename cargo feature `localtime` to `local-time`
+- The `local-time` feature is not the default anymore, enable it using the `RUSTFLAGS="--cfg unsound_local_offset"` environment when building the binary.
 
 ## v15.0.1
 

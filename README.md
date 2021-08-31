@@ -26,10 +26,12 @@ This crate comes with various cargo features to tailor it to your needs.
     * May interfere with `render-tui` or `render-line`, or any renderer outputting to the console.
 * **progress-log**
   * A `Progress` implementation which logs messages and progress using the `log` crate
-* **local-time** _(default)_
+* **local-time**
   * If set, timestamps in the message pane of the `render-tui` will be using the local time, not UTC
   * If set, timestamps of the log messages of the `render-line` will be using the local time, not UTC
   * Has no effect without the `render-tui` or `render-line` respectively
+  * **On Unix** one needs to provide flags to rustc when building the binary to acknowledge potential unsoundness: `RUSTFLAGS="--cfg unsound_local_offset" cargo build`
+    will do the job, but there are [other ways](https://doc.rust-lang.org/cargo/reference/config.html#hierarchical-structure) to do that as well.
 * **render-line**
   * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
   * It's like the render-tui, but with far less dependencies and less visual fidelity - all it needs is to move

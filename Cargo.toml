@@ -37,7 +37,7 @@ required-features = [
 ]
 
 [features]
-default = ["progress-tree", "progress-tree-log", "local-time"]
+default = ["progress-tree", "progress-tree-log"]
 progress-tree = ["dashmap", "parking_lot"]
 progress-tree-log = ["log"]
 progress-log = ["log"]
