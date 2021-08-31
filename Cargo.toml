@@ -15,12 +15,12 @@ doctest = true
 [[example]]
 name = "dashboard"
 path = "examples/dashboard.rs"
-required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "signal-hook", "render-line-autoconfigure"]
+required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "signal-hook", "render-line-autoconfigure", "progress-tree"]
 
 [[example]]
 name = "dashboard-termion"
 path = "examples/dashboard.rs"
-required-features = ["render-tui", "render-tui-termion", "render-line", "render-line-termion"]
+required-features = ["render-tui", "render-tui-termion", "render-line", "render-line-termion", "progress-tree"]
 
 [[example]]
 name = "units"
@@ -37,7 +37,7 @@ required-features = [
 ]
 
 [features]
-default = ["progress-tree", "progress-tree-log", "localtime"]
+default = ["progress-tree", "progress-tree-log", "local-time"]
 progress-tree = ["dashmap", "parking_lot"]
 progress-tree-log = ["log"]
 progress-log = ["log"]
@@ -60,7 +60,7 @@ render-line-crossterm = ["crosstermion/crossterm"]
 render-line-termion = ["crosstermion/termion"]
 render-line-autoconfigure = ["atty"]
 
-localtime = ["time"]
+local-time = ["time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]

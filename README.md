@@ -26,7 +26,7 @@ This crate comes with various cargo features to tailor it to your needs.
     * May interfere with `render-tui` or `render-line`, or any renderer outputting to the console.
 * **progress-log**
   * A `Progress` implementation which logs messages and progress using the `log` crate
-* **localtime** _(default)_
+* **local-time** _(default)_
   * If set, timestamps in the message pane of the `render-tui` will be using the local time, not UTC
   * If set, timestamps of the log messages of the `render-line` will be using the local time, not UTC
   * Has no effect without the `render-tui` or `render-line` respectively

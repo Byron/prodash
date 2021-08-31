@@ -1,4 +1,4 @@
-#[cfg(feature = "localtime")]
+#[cfg(feature = "local-time")]
 mod localtime {
     use std::time::SystemTime;
 
@@ -24,7 +24,7 @@ mod localtime {
 /// An `hours:minute:seconds` format.
 pub const DATE_TIME_HMS: usize = "00:51:45".len();
 
-#[cfg(not(feature = "localtime"))]
+#[cfg(not(feature = "local-time"))]
 mod utc {
     use super::DATE_TIME_HMS;
     use std::time::SystemTime;
@@ -54,8 +54,8 @@ mod utc {
     }
 }
 
-#[cfg(feature = "localtime")]
+#[cfg(feature = "local-time")]
 pub use localtime::*;
 
-#[cfg(not(feature = "localtime"))]
+#[cfg(not(feature = "local-time"))]
 pub use utc::*;

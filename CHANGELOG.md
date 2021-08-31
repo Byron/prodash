@@ -1,3 +1,13 @@
+## v16.0.0
+
+### Improvements
+
+- Use `time` version 0.3 when the `local-time` feature is enabled
+
+### Breaking
+
+- rename cargo feature `localtime` to `local-time`
+
 ## v15.0.1
 
 * crosstermion is optional for some renderers (again)
