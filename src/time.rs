@@ -7,8 +7,9 @@ mod localtime {
     /// Available with the `localtime` feature toggle.
     pub fn format_now_datetime_seconds() -> String {
         let t = time::OffsetDateTime::now_utc();
-        t.to_offset(time::UtcOffset::try_local_offset_at(t).unwrap_or(time::UtcOffset::UTC))
-            .format("%F %T")
+        t.to_offset(time::UtcOffset::local_offset_at(t).unwrap_or(time::UtcOffset::UTC))
+            .format(&time::format_description::parse("%F %T").expect("format known to work"))
+            .expect("formatting always works")
     }
 
     /// Return a string representing the current time as localtime.
@@ -16,8 +17,9 @@ mod localtime {
     /// Available with the `localtime` feature toggle.
     pub fn format_time_for_messages(time: SystemTime) -> String {
         time::OffsetDateTime::from(time)
-            .to_offset(time::UtcOffset::try_current_local_offset().unwrap_or(time::UtcOffset::UTC))
-            .format("%T")
+            .to_offset(time::UtcOffset::current_local_offset().unwrap_or(time::UtcOffset::UTC))
+            .format(&time::format_description::parse("[hour]:[minute]:[second]").expect("format known to work"))
+            .expect("formatting always works")
     }
 }
 
