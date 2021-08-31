@@ -1,3 +1,7 @@
+## v15.0.1
+
+* crosstermion is optional for some renderers (again)
+
 ## v15.0.0
 
 * Upgrade to TUI v0.16
