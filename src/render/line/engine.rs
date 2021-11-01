@@ -231,7 +231,7 @@ pub fn render(
             let tick_send = event_send.clone();
             move || {
                 {
-                    let initial_delay = initial_delay.unwrap_or_else(Duration::default);
+                    let initial_delay = initial_delay.unwrap_or_default();
                     SHOW_PROGRESS.store(initial_delay == Duration::default(), Ordering::Relaxed);
                     if !SHOW_PROGRESS.load(Ordering::Relaxed) {
                         std::thread::Builder::new()
