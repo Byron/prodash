@@ -1,5 +1,5 @@
 use crate::{
-    messages::{Message, MessageCopyState, MessageLevel},
+    messages::{Envelope, Message, MessageCopyState, MessageLevel},
     progress::{self, Value},
     unit, Root, Throughput,
 };
@@ -13,7 +13,7 @@ use unicode_width::UnicodeWidthStr;
 #[derive(Default)]
 pub struct State {
     tree: Vec<(progress::Key, progress::Task)>,
-    messages: Vec<Message>,
+    messages: Vec<Envelope>,
     for_next_copy: Option<MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
     message_origin_size: VecDeque<usize>,
@@ -52,47 +52,57 @@ fn messages(
     }
     let mut tokens: Vec<ANSIString<'_>> = Vec::with_capacity(6);
     let mut current_maximum = state.message_origin_size.iter().max().cloned().unwrap_or(0);
-    for Message {
-        time,
-        level,
-        origin,
-        message,
-    } in &state.messages
-    {
+    for envelope in &state.messages {
         tokens.clear();
         let blocks_drawn_during_previous_tick = state.blocks_per_line.pop_front().unwrap_or(0);
-        let message_block_len = origin.width();
-        current_maximum = current_maximum.max(message_block_len);
-        if state.message_origin_size.len() == max_height {
-            state.message_origin_size.pop_front();
-        }
-        state.message_origin_size.push_back(message_block_len);
 
-        let color = to_color(*level);
-        tokens.push(" ".into());
-        if timestamp {
-            tokens.push(
-                brush
-                    .style(color.dimmed().on(Color::Yellow))
-                    .paint(crate::time::format_time_for_messages(*time)),
-            );
-            tokens.push(Style::default().paint(" "));
-        } else {
-            tokens.push("".into());
+        match envelope {
+            Envelope::RawMessage(content) => {
+                // RawMessages have already been split into single lines without newlines appended,
+                // and so can be rendered directly as ANSIStrings.
+                tokens.push(ANSIString::from(content))
+            }
+            Envelope::Message(Message {
+                time,
+                level,
+                origin,
+                message,
+            }) => {
+                let message_block_len = origin.width();
+                current_maximum = current_maximum.max(message_block_len);
+                if state.message_origin_size.len() == max_height {
+                    state.message_origin_size.pop_front();
+                }
+                state.message_origin_size.push_back(message_block_len);
+
+                let color = to_color(*level);
+                tokens.push(" ".into());
+                if timestamp {
+                    tokens.push(
+                        brush
+                            .style(color.dimmed().on(Color::Yellow))
+                            .paint(crate::time::format_time_for_messages(*time)),
+                    );
+                    tokens.push(Style::default().paint(" "));
+                } else {
+                    tokens.push("".into());
+                };
+                tokens.push(brush.style(Style::default().dimmed()).paint(format!(
+                    "{:>fill_size$}{}",
+                    "",
+                    origin,
+                    fill_size = current_maximum - message_block_len,
+                )));
+                tokens.push(" ".into());
+                tokens.push(brush.style(color.bold()).paint(message));
+            }
         };
-        tokens.push(brush.style(Style::default().dimmed()).paint(format!(
-            "{:>fill_size$}{}",
-            "",
-            origin,
-            fill_size = current_maximum - message_block_len,
-        )));
-        tokens.push(" ".into());
-        tokens.push(brush.style(color.bold()).paint(message));
+
         let message_block_count = block_count_sans_ansi_codes(&tokens);
         write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
         if blocks_drawn_during_previous_tick > message_block_count {
-            newline_with_overdraw(out, &tokens, blocks_drawn_during_previous_tick)?;
+            newline_with_overdraw(out, message_block_count, blocks_drawn_during_previous_tick)?;
         } else {
             writeln!(out)?;
         }
@@ -161,7 +171,8 @@ pub fn all(
             );
             write!(out, "{}", ANSIStrings(tokens.as_slice()))?;
 
-            **blocks_in_last_iteration = newline_with_overdraw(out, &tokens, **blocks_in_last_iteration)?;
+            **blocks_in_last_iteration =
+                newline_with_overdraw(out, block_count_sans_ansi_codes(&tokens), **blocks_in_last_iteration)?;
         }
         if let Some(tp) = state.throughput.as_mut() {
             tp.reconcile(&state.tree);
@@ -186,10 +197,9 @@ pub fn all(
 /// Must be called directly after `tokens` were drawn, without newline. Takes care of adding the newline.
 fn newline_with_overdraw(
     out: &mut impl io::Write,
-    tokens: &[ANSIString<'_>],
+    current_block_count: u16,
     blocks_in_last_iteration: u16,
 ) -> io::Result<u16> {
-    let current_block_count = block_count_sans_ansi_codes(tokens);
     if blocks_in_last_iteration > current_block_count {
         // fill to the end of line to overwrite what was previously there
         writeln!(

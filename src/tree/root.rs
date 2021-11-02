@@ -1,5 +1,5 @@
 use crate::{
-    messages::{Message, MessageCopyState, MessageRingBuffer},
+    messages::{Envelope, MessageCopyState, MessageRingBuffer},
     progress::{Key, Task},
     tree::Item,
 };
@@ -55,15 +55,26 @@ impl Root {
         out.sort_by_key(|t| t.0);
     }
 
+    /// Create a raw `message` and store it with the progress tree.
+    ///
+    /// Use this to render additional unclassified output about the progress made.
+    fn message_raw(&mut self, message: impl Into<String>) {
+        let inner = self.inner.lock();
+        let mut messages = inner.messages.lock();
+        for line in message.into().lines() {
+            messages.push_overwrite(Envelope::RawMessage(line.trim_end().to_owned()));
+        }
+    }
+
     /// Copy all messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
-    pub fn copy_messages(&self, out: &mut Vec<Message>) {
+    pub fn copy_messages(&self, out: &mut Vec<Envelope>) {
         self.inner.lock().messages.lock().copy_all(out);
     }
 
     /// Copy only new messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
-    pub fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
+    pub fn copy_new_messages(&self, out: &mut Vec<Envelope>, prev: Option<MessageCopyState>) -> MessageCopyState {
         self.inner.lock().messages.lock().copy_new(out, prev)
     }
 
@@ -139,11 +150,15 @@ impl crate::Root for Root {
         self.sorted_snapshot(out)
     }
 
-    fn copy_messages(&self, out: &mut Vec<Message>) {
+    fn message_raw(&mut self, message: impl Into<String>) {
+        self.message_raw(message)
+    }
+
+    fn copy_messages(&self, out: &mut Vec<Envelope>) {
         self.copy_messages(out)
     }
 
-    fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
+    fn copy_new_messages(&self, out: &mut Vec<Envelope>, prev: Option<MessageCopyState>) -> MessageCopyState {
         self.copy_new_messages(out, prev)
     }
 }

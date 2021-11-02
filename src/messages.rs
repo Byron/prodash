@@ -26,10 +26,31 @@ pub struct Message {
     pub message: String,
 }
 
+impl Message {
+    /// Create a new Message at the current time, with the given arguments.
+    pub fn new(level: MessageLevel, origin: String, message: impl Into<String>) -> Self {
+        Message {
+            time: SystemTime::now(),
+            level,
+            origin,
+            message: message.into(),
+        }
+    }
+}
+
+/// A container for multiple message types.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum Envelope {
+    /// A high level string message and its metadata.
+    Message(Message),
+    /// A single-line, raw message, with no metadata.
+    RawMessage(String),
+}
+
 /// A ring buffer for messages.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct MessageRingBuffer {
-    pub(crate) buf: Vec<Message>,
+    pub(crate) buf: Vec<Envelope>,
     cursor: usize,
     total: usize,
 }
@@ -44,25 +65,19 @@ impl MessageRingBuffer {
         }
     }
 
-    /// Push a `message` from `origin` at severity `level` into the buffer, possibly overwriting the last message added.
-    pub fn push_overwrite(&mut self, level: MessageLevel, origin: String, message: impl Into<String>) {
-        let msg = Message {
-            time: SystemTime::now(),
-            level,
-            origin,
-            message: message.into(),
-        };
+    /// Push a `message` into the buffer, possibly overwriting the last message added.
+    pub fn push_overwrite(&mut self, message: Envelope) {
         if self.has_capacity() {
-            self.buf.push(msg)
+            self.buf.push(message)
         } else {
-            self.buf[self.cursor] = msg;
+            self.buf[self.cursor] = message;
             self.cursor = (self.cursor + 1) % self.buf.len();
         }
         self.total = self.total.wrapping_add(1);
     }
 
     /// Copy all messages currently contained in the buffer to `out`.
-    pub fn copy_all(&self, out: &mut Vec<Message>) {
+    pub fn copy_all(&self, out: &mut Vec<Envelope>) {
         out.clear();
         if self.buf.is_empty() {
             return;
@@ -75,7 +90,7 @@ impl MessageRingBuffer {
 
     /// Copy all new messages into `out` that where received since the last time this method was called provided
     /// its `previous` return value.
-    pub fn copy_new(&self, out: &mut Vec<Message>, previous: Option<MessageCopyState>) -> MessageCopyState {
+    pub fn copy_new(&self, out: &mut Vec<Envelope>, previous: Option<MessageCopyState>) -> MessageCopyState {
         out.clear();
         match previous {
             Some(MessageCopyState { cursor, buf_len, total }) => {

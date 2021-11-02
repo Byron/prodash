@@ -65,7 +65,7 @@ pub trait Progress: Send + 'static {
 
     /// Create a `message` of the given `level` and store it with the progress tree.
     ///
-    /// Use this to provide additional,human-readable information about the progress
+    /// Use this to provide additional, human-readable information about the progress
     /// made, including indicating success or failure.
     fn message(&mut self, level: MessageLevel, message: impl Into<String>);
 
@@ -126,7 +126,7 @@ pub trait Progress: Send + 'static {
     }
 }
 
-use crate::messages::{Message, MessageCopyState};
+use crate::messages::{Envelope, MessageCopyState};
 
 /// The top level of a progress task hiearchy, with `progress::Task`s identified with `progress::Key`s
 pub trait Root {
@@ -142,11 +142,16 @@ pub trait Root {
     /// The `out` vec will be cleared automatically.
     fn sorted_snapshot(&self, out: &mut Vec<(progress::Key, progress::Task)>);
 
+    /// Create a raw `message` and store it with the progress tree.
+    ///
+    /// Use this to render additional unclassified output about the progress made.
+    fn message_raw(&mut self, message: impl Into<String>);
+
     /// Copy all messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
-    fn copy_messages(&self, out: &mut Vec<Message>);
+    fn copy_messages(&self, out: &mut Vec<Envelope>);
 
     /// Copy only new messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
-    fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState;
+    fn copy_new_messages(&self, out: &mut Vec<Envelope>, prev: Option<MessageCopyState>) -> MessageCopyState;
 }

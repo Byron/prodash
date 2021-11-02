@@ -1,5 +1,5 @@
 use crate::{
-    messages::{MessageLevel, MessageRingBuffer},
+    messages::{Envelope, Message, MessageLevel, MessageRingBuffer},
     progress::{key, Key, State, Step, Task, Value},
     unit::Unit,
 };
@@ -189,7 +189,7 @@ impl Item {
     /// made, including indicating success or failure.
     pub fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         let message: String = message.into();
-        self.messages.lock().push_overwrite(
+        self.messages.lock().push_overwrite(Envelope::Message(Message::new(
             level,
             {
                 let name = self.tree.get(&self.key).map(|v| v.name.to_owned()).unwrap_or_default();
@@ -203,7 +203,7 @@ impl Item {
                 name
             },
             message,
-        )
+        )))
     }
 
     /// Create a message indicating the task is done
