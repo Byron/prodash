@@ -7,8 +7,8 @@ use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},
     color,
 };
-use std::{collections::VecDeque, io, ops::RangeInclusive};
-use unicode_width::UnicodeWidthStr;
+use std::{collections::VecDeque, convert::TryInto, io, ops::RangeInclusive};
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
 #[derive(Default)]
 pub struct State {
@@ -214,8 +214,35 @@ fn newline_with_overdraw(
     Ok(current_block_count)
 }
 
+/// NB: Counting characters using the `unicode-width` crate alone will not strip ANSI sequences
+/// already present in messages: see https://github.com/unicode-rs/unicode-width/issues/24
+///
+/// To do so, we additionally use the `vte` crate (similar to how it is used in the
+/// `strip-ansi-escapes` crate) to strip control sequences, and then sum the widths of only the
+/// resulting chars.
 fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
-    strings.iter().map(|s| s.width() as u16).sum()
+    struct BlockCounter(usize);
+
+    impl vte::Perform for BlockCounter {
+        fn print(&mut self, c: char) {
+            self.0 += c.width().unwrap_or(0);
+        }
+
+        fn execute(&mut self, byte: u8) {
+            if byte == b'\n' {
+                self.0 += 1;
+            }
+        }
+    }
+
+    let mut block_counter = BlockCounter(0);
+    let mut parser = vte::Parser::new();
+    for s in strings.iter() {
+        for b in s.as_bytes() {
+            parser.advance(&mut block_counter, *b)
+        }
+    }
+    block_counter.0.try_into().unwrap()
 }
 
 fn draw_progress_bar<'a>(
