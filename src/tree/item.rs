@@ -1,3 +1,4 @@
+use crate::progress::StepShared;
 use crate::{
     messages::{MessageLevel, MessageRingBuffer},
     progress::{key, Key, State, Step, Task, Value},
@@ -5,6 +6,7 @@ use crate::{
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 /// A `Tree` represents an element of the progress tree.
@@ -27,6 +29,7 @@ use std::{ops::Deref, sync::Arc, time::SystemTime};
 #[derive(Debug)]
 pub struct Item {
     pub(crate) key: Key,
+    pub(crate) value: StepShared,
     pub(crate) highest_child_id: key::Id,
     pub(crate) tree: Arc<DashMap<Key, Task>>,
     pub(crate) messages: Arc<Mutex<MessageRingBuffer>>,
@@ -52,7 +55,7 @@ impl Item {
     /// to the progress tree.
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    pub fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+    pub fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
             r.value_mut().progress = Some(Value {
                 done_at: max,
@@ -87,9 +90,7 @@ impl Item {
 
     /// Returns the current step, as controlled by `inc*(…)` calls
     pub fn step(&self) -> Option<Step> {
-        self.tree
-            .get(&self.key)
-            .and_then(|r| r.value().progress.as_ref().map(|p| p.step))
+        self.value.load(Ordering::Relaxed).into()
     }
 
     /// Returns the maximum about of items we expect, as provided with the `init(…)` call
@@ -110,30 +111,21 @@ impl Item {
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn set(&mut self, step: Step) {
-        self.alter_progress(|p| {
-            p.step = step;
-            p.state = State::Running;
-        });
+        self.value.fetch_add(step, Ordering::SeqCst);
     }
 
     /// Increment the current progress by the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc_by(&mut self, step: Step) {
-        self.alter_progress(|p| {
-            p.step += step;
-            p.state = State::Running;
-        });
+        todo!()
     }
 
     /// Increment the current progress by one.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc(&mut self) {
-        self.alter_progress(|p| {
-            p.step += 1;
-            p.state = State::Running;
-        });
+        todo!()
     }
 
     /// Call to indicate that progress cannot be indicated, and that the task cannot be interrupted.
@@ -177,6 +169,7 @@ impl Item {
         self.highest_child_id = self.highest_child_id.wrapping_add(1);
         Item {
             highest_child_id: 0,
+            value: Default::default(),
             key: child_key,
             tree: self.tree.clone(),
             messages: self.messages.clone(),
@@ -224,6 +217,7 @@ impl Item {
     pub(crate) fn deep_clone(&self) -> Item {
         Item {
             key: self.key,
+            value: Default::default(),
             highest_child_id: self.highest_child_id,
             tree: Arc::new(self.tree.deref().clone()),
             messages: Arc::new(Mutex::new(self.messages.lock().clone())),
@@ -238,7 +232,7 @@ impl crate::Progress for Item {
         Item::add_child(self, name)
     }
 
-    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
+    fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         Item::init(self, max, unit)
     }
 
