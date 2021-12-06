@@ -1,4 +1,6 @@
 use crate::unit::Unit;
+use std::sync::atomic::AtomicUsize;
+use std::sync::Arc;
 use std::time::SystemTime;
 
 ///
@@ -17,6 +19,9 @@ pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
 
 /// The amount of steps a progress can make
 pub type Step = usize;
+
+/// As step, but shareable.
+pub type StepShared = Arc<AtomicUsize>;
 
 /// Indicate whether a progress can or cannot be made.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
@@ -41,7 +46,7 @@ impl Default for State {
 #[derive(Clone, Default, Debug)]
 pub struct Value {
     /// The amount of progress currently made
-    pub step: Step,
+    pub step: StepShared,
     /// The step at which no further progress has to be made.
     ///
     /// If unset, the progress is unbounded.
@@ -57,7 +62,7 @@ impl Value {
     ///
     /// A task half done would return `Some(0.5)`.
     pub fn fraction(&self) -> Option<f32> {
-        self.done_at.map(|done_at| self.step as f32 / done_at as f32)
+        todo!()
     }
 }
 

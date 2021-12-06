@@ -5,6 +5,7 @@ use crate::{
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;
+use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
 
 /// The top-level of the progress tree.
@@ -118,6 +119,7 @@ impl From<Options> for Root {
         Root {
             inner: Arc::new(Mutex::new(Item {
                 highest_child_id: 0,
+                value: Arc::new(AtomicUsize::default()),
                 key: Key::default(),
                 tree: Arc::new(DashMap::with_capacity(initial_capacity)),
                 messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(message_buffer_capacity))),

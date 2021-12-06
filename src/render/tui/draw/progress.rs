@@ -144,16 +144,7 @@ struct ProgressFormat<'a>(&'a Option<Value>, u16, Option<unit::display::Throughp
 
 impl<'a> fmt::Display for ProgressFormat<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self.0 {
-            Some(p) => match p.unit.as_ref() {
-                Some(unit) => write!(f, "{}", unit.display(p.step, p.done_at, self.2)),
-                None => match p.done_at {
-                    Some(done_at) => write!(f, "{}/{}", p.step, done_at),
-                    None => write!(f, "{}", p.step),
-                },
-            },
-            None => write!(f, "{:─<width$}", '─', width = self.1 as usize),
-        }
+        todo!()
     }
 }
 
@@ -220,53 +211,7 @@ pub fn draw_progress(
         let tree_prefix = level_prefix(entries, entry_index);
         let progress_rect = rect::offset_x(line_bound, block_width(&tree_prefix) as u16);
         draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
-        match progress.as_ref().map(|p| (p.fraction(), p.state, p.step)) {
-            Some((Some(fraction), state, _step)) => {
-                let mut progress_text = progress_text;
-                add_block_eta(state, &mut progress_text);
-                let (bound, style) = draw_progress_bar_fn(buf, progress_rect, fraction, |fraction| match state {
-                    progress::State::Blocked(_, _) => Color::Red,
-                    progress::State::Halted(_, _) => Color::LightRed,
-                    progress::State::Running => {
-                        if fraction >= 0.8 {
-                            Color::Green
-                        } else {
-                            Color::Yellow
-                        }
-                    }
-                });
-                let style_fn = move |_t: &str, x: u16, _y: u16| {
-                    if x < bound.right() {
-                        style
-                    } else {
-                        Style::default()
-                    }
-                };
-                draw_text_nowrap_fn(progress_rect, buf, progress_text, style_fn);
-            }
-            Some((None, state, step)) => {
-                let mut progress_text = progress_text;
-                add_block_eta(state, &mut progress_text);
-                draw_text_with_ellipsis_nowrap(progress_rect, buf, progress_text, None);
-                let bar_rect = rect::offset_x(line_bound, max_progress_label_width as u16);
-                draw_spinner(
-                    buf,
-                    bar_rect,
-                    step,
-                    line,
-                    match state {
-                        progress::State::Blocked(_, _) => Color::Red,
-                        progress::State::Halted(_, _) => Color::LightRed,
-                        progress::State::Running => Color::White,
-                    },
-                );
-            }
-            None => {
-                let bold = Style::default().add_modifier(Modifier::BOLD);
-                draw_text_nowrap_fn(progress_rect, buf, progress_text, |_, _, _| Style::default());
-                draw_text_with_ellipsis_nowrap(progress_rect, buf, format!(" {} ", title), bold);
-            }
-        }
+        todo!()
     }
 }
 
