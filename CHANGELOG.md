@@ -5,15 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 16.0.1 (2021-12-19)
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 5 commits contributed to the release over the course of 47 calendar days.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#8](https://github.com/byron/prodash/issues/8)
 
 ### Thanks Clippy
 
@@ -27,7 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <details><summary>view details</summary>
 
+ * **[#8](https://github.com/byron/prodash/issues/8)**
+    - Run `cargo changelog --write` for an improved changelog ([`a1054e8`](https://github.com/byron/prodash/commit/a1054e89b6f5bbdead1a5c2f975cdce0da0700e7))
  * **Uncategorized**
+    - upgrade dashmap to latest version ([`e6f53d5`](https://github.com/byron/prodash/commit/e6f53d59ef1aef027a2aad5b164535c6ca0d620b))
     - cleanup changelog ([`5aa6275`](https://github.com/byron/prodash/commit/5aa627523536a85c382f0da20636963387b437bd))
     - thanks clippy ([`c1258e2`](https://github.com/byron/prodash/commit/c1258e250207889c62ef3208590d84185752e1a2))
     - Looks like array syntax isn't supported anymore ([`bfbce01`](https://github.com/byron/prodash/commit/bfbce01af9b90f5ae6b0490d6d7cdc29e05a1338))
@@ -233,8 +236,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
- - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 13 commits contributed to the release over the course of 109 calendar days.
+ - 3 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
 ### Commit Details
@@ -247,6 +250,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - (cargo-release) version 13.0.0 ([`c0a97fa`](https://github.com/byron/prodash/commit/c0a97fa648cb2a0491d09bd0fbdd1daa6d6e290e))
     - prep release ([`e3665a2`](https://github.com/byron/prodash/commit/e3665a2100fba190fc0f047ff05f2904f4dcaf4a))
     - upgrade to tui 0.15 ([`edd11be`](https://github.com/byron/prodash/commit/edd11be0aa6ed84370603452286182a28c577961))
+    - prepare release ([`c91d410`](https://github.com/byron/prodash/commit/c91d410e8d6242b78c44119155b5fc3b2956d111))
+    - Upgrade to tui 0.15 ([`03d1c20`](https://github.com/byron/prodash/commit/03d1c2067778fb6ec231bf18dd587046a03434bc))
+    - Revert "Allow most recent version of 'time' crate" ([`ee8ab91`](https://github.com/byron/prodash/commit/ee8ab91f74d6e598f59947d08405ca1f7fdb2785))
+    - Allow most recent version of 'time' crate ([`300aa7b`](https://github.com/byron/prodash/commit/300aa7b29ff6bad31197368340bebd2e2a5dfea0))
+    - run actions on main ([`a2b3037`](https://github.com/byron/prodash/commit/a2b303730602c1b6e4a63475b134f87d640b6d2f))
+    - Make it more obvious what prodash actually is ([`5b862d5`](https://github.com/byron/prodash/commit/5b862d5e262cc08466afed235b862a6e79bffc8b))
+    - Fix compile warning ([`d48f3b9`](https://github.com/byron/prodash/commit/d48f3b97643cbd3a264400cacff29eb1436cb002))
+    - Use new resolver ([`ad03a43`](https://github.com/byron/prodash/commit/ad03a43056351899b8b76a62b0a0598b83c1e213))
+    - Fix compile warnings ([`4cb8681`](https://github.com/byron/prodash/commit/4cb8681f3826994d92b703cc7cf105ccf01cc4d8))
+    - Fix typo ([`75f311e`](https://github.com/byron/prodash/commit/75f311e5da2b5aeff608048d13075acb3dd41a0e))
 </details>
 
 ## v12.0.2 (2021-01-12)
@@ -315,7 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -327,6 +340,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * **Uncategorized**
     - upgrade to tui 14 ([`06791b3`](https://github.com/byron/prodash/commit/06791b3cf0dd2589985bc1deb82b73e9278ae723))
+    - update to tui 14 ([`169d62d`](https://github.com/byron/prodash/commit/169d62d04f50eb1b97e6766eb8e7a8f7878b2aef))
 </details>
 
 ## v11.0.0 (2020-11-15)
@@ -337,7 +351,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 10 commits contributed to the release over the course of 47 calendar days.
  - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -350,6 +364,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * **Uncategorized**
     - bump major version ([`b2989fa`](https://github.com/byron/prodash/commit/b2989faa799f27701193c52c1b335302f9751639))
     - upgrade to tui v0.13 ([`808f7d5`](https://github.com/byron/prodash/commit/808f7d5983ed9a3165afbd8f59959eca16d4a16a))
+    - crosstermion now uses tui v0.13 ([`7684a50`](https://github.com/byron/prodash/commit/7684a50e1b94d6f19fa7d2c4d646ff569a51ffbd))
+    - cargo clippy ([`725449b`](https://github.com/byron/prodash/commit/725449bfb3f4e39a543b023561b20365d9052a62))
+    - Update README.md ([`b485568`](https://github.com/byron/prodash/commit/b4855683b4d33c4db2eade4db7a33a53de47961a))
+    - Update README with accurate instructions on running example ([`d9288e9`](https://github.com/byron/prodash/commit/d9288e946bbc791f630c568b2b65899f644abd81))
+    - Ignore interrupts when reading inputs… ([`a3bf8be`](https://github.com/byron/prodash/commit/a3bf8beeb8f9496fa102ff59aeb4a7c6bdcac70e))
+    - update to crossterm 0.18, but… ([`b5aa292`](https://github.com/byron/prodash/commit/b5aa292bd89cb223e9239bad3decc74495363b55))
+    - update to tui 0.12 ([`a70e96d`](https://github.com/byron/prodash/commit/a70e96d64f52de0d3d4fcec9cbacbdf0fd6b7bb0))
+    - upgrade to tui 0.12 ([`0606d46`](https://github.com/byron/prodash/commit/0606d4639c286c1917b85aee02f294dbadbaba77))
 </details>
 
 ## v10.0.2 (2020-09-17)
@@ -360,7 +382,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 6 commits contributed to the release over the course of 2 calendar days.
+ - 10 commits contributed to the release over the course of 3 calendar days.
  - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -377,6 +399,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Switch to release version of futures-lite ([`4fda4c0`](https://github.com/byron/prodash/commit/4fda4c05e5f4b7be2ff4a3b8898b060aa5c49ed4))
     - Switch to latest version of futures-lite to remove stream::select_all ([`53ff638`](https://github.com/byron/prodash/commit/53ff638997736010f696db21c95c70cd87792ab0))
     - Get rid of some more future-util functionality - just one more missing ([`0c82556`](https://github.com/byron/prodash/commit/0c82556cba25c16bd50c7abc39f8bb8078ea4228))
+    - (cargo-release) version 0.3.2 ([`e187a9d`](https://github.com/byron/prodash/commit/e187a9d4addcde2587f02fdffa1d7a06a58dd3a6))
+    - Crosstermion without futures-util! ([`d41352d`](https://github.com/byron/prodash/commit/d41352dff8954cf64ed31c2644aba5c4d846256b))
+    - (cargo-release) version 0.3.1 ([`0a6b6bc`](https://github.com/byron/prodash/commit/0a6b6bcb2ce629254e715ecdff5544303e7c2d2c))
+    - upgrade futures-lite dependency ([`da021ea`](https://github.com/byron/prodash/commit/da021ea8306eaadb2bd40b155d4c431a164b6c42))
 </details>
 
 ## v10.0.1 (2020-09-13)
@@ -630,7 +656,7 @@ Add missing trailing paranthesis in throughput display
 </details>
 
 <csr-unknown>
-Add Progress trait to allow make progress genericAdd progress::Discard and progress::DoOrDiscard to make optional progress more convenient, especially when using the Progress trait.Add progress-tree feature to gate the dashmap powered tree (enabled by default)<csr-unknown/>
+Key::adjecency(…)<csr-unknown/>
 
 ## v7.1.1 (2020-07-22)
 
@@ -663,7 +689,7 @@ Add Progress trait to allow make progress genericAdd progress::Discard and progr
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -677,6 +703,8 @@ Add Progress trait to allow make progress genericAdd progress::Discard and progr
     - bump minor version ([`aac8cb2`](https://github.com/byron/prodash/commit/aac8cb2ce99c3eb70b42919754e6ecefcab43854))
     - Use bold characters for some highlights ([`56cf67e`](https://github.com/byron/prodash/commit/56cf67e36ed0db6a4a78e1d30e7fc4eebe7c7342))
     - upgrade to tui 0.10 ([`79afe12`](https://github.com/byron/prodash/commit/79afe123dda6e892425772fca8e040ac256edf9d))
+    - Crosstermion 0.3 with support for tui 0.10 ([`dcda91b`](https://github.com/byron/prodash/commit/dcda91b744cb9f4f735591a53997ac4f2747a61e))
+    - decouple prodash from local crosstermion for tui migration ([`1105cfd`](https://github.com/byron/prodash/commit/1105cfd46d9a163c6e6d6c761fec8f70a0b08156))
 </details>
 
 ## v7.0.4 (2020-07-21)
@@ -718,7 +746,7 @@ cleanup and code simplification in the line renderer.
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 3 commits contributed to the release.
  - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -730,6 +758,8 @@ cleanup and code simplification in the line renderer.
 
  * **Uncategorized**
     - bump patch level ([`ffc58bb`](https://github.com/byron/prodash/commit/ffc58bbd0d305b4e3c1b33f5a6661cea4b692def))
+    - crosstermion 0.2 with much less code and complexity ([`f3b24d0`](https://github.com/byron/prodash/commit/f3b24d0edfdc40c5fb045facd467aab2e7e53f12))
+    - greatly simplify line renderer engine code ([`f0eaf27`](https://github.com/byron/prodash/commit/f0eaf279c42f0a7d28bc6b4c6d064df072f3a3a7))
 </details>
 
 ## v7.0.2 (2020-07-11)
@@ -794,10 +824,8 @@ Add new render-line, change feature flag names.
     too dynamically changing progress trees.
   * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
-* New methods in **Root*
-    * `copy_new_messages(…)` method, copying only messages seen since last time it was called
-    * `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
-* `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
+  * `copy_new_messages(…)` method, copying only messages seen since last time it was called
+  * `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
 
 ### Breaking Changes
 
@@ -812,8 +840,8 @@ Add new render-line, change feature flag names.
 
 <csr-read-only-do-not-edit/>
 
- - 73 commits contributed to the release over the course of 3 calendar days.
- - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 81 commits contributed to the release over the course of 4 calendar days.
+ - 2 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
 ### Commit Details
@@ -896,10 +924,18 @@ Add new render-line, change feature flag names.
     - Make external crates available as re-exports ([`0b8a763`](https://github.com/byron/prodash/commit/0b8a763585d7828f6ac1ccbcc23d985ff1eab3a9))
     - Notes about the tradeoffs in backend choice ([`a942e85`](https://github.com/byron/prodash/commit/a942e85b62118c447214f683f3c866e502842337))
     - Write down insights about coloring in terminals, in conjunction with crosstermion ([`c96abdb`](https://github.com/byron/prodash/commit/c96abdbc116801eb873e021151a853599f32ec43))
+    - bump patch level ([`c879dfa`](https://github.com/byron/prodash/commit/c879dfa59fa4de6f7b0a02de42668224d791e5db))
+    - fix description of crosstermion ([`8781c9f`](https://github.com/byron/prodash/commit/8781c9f3f70e12d436c957834f0a6dd61a74651b))
+    - Fix precedence in terminal module, crossterm is winning over termion now ([`521dd23`](https://github.com/byron/prodash/commit/521dd23dc67d6dee52cfbe0c35c3fe8fc28dc881))
+    - bump patch level ([`1bc5c76`](https://github.com/byron/prodash/commit/1bc5c764c9b1190f168d076b2183a27569750421))
+    - Make sure conversions are always compiled ([`5a03628`](https://github.com/byron/prodash/commit/5a03628b1cafd8d06476f364242d0e149f4fad18))
+    - fix flume features, bump to 0.1.2 ([`11d6665`](https://github.com/byron/prodash/commit/11d6665c77a1e4ce4dc262744ffb76dc8b907832))
+    - bump patch level; add 'input-thread-flume' support ([`7fdbb72`](https://github.com/byron/prodash/commit/7fdbb72822c450a4e13eba998236b608cf9eeca3))
+    - Fix Cargo.toml to allow 'cargo test' to work without specifying features ([`748ab4b`](https://github.com/byron/prodash/commit/748ab4be6aa5fc975fcdcacbd92a2fa388103734))
 </details>
 
 <csr-unknown>
-tree<csr-unknown/>
+Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.New methods in *Rootmessage_buffer_usage(…) returns the amount of message we currently store, as well as the ring buffer capacity<csr-unknown/>
 
 ## v6.0.0 (2020-07-05)
 
@@ -1640,269 +1676,6 @@ a redraw manually.
     - ETA messages in blocked unbounded tasks ([`d42c0d5`](https://github.com/byron/prodash/commit/d42c0d52f803595a48594a91b3278ce57ff8b95b))
 </details>
 
-## v0.7.0 (2021-05-02)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 10 commits contributed to the release over the course of 109 calendar days.
- - 2 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - prepare release ([`c91d410`](https://github.com/byron/prodash/commit/c91d410e8d6242b78c44119155b5fc3b2956d111))
-    - Upgrade to tui 0.15 ([`03d1c20`](https://github.com/byron/prodash/commit/03d1c2067778fb6ec231bf18dd587046a03434bc))
-    - Revert "Allow most recent version of 'time' crate" ([`ee8ab91`](https://github.com/byron/prodash/commit/ee8ab91f74d6e598f59947d08405ca1f7fdb2785))
-    - Allow most recent version of 'time' crate ([`300aa7b`](https://github.com/byron/prodash/commit/300aa7b29ff6bad31197368340bebd2e2a5dfea0))
-    - run actions on main ([`a2b3037`](https://github.com/byron/prodash/commit/a2b303730602c1b6e4a63475b134f87d640b6d2f))
-    - Make it more obvious what prodash actually is ([`5b862d5`](https://github.com/byron/prodash/commit/5b862d5e262cc08466afed235b862a6e79bffc8b))
-    - Fix compile warning ([`d48f3b9`](https://github.com/byron/prodash/commit/d48f3b97643cbd3a264400cacff29eb1436cb002))
-    - Use new resolver ([`ad03a43`](https://github.com/byron/prodash/commit/ad03a43056351899b8b76a62b0a0598b83c1e213))
-    - Fix compile warnings ([`4cb8681`](https://github.com/byron/prodash/commit/4cb8681f3826994d92b703cc7cf105ccf01cc4d8))
-    - Fix typo ([`75f311e`](https://github.com/byron/prodash/commit/75f311e5da2b5aeff608048d13075acb3dd41a0e))
-</details>
-
-## v0.6.0 (2021-01-04)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 1 commit contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - update to tui 14 ([`169d62d`](https://github.com/byron/prodash/commit/169d62d04f50eb1b97e6766eb8e7a8f7878b2aef))
-</details>
-
-## v0.5.0 (2020-11-15)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 7 commits contributed to the release over the course of 47 calendar days.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - crosstermion now uses tui v0.13 ([`7684a50`](https://github.com/byron/prodash/commit/7684a50e1b94d6f19fa7d2c4d646ff569a51ffbd))
-    - cargo clippy ([`725449b`](https://github.com/byron/prodash/commit/725449bfb3f4e39a543b023561b20365d9052a62))
-    - Update README.md ([`b485568`](https://github.com/byron/prodash/commit/b4855683b4d33c4db2eade4db7a33a53de47961a))
-    - Update README with accurate instructions on running example ([`d9288e9`](https://github.com/byron/prodash/commit/d9288e946bbc791f630c568b2b65899f644abd81))
-    - Ignore interrupts when reading inputs… ([`a3bf8be`](https://github.com/byron/prodash/commit/a3bf8beeb8f9496fa102ff59aeb4a7c6bdcac70e))
-    - update to crossterm 0.18, but… ([`b5aa292`](https://github.com/byron/prodash/commit/b5aa292bd89cb223e9239bad3decc74495363b55))
-    - update to tui 0.12 ([`a70e96d`](https://github.com/byron/prodash/commit/a70e96d64f52de0d3d4fcec9cbacbdf0fd6b7bb0))
-</details>
-
-## v0.4.0 (2020-09-28)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 1 commit contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - upgrade to tui 0.12 ([`0606d46`](https://github.com/byron/prodash/commit/0606d4639c286c1917b85aee02f294dbadbaba77))
-</details>
-
-## v0.3.2 (2020-09-14)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - (cargo-release) version 0.3.2 ([`e187a9d`](https://github.com/byron/prodash/commit/e187a9d4addcde2587f02fdffa1d7a06a58dd3a6))
-    - Crosstermion without futures-util! ([`d41352d`](https://github.com/byron/prodash/commit/d41352dff8954cf64ed31c2644aba5c4d846256b))
-</details>
-
-## v0.3.1 (2020-09-13)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - (cargo-release) version 0.3.1 ([`0a6b6bc`](https://github.com/byron/prodash/commit/0a6b6bcb2ce629254e715ecdff5544303e7c2d2c))
-    - upgrade futures-lite dependency ([`da021ea`](https://github.com/byron/prodash/commit/da021ea8306eaadb2bd40b155d4c431a164b6c42))
-</details>
-
-## v0.3.0 (2020-07-22)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - Crosstermion 0.3 with support for tui 0.10 ([`dcda91b`](https://github.com/byron/prodash/commit/dcda91b744cb9f4f735591a53997ac4f2747a61e))
-    - decouple prodash from local crosstermion for tui migration ([`1105cfd`](https://github.com/byron/prodash/commit/1105cfd46d9a163c6e6d6c761fec8f70a0b08156))
-</details>
-
-## v0.2.0 (2020-07-11)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - crosstermion 0.2 with much less code and complexity ([`f3b24d0`](https://github.com/byron/prodash/commit/f3b24d0edfdc40c5fb045facd467aab2e7e53f12))
-    - greatly simplify line renderer engine code ([`f0eaf27`](https://github.com/byron/prodash/commit/f0eaf279c42f0a7d28bc6b4c6d064df072f3a3a7))
-</details>
-
-## v0.1.4 (2020-07-06)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 3 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - bump patch level ([`c879dfa`](https://github.com/byron/prodash/commit/c879dfa59fa4de6f7b0a02de42668224d791e5db))
-    - fix description of crosstermion ([`8781c9f`](https://github.com/byron/prodash/commit/8781c9f3f70e12d436c957834f0a6dd61a74651b))
-    - Fix precedence in terminal module, crossterm is winning over termion now ([`521dd23`](https://github.com/byron/prodash/commit/521dd23dc67d6dee52cfbe0c35c3fe8fc28dc881))
-</details>
-
-## v0.1.3 (2020-07-06)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - bump patch level ([`1bc5c76`](https://github.com/byron/prodash/commit/1bc5c764c9b1190f168d076b2183a27569750421))
-    - Make sure conversions are always compiled ([`5a03628`](https://github.com/byron/prodash/commit/5a03628b1cafd8d06476f364242d0e149f4fad18))
-</details>
-
-## v0.1.2 (2020-07-06)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 1 commit contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - fix flume features, bump to 0.1.2 ([`11d6665`](https://github.com/byron/prodash/commit/11d6665c77a1e4ce4dc262744ffb76dc8b907832))
-</details>
-
-## v0.1.1 (2020-07-05)
-
-### Commit Statistics
-
-<csr-read-only-do-not-edit/>
-
- - 2 commits contributed to the release.
- - 0 commits where understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
-
-### Commit Details
-
-<csr-read-only-do-not-edit/>
-
-<details><summary>view details</summary>
-
- * **Uncategorized**
-    - bump patch level; add 'input-thread-flume' support ([`7fdbb72`](https://github.com/byron/prodash/commit/7fdbb72822c450a4e13eba998236b608cf9eeca3))
-    - Fix Cargo.toml to allow 'cargo test' to work without specifying features ([`748ab4b`](https://github.com/byron/prodash/commit/748ab4be6aa5fc975fcdcacbd92a2fa388103734))
-</details>
-
 ## v1.1.6 (2020-03-02)
 
 * improve API symmetry by providing a `Tree::name()` to accompany `Tree::set_name(…)`
@@ -2024,4 +1797,28 @@ a redraw manually.
 
 * fix toggles - previously prodash, withoug tui, would always build humantime and unicode width
 * add support for logging as user interface
+
+## v0.7.0 (2021-05-02)
+
+## v0.6.0 (2021-01-04)
+
+## v0.5.0 (2020-11-15)
+
+## v0.4.0 (2020-09-28)
+
+## v0.3.2 (2020-09-14)
+
+## v0.3.1 (2020-09-13)
+
+## v0.3.0 (2020-07-22)
+
+## v0.2.0 (2020-07-11)
+
+## v0.1.4 (2020-07-06)
+
+## v0.1.3 (2020-07-06)
+
+## v0.1.2 (2020-07-06)
+
+## v0.1.1 (2020-07-05)
 
