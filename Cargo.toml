@@ -64,7 +64,7 @@ local-time = ["time"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-dashmap = { version = "4.0.1", optional = true, default-features = false }
+dashmap = { version = "5.0.0", optional = true, default-features = false }
 parking_lot = { version = "0.11.0", optional = true, default-features = false }
 
 # with-logging
