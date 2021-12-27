@@ -5,13 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 16.1.0 (2021-12-27)
+
+### New Features
+
+ - <csr-id-3886754817ac528178b8ea326d0b4d576168eb28/> Setting the progress value is now 9x faster
+   This is accomplished at the cost of not autoamtically setting the
+   progress to 'running' anymore when the progress is set.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Setting the progress value is now 9x faster ([`3886754`](https://github.com/byron/prodash/commit/3886754817ac528178b8ea326d0b4d576168eb28))
+    - An experiment to show we don't want to rely on dashmap for this ([`4f527c1`](https://github.com/byron/prodash/commit/4f527c12caa85018de293762194f9a2aed5daaea))
+</details>
+
 ## 16.0.1 (2021-12-19)
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release over the course of 47 calendar days.
+ - 6 commits contributed to the release over the course of 47 calendar days.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 1 unique issue was worked on: [#8](https://github.com/byron/prodash/issues/8)
 
@@ -30,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * **[#8](https://github.com/byron/prodash/issues/8)**
     - Run `cargo changelog --write` for an improved changelog ([`a1054e8`](https://github.com/byron/prodash/commit/a1054e89b6f5bbdead1a5c2f975cdce0da0700e7))
  * **Uncategorized**
+    - Release prodash v16.0.1 ([`9418df2`](https://github.com/byron/prodash/commit/9418df2660e5cb17c9906f86fb379c0d22c7ddb7))
     - upgrade dashmap to latest version ([`e6f53d5`](https://github.com/byron/prodash/commit/e6f53d59ef1aef027a2aad5b164535c6ca0d620b))
     - cleanup changelog ([`5aa6275`](https://github.com/byron/prodash/commit/5aa627523536a85c382f0da20636963387b437bd))
     - thanks clippy ([`c1258e2`](https://github.com/byron/prodash/commit/c1258e250207889c62ef3208590d84185752e1a2))
@@ -824,8 +852,8 @@ Add new render-line, change feature flag names.
     too dynamically changing progress trees.
   * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
-  * `copy_new_messages(…)` method, copying only messages seen since last time it was called
-  * `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
+* `copy_new_messages(…)` method, copying only messages seen since last time it was called
+* `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
 
 ### Breaking Changes
 
@@ -935,7 +963,7 @@ Add new render-line, change feature flag names.
 </details>
 
 <csr-unknown>
-Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.New methods in *Rootmessage_buffer_usage(…) returns the amount of message we currently store, as well as the ring buffer capacity<csr-unknown/>
+Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.<csr-unknown/>
 
 ## v6.0.0 (2020-07-05)
 
