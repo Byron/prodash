@@ -154,9 +154,9 @@ impl Item {
     }
 
     /// Call to indicate that progress is back in running state, which should be called after the reason for
-    /// calling `blocked()` or `halted()` as passed.
-    pub fn running(&mut self, reason: &'static str, eta: Option<SystemTime>) {
-        self.alter_progress(|p| p.state = State::Halted(reason, eta));
+    /// calling `blocked()` or `halted()` has passed.
+    pub fn running(&mut self) {
+        self.alter_progress(|p| p.state = State::Running);
     }
 
     /// Adds a new child `Tree`, whose parent is this instance, with the given `name`.
