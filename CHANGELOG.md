@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 16.1.1 (2021-12-27)
+
+### Bug Fixes
+
+ - <csr-id-ca5f544594facc92c8744b293c7287dcffe065e5/> correct signature of new 'running()' method
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - correct signature of new 'running()' method ([`ca5f544`](https://github.com/byron/prodash/commit/ca5f544594facc92c8744b293c7287dcffe065e5))
+</details>
+
 ## 16.1.0 (2021-12-27)
 
 ### New Features
@@ -17,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -28,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v16.1.0 ([`34ae001`](https://github.com/byron/prodash/commit/34ae0014627c5fde785691ffc6583c52b629da51))
     - Setting the progress value is now 9x faster ([`3886754`](https://github.com/byron/prodash/commit/3886754817ac528178b8ea326d0b4d576168eb28))
     - An experiment to show we don't want to rely on dashmap for this ([`4f527c1`](https://github.com/byron/prodash/commit/4f527c12caa85018de293762194f9a2aed5daaea))
 </details>
@@ -852,8 +877,6 @@ Add new render-line, change feature flag names.
     too dynamically changing progress trees.
   * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
-* `copy_new_messages(…)` method, copying only messages seen since last time it was called
-* `message_buffer_usage(…)` returns the amount of message we currently store, as well as the ring buffer capacity
 
 ### Breaking Changes
 
@@ -963,7 +986,7 @@ Add new render-line, change feature flag names.
 </details>
 
 <csr-unknown>
-Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.<csr-unknown/>
+Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.copy_new_messages(…) method, copying only messages seen since last time it was calledmessage_buffer_usage(…) returns the amount of message we currently store, as well as the ring buffer capacity<csr-unknown/>
 
 ## v6.0.0 (2020-07-05)
 
