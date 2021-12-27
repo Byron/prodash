@@ -1,5 +1,6 @@
 use crate::{progress, unit};
 use std::collections::VecDeque;
+use std::sync::atomic::Ordering;
 use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
@@ -93,7 +94,20 @@ impl Throughput {
         key: &progress::Key,
         progress: Option<&progress::Value>,
     ) -> Option<unit::display::Throughput> {
-        todo!()
+        progress.and_then(|progress| {
+            self.elapsed
+                .and_then(|elapsed| match self.sorted_by_key.binary_search_by_key(key, |t| t.0) {
+                    Ok(index) => self.sorted_by_key[index]
+                        .1
+                        .update(progress.step.load(Ordering::SeqCst), elapsed),
+                    Err(index) => {
+                        let state = State::new(progress.step.load(Ordering::SeqCst), elapsed);
+                        let tp = state.throughput();
+                        self.sorted_by_key.insert(index, (*key, state));
+                        tp
+                    }
+                })
+        })
     }
 
     /// Compare the keys in `sorted_values` with our internal state and remove all missing tasks from it.

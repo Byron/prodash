@@ -36,7 +36,7 @@ pub trait DisplayValue {
     }
 
     /// Emit the `throughput` of an operation to `w`.
-    fn display_throughput(&self, w: &mut dyn fmt::Write, throughput: display::Throughput) -> fmt::Result {
+    fn display_throughput(&self, w: &mut dyn fmt::Write, throughput: &display::Throughput) -> fmt::Result {
         let (fraction, unit) = self.fraction_and_time_unit(throughput.timespan);
         w.write_char('|')?;
         self.display_current_value(w, throughput.value_change_in_timespan, None)?;

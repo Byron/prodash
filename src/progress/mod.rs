@@ -1,5 +1,5 @@
 use crate::unit::Unit;
-use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::SystemTime;
 
@@ -62,7 +62,8 @@ impl Value {
     ///
     /// A task half done would return `Some(0.5)`.
     pub fn fraction(&self) -> Option<f32> {
-        todo!()
+        self.done_at
+            .map(|done_at| self.step.load(Ordering::SeqCst) as f32 / done_at as f32)
     }
 }
 

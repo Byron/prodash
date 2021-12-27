@@ -6,7 +6,7 @@ use crate::{
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::Ordering;
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 /// A `Tree` represents an element of the progress tree.
@@ -60,6 +60,7 @@ impl Item {
             r.value_mut().progress = Some(Value {
                 done_at: max,
                 unit,
+                step: Arc::clone(&self.value),
                 ..Default::default()
             })
         };
@@ -111,21 +112,21 @@ impl Item {
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn set(&mut self, step: Step) {
-        self.value.fetch_add(step, Ordering::SeqCst);
+        self.value.store(step, Ordering::SeqCst);
     }
 
     /// Increment the current progress by the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc_by(&mut self, step: Step) {
-        todo!()
+        self.value.fetch_add(step, Ordering::SeqCst);
     }
 
     /// Increment the current progress by one.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc(&mut self) {
-        todo!()
+        self.value.fetch_add(1, Ordering::SeqCst);
     }
 
     /// Call to indicate that progress cannot be indicated, and that the task cannot be interrupted.
@@ -135,7 +136,7 @@ impl Item {
     /// If `eta` is `Some(…)`, it specifies the time at which this task is expected to
     /// make progress again.
     ///
-    /// The blocked-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
+    /// The halted-state is undone next time [`tree::Item::running(…)`][Item::running()] is called.
     pub fn blocked(&mut self, reason: &'static str, eta: Option<SystemTime>) {
         self.alter_progress(|p| p.state = State::Blocked(reason, eta));
     }
@@ -147,8 +148,14 @@ impl Item {
     /// If `eta` is `Some(…)`, it specifies the time at which this task is expected to
     /// make progress again.
     ///
-    /// The halted-state is undone next time [`tree::Item::set(…)`](./struct.Item.html#method.set) is called.
+    /// The halted-state is undone next time [`tree::Item::running(…)`][Item::running()] is called.
     pub fn halted(&mut self, reason: &'static str, eta: Option<SystemTime>) {
+        self.alter_progress(|p| p.state = State::Halted(reason, eta));
+    }
+
+    /// Call to indicate that progress is back in running state, which should be called after the reason for
+    /// calling `blocked()` or `halted()` as passed.
+    pub fn running(&mut self, reason: &'static str, eta: Option<SystemTime>) {
         self.alter_progress(|p| p.state = State::Halted(reason, eta));
     }
 

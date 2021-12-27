@@ -136,6 +136,52 @@ impl<'a> UnitDisplay<'a> {
 
 impl<'a> fmt::Display for UnitDisplay<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+        let unit: &dyn DisplayValue = self.parent.as_display_value();
+        let mode = self.parent.mode;
+
+        let percent_location_and_fraction = self.upper_bound.and_then(|upper| {
+            mode.and_then(|m| m.percent_location())
+                .map(|location| (location, ((self.current_value as f64 / upper as f64) * 100.0).floor()))
+        });
+        let throughput_and_location = self.throughput.as_ref().and_then(|throughput| {
+            mode.and_then(|m| m.throughput_location())
+                .map(|location| (location, throughput))
+        });
+        if self.display.values() {
+            if let Some((Location::BeforeValue, fraction)) = percent_location_and_fraction {
+                unit.display_percentage(f, fraction)?;
+                f.write_char(' ')?;
+            }
+            if let Some((Location::BeforeValue, throughput)) = throughput_and_location {
+                unit.display_throughput(f, throughput)?;
+                f.write_char(' ')?;
+            }
+            unit.display_current_value(f, self.current_value, self.upper_bound)?;
+            if let Some(upper) = self.upper_bound {
+                unit.separator(f, self.current_value, self.upper_bound)?;
+                unit.display_upper_bound(f, upper, self.current_value)?;
+            }
+        }
+        if self.display.unit() {
+            let mut buf = String::with_capacity(10);
+            if self.display.values() {
+                buf.write_char(' ')?;
+            }
+            unit.display_unit(&mut buf, self.current_value)?;
+            if buf.len() > 1 {
+                // did they actually write a unit?
+                f.write_str(&buf)?;
+            }
+
+            if let Some((Location::AfterUnit, fraction)) = percent_location_and_fraction {
+                f.write_char(' ')?;
+                unit.display_percentage(f, fraction)?;
+            }
+            if let Some((Location::AfterUnit, throughput)) = throughput_and_location {
+                f.write_char(' ')?;
+                unit.display_throughput(f, throughput)?;
+            }
+        }
+        Ok(())
     }
 }
