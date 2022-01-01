@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 16.1.1 (2021-12-27)
+## 16.1.2 (2022-01-01)
 
 ### Bug Fixes
 
- - <csr-id-ca5f544594facc92c8744b293c7287dcffe065e5/> correct signature of new 'running()' method
+ - <csr-id-aa70a27ef1de930fdd00266239ee262b52a681a1/> reset the shared value on init to avoid keeping the previously set value.
 
 ### Commit Statistics
 
@@ -26,6 +26,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - reset the shared value on init to avoid keeping the previously set value. ([`aa70a27`](https://github.com/byron/prodash/commit/aa70a27ef1de930fdd00266239ee262b52a681a1))
+</details>
+
+## 16.1.1 (2021-12-27)
+
+### Bug Fixes
+
+ - <csr-id-ca5f544594facc92c8744b293c7287dcffe065e5/> correct signature of new 'running()' method
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release prodash v16.1.1 ([`f426c20`](https://github.com/byron/prodash/commit/f426c20dca5440f6d39c979a8a851ee444a2c388))
     - correct signature of new 'running()' method ([`ca5f544`](https://github.com/byron/prodash/commit/ca5f544594facc92c8744b293c7287dcffe065e5))
 </details>
 
@@ -986,7 +1011,7 @@ Add new render-line, change feature flag names.
 </details>
 
 <csr-unknown>
-Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.copy_new_messages(…) method, copying only messages seen since last time it was calledmessage_buffer_usage(…) returns the amount of message we currently store, as well as the ring buffer capacity<csr-unknown/>
+Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.<csr-unknown/>
 
 ## v6.0.0 (2020-07-05)
 
