@@ -58,7 +58,7 @@ impl Item {
     pub fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
             self.value = Default::default();
-            r.value_mut().progress = Some(Value {
+            r.value_mut().progress = (max.is_some() || unit.is_some()).then(|| Value {
                 done_at: max,
                 unit,
                 step: Arc::clone(&self.value),

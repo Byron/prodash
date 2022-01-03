@@ -20,6 +20,8 @@ pub trait Progress: Send + 'static {
     ///
     /// If `unit` is `Some(…)`, it is used for display purposes only. See `prodash::Unit` for more information.
     ///
+    /// If both `unit` and `max` are `None`, the item will be reset to be equivalent to 'uninitialized'.
+    ///
     /// If this method is never called, this `Progress` instance will serve as organizational unit, useful to add more structure
     /// to the progress tree (e.g. a headline).
     ///
