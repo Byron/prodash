@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 16.1.2 (2022-01-01)
+## 16.1.3 (2022-01-03)
 
 ### Bug Fixes
 
- - <csr-id-aa70a27ef1de930fdd00266239ee262b52a681a1/> reset the shared value on init to avoid keeping the previously set value.
+ - <csr-id-2fe3eebbd62ddd9beacc294eb6ec04b4b39a26f6/> `Progress::init(None, None)` now resets the progress entirely
 
 ### Commit Statistics
 
@@ -26,6 +26,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - `Progress::init(None, None)` now resets the progress entirely ([`2fe3eeb`](https://github.com/byron/prodash/commit/2fe3eebbd62ddd9beacc294eb6ec04b4b39a26f6))
+</details>
+
+## 16.1.2 (2022-01-01)
+
+### Bug Fixes
+
+ - <csr-id-aa70a27ef1de930fdd00266239ee262b52a681a1/> reset the shared value on init to avoid keeping the previously set value.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release prodash v16.1.2 ([`3f16e6e`](https://github.com/byron/prodash/commit/3f16e6e31ee2b6df70841900d5b118f6533f9d2e))
     - reset the shared value on init to avoid keeping the previously set value. ([`aa70a27`](https://github.com/byron/prodash/commit/aa70a27ef1de930fdd00266239ee262b52a681a1))
 </details>
 
