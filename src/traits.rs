@@ -87,7 +87,7 @@ pub trait Progress: Send + 'static {
     fn show_throughput(&mut self, start: Instant) {
         let step = self.step();
         match self.unit() {
-            Some(unit) => self.show_throughput_with(start, step, unit),
+            Some(unit) => self.show_throughput_with(start, step, unit, MessageLevel::Info),
             None => {
                 let elapsed = start.elapsed().as_secs_f32();
                 let steps_per_second = (step as f32 / elapsed) as progress::Step;
@@ -99,8 +99,8 @@ pub trait Progress: Send + 'static {
         };
     }
 
-    /// A shorthand to print throughput information, with the given step and unit
-    fn show_throughput_with(&mut self, start: Instant, step: progress::Step, unit: Unit) {
+    /// A shorthand to print throughput information, with the given step and unit, and message level.
+    fn show_throughput_with(&mut self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel) {
         use std::fmt::Write;
         let elapsed = start.elapsed().as_secs_f32();
         let steps_per_second = (step as f32 / elapsed) as progress::Step;
@@ -124,7 +124,7 @@ pub trait Progress: Send + 'static {
         push_unit(&mut buf);
         buf.push_str("/s)");
 
-        self.info(buf);
+        self.message(level, buf);
     }
 }
 
