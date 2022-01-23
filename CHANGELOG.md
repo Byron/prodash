@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### New Features (BREAKING)
+
+ - <csr-id-482b54f9c584b0e2d22c53622c9f7ad45b79ad2c/> upgrade to tui 0.17
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 19 days passed between releases.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - upgrade to tui 0.17 ([`482b54f`](https://github.com/byron/prodash/commit/482b54f9c584b0e2d22c53622c9f7ad45b79ad2c))
+</details>
+
 ## 17.0.0 (2022-01-03)
 
 ### New Features (BREAKING)
@@ -17,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -28,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v17.0.0 ([`9085aaa`](https://github.com/byron/prodash/commit/9085aaaa0a7844c1d4b4afcec4b688f5c398ba87))
     - Add `MessageLevel` parameter to `Progress::show_throughput_with(…, level)` ([`46214a3`](https://github.com/byron/prodash/commit/46214a306793a6a9f304f854dfd7396ceaf433d3))
 </details>
 
@@ -665,9 +691,7 @@ Add missing trailing paranthesis in throughput display
 * Turn `ProgressStep` type into usize to allow for a broader range of values. Specifically, this enables counting bytes read and written
   of files or streams bigger than 2^32-1
 * A new example program: **units**
-* Add methods to help determine key hierarchy, useful for writing custom renderers:
-  * `Key::shares_parent_with(…)`
-  * `Key::adjecency(…)`
+* Add methods to help determine key hierarchy, useful for writing custom renderers: `Key::shares_parent_with(…)`,`Key::adjecency(…)`
 * `Key::adjecency(…)`
 
 ### Breaking
@@ -802,9 +826,6 @@ Add missing trailing paranthesis in throughput display
     - Try to manually implement/run a local executor ([`64cfe9e`](https://github.com/byron/prodash/commit/64cfe9e87e038fb36492307dfb75cbc8204180d8))
     - Actually only a few lines are needed to drive multi-task ([`d19a1db`](https://github.com/byron/prodash/commit/d19a1db08305abb77505868cc237b1c71491960d))
 </details>
-
-<csr-unknown>
-Key::adjecency(…)<csr-unknown/>
 
 ## v7.1.1 (2020-07-22)
 
@@ -969,9 +990,9 @@ Add new render-line, change feature flag names.
 ### New Features
 
 * **line**
-  * There is a new line renderer as neat trade off between bare logs and full-blown tui. It will work best with 'simple' and not
-    too dynamically changing progress trees.
-  * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
+   There is a new line renderer as neat trade off between bare logs and full-blown tui. It will work best with 'simple' and not
+   too dynamically changing progress trees.
+   Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 * Activate it with the `render-line` + one of `render-line-crossterm` or `render-line-termion` feature flags.
 
 ### Breaking Changes
@@ -1081,9 +1102,6 @@ Add new render-line, change feature flag names.
     - bump patch level; add 'input-thread-flume' support ([`7fdbb72`](https://github.com/byron/prodash/commit/7fdbb72822c450a4e13eba998236b608cf9eeca3))
     - Fix Cargo.toml to allow 'cargo test' to work without specifying features ([`748ab4b`](https://github.com/byron/prodash/commit/748ab4be6aa5fc975fcdcacbd92a2fa388103734))
 </details>
-
-<csr-unknown>
-Activate it with the render-line + one of render-line-crossterm or render-line-termion feature flags.<csr-unknown/>
 
 ## v6.0.0 (2020-07-05)
 
