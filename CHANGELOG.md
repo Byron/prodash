@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 18.0.1 (2022-02-01)
+
+### Bug Fixes
+
+ - <csr-id-a1f8aa650d1a1d2ac53025e29c71782b1cab58c5/> Downgrade to dashmap 4.0
+   While waiting for unoundness to be resolved.
+   
+   See the issue for details: https://github.com/xacrimon/dashmap/issues/167
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 9 days passed between releases.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Downgrade to dashmap 4.0 ([`a1f8aa6`](https://github.com/byron/prodash/commit/a1f8aa650d1a1d2ac53025e29c71782b1cab58c5))
+</details>
+
 ## 18.0.0 (2022-01-23)
 
 ### New Features (BREAKING)
@@ -15,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 19 days passed between releases.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -27,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v18.0.0 ([`10531ae`](https://github.com/byron/prodash/commit/10531ae35570af6003275a92ba40612a5e23678f))
     - prepare changelog ([`a7a58c0`](https://github.com/byron/prodash/commit/a7a58c0fb6ea1068b914a653eb33c96dc157dc06))
     - upgrade to tui 0.17 ([`482b54f`](https://github.com/byron/prodash/commit/482b54f9c584b0e2d22c53622c9f7ad45b79ad2c))
 </details>
@@ -165,6 +194,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 ## 16.0.1 (2021-12-19)
+
+### Chore
+
+ - <csr-id-e6f53d59ef1aef027a2aad5b164535c6ca0d620b/> upgrade dashmap to latest version
 
 ### Commit Statistics
 
