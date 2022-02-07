@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 18.0.2 (2022-02-07)
+
+### Chore
+
+ - <csr-id-e4f2ab842b34f4a4fe9b2f4c34b664a2e3dba200/> Upgrade dashmap to 5.0.1 (with security fix)
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 5 days passed between releases.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Upgrade dashmap to 5.0.1 (with security fix) ([`e4f2ab8`](https://github.com/byron/prodash/commit/e4f2ab842b34f4a4fe9b2f4c34b664a2e3dba200))
+</details>
+
 ## 18.0.1 (2022-02-01)
 
 ### Bug Fixes
@@ -18,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 9 days passed between releases.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -30,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v18.0.1 ([`e9769dd`](https://github.com/byron/prodash/commit/e9769dd7ad5c6f4618dd138aea74aba10fba69b3))
     - Downgrade to dashmap 4.0 ([`a1f8aa6`](https://github.com/byron/prodash/commit/a1f8aa650d1a1d2ac53025e29c71782b1cab58c5))
 </details>
 
@@ -194,6 +220,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 ## 16.0.1 (2021-12-19)
+
+<csr-id-e6f53d59ef1aef027a2aad5b164535c6ca0d620b/>
 
 ### Chore
 
