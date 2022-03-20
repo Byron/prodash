@@ -140,7 +140,9 @@ impl JoinHandle {
         self.disconnect();
         self.forget();
     }
-    /// Remove the handles capability to instruct the render thread to stop.
+    /// Remove the handles capability to instruct the render thread to stop, but it will still wait for it
+    /// if dropped.
+    /// Use `forget()` if it should not wait for the render thread anymore.
     pub fn disconnect(&mut self) {
         self.disconnected = true;
     }

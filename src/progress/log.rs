@@ -1,4 +1,6 @@
 use crate::{messages::MessageLevel, Progress, Unit};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::time::Duration;
 
 /// A [`Progress`] implementation which displays progress as it happens without the use of a renderer.
@@ -9,10 +11,10 @@ pub struct Log {
     name: String,
     max: Option<usize>,
     unit: Option<Unit>,
-    last_set: Option<std::time::SystemTime>,
     step: usize,
     current_level: usize,
     max_level: usize,
+    trigger: Arc<AtomicBool>,
 }
 
 const EMIT_LOG_EVERY_S: f32 = 0.5;
@@ -21,6 +23,17 @@ const SEP: &str = "::";
 impl Log {
     /// Create a new instance from `name` while displaying progress information only up to `max_level`.
     pub fn new(name: impl Into<String>, max_level: Option<usize>) -> Self {
+        let trigger = Arc::new(AtomicBool::new(true));
+        std::thread::spawn({
+            let duration = Duration::from_secs_f32(EMIT_LOG_EVERY_S);
+            let trigger = Arc::downgrade(&trigger);
+            move || {
+                while let Some(t) = trigger.upgrade() {
+                    t.store(true, Ordering::Relaxed);
+                    std::thread::sleep(duration);
+                }
+            }
+        });
         Log {
             name: name.into(),
             current_level: 0,
@@ -28,7 +41,7 @@ impl Log {
             max: None,
             step: 0,
             unit: None,
-            last_set: None,
+            trigger,
         }
     }
 }
@@ -44,7 +57,7 @@ impl Progress for Log {
             step: 0,
             max: None,
             unit: None,
-            last_set: None,
+            trigger: Arc::clone(&self.trigger),
         }
     }
 
@@ -58,17 +71,7 @@ impl Progress for Log {
         if self.current_level > self.max_level {
             return;
         }
-        let now = std::time::SystemTime::now();
-        let last_emission_time = self
-            .last_set
-            .map(|last| {
-                now.duration_since(last)
-                    .unwrap_or_else(|_| Duration::default())
-                    .as_secs_f32()
-            })
-            .unwrap_or_else(|| EMIT_LOG_EVERY_S * 2.0);
-        if last_emission_time > EMIT_LOG_EVERY_S {
-            self.last_set = Some(now);
+        if self.trigger.swap(false, Ordering::Relaxed) {
             match (self.max, &self.unit) {
                 (max, Some(unit)) => log::info!("{} → {}", self.name, unit.display(step, max, None)),
                 (Some(max), None) => log::info!("{} → {} / {}", self.name, step, max),

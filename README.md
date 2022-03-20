@@ -102,7 +102,7 @@ This crate comes with various cargo features to tailor it to your needs.
     * visual artifacts will appear
   * why
     * trying to draw beyond the terminal boundary will add a line break automatically, which can cause unexpected overdraw.
-  * fix
+  * **fix**
     * count amount of blocks drawn, without ansi codes, and stop drawing at the boundary.
     
 ## Lessons Learned
