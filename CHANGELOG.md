@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 19.0.1 (2022-03-20)
+
+### Bug Fixes
+
+ - <csr-id-dbca35f478253176e852c177e79b3253eaafe3bd/> line renderer will clear previous lines if progress is lost
+   Previously it would just exit its main loop and leave lines on screen.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - line renderer will clear previous lines if progress is lost ([`dbca35f`](https://github.com/byron/prodash/commit/dbca35f478253176e852c177e79b3253eaafe3bd))
+    - fix benchmark compilation ([`39bc237`](https://github.com/byron/prodash/commit/39bc2379c966244746b4ce361e576997159e19aa))
+</details>
+
 ## 19.0.0 (2022-03-20)
 
 ### New Features
@@ -34,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release over the course of 41 calendar days.
+ - 4 commits contributed to the release over the course of 41 calendar days.
  - 41 days passed between releases.
  - 2 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -46,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v19.0.0 ([`fda577e`](https://github.com/byron/prodash/commit/fda577e72d831d455289a6786262ea94f861063e))
     - Improve render-log performance greatly. ([`cba841c`](https://github.com/byron/prodash/commit/cba841c828142c0dd028dd9413c31f509f2bbb1b))
     - Allow rendererers to respond to dropped progress roots ([`b6d5245`](https://github.com/byron/prodash/commit/b6d5245344bde92672cd98aecacb5d94ecca4e19))
     - Actually, the correct dashmap version is 5.1 ([`6bdb7e8`](https://github.com/byron/prodash/commit/6bdb7e8ea3a65d51e69436799de3f9862b55dba4))
@@ -505,6 +532,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v13.0.0 (2021-05-02)
 
+<csr-id-e3665a2100fba190fc0f047ff05f2904f4dcaf4a/>
+<csr-id-c91d410e8d6242b78c44119155b5fc3b2956d111/>
+<csr-id-03d1c2067778fb6ec231bf18dd587046a03434bc/>
+
 * Upgrade to TUI v0.15
 
 ### Other
@@ -800,6 +831,9 @@ Add missing trailing paranthesis in throughput display
 </details>
 
 ## v8.0.0 (2020-08-10)
+
+<csr-id-66800fd4e6c9f517f19da4e26a75cb3f139353b0/>
+<csr-id-64cfe9e87e038fb36492307dfb75cbc8204180d8/>
 
 ### New Features
 
@@ -1118,6 +1152,9 @@ Prevent cursor movement if no progress bar is drawn.
 
 ## v7.0.0 (2020-07-10)
 
+<csr-id-a684188b3eee0cc67fe48b9ae14aa9cd63603caf/>
+<csr-id-1bc5c764c9b1190f168d076b2183a27569750421/>
+
 Add new render-line, change feature flag names.
 
 ### Other
@@ -1242,6 +1279,8 @@ Add new render-line, change feature flag names.
 </details>
 
 ## v6.0.0 (2020-07-05)
+
+<csr-id-bbf2651e379b5758d53a889d9fb220c616d2a096/>
 
 Factor terminal input into the new `crosstermion` crate.
 
@@ -1856,6 +1895,8 @@ a redraw manually.
 </details>
 
 ## v3.0.1 (2020-03-25)
+
+<csr-id-82baf266045d44ba31aad4e570c687d7c51d0df7/>
 
 - Bugfix: Don't allow values of 0 for when to recompute task column widths
  
