@@ -3,7 +3,7 @@ use criterion::*;
 use prodash::{messages::MessageLevel, Tree, TreeOptions};
 
 fn usage(c: &mut Criterion) {
-    fn small_tree() -> Tree {
+    fn small_tree() -> std::sync::Arc<Tree> {
         TreeOptions {
             initial_capacity: 10,
             message_buffer_capacity: 2,
