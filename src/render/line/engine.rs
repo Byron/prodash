@@ -270,16 +270,21 @@ pub fn render(
                 for event in event_recv {
                     match event {
                         Event::Tick => match progress.upgrade() {
-                            Some(progress) => draw::all(
-                                &mut out,
-                                progress,
-                                SHOW_PROGRESS.load(Ordering::Relaxed),
-                                &mut state,
-                                &config,
-                            )?,
-                            None => break,
+                            Some(progress) => {
+                                state.update_from_progress(&progress);
+                                draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
+                            }
+                            None => {
+                                state.clear();
+                                draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
+                                break;
+                            }
                         },
-                        Event::Quit => break,
+                        Event::Quit => {
+                            state.clear();
+                            draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
+                            break;
+                        }
                     }
                 }
 

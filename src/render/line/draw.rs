@@ -25,6 +25,20 @@ pub struct State {
     pub throughput: Option<Throughput>,
 }
 
+impl State {
+    pub(crate) fn update_from_progress(&mut self, progress: &impl Root) {
+        progress.sorted_snapshot(&mut self.tree);
+        self.for_next_copy = progress
+            .copy_new_messages(&mut self.messages, self.for_next_copy.take())
+            .into();
+    }
+    pub(crate) fn clear(&mut self) {
+        self.tree.clear();
+        self.messages.clear();
+        self.for_next_copy.take();
+    }
+}
+
 pub struct Options {
     pub level_filter: Option<RangeInclusive<progress::key::Level>>,
     pub terminal_dimensions: (u16, u16),
@@ -101,18 +115,10 @@ fn messages(
     Ok(())
 }
 
-pub fn all(
-    out: &mut impl io::Write,
-    progress: impl Root,
-    show_progress: bool,
-    state: &mut State,
-    config: &Options,
-) -> io::Result<()> {
-    progress.sorted_snapshot(&mut state.tree);
+pub fn all(out: &mut impl io::Write, show_progress: bool, state: &mut State, config: &Options) -> io::Result<()> {
     if !config.keep_running_if_progress_is_empty && state.tree.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "stop as progress is empty"));
     }
-    state.for_next_copy = Some(progress.copy_new_messages(&mut state.messages, state.for_next_copy.take()));
     messages(
         out,
         state,
