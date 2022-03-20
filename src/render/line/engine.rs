@@ -1,4 +1,4 @@
-use crate::{progress, render::line::draw, Root, Throughput};
+use crate::{progress, render::line::draw, Throughput, WeakRoot};
 use std::{
     io,
     ops::RangeInclusive,
@@ -184,10 +184,8 @@ enum Event {
 /// Configure it with `config`, see the [`Options`] for details.
 pub fn render(
     mut out: impl io::Write + Send + 'static,
-    progress: impl Root + Send + 'static,
-    config: Options,
-) -> JoinHandle {
-    let Options {
+    progress: impl WeakRoot + Send + 'static,
+    Options {
         output_is_terminal,
         colored,
         timestamp,
@@ -198,7 +196,8 @@ pub fn render(
         keep_running_if_progress_is_empty,
         hide_cursor,
         throughput,
-    } = config;
+    }: Options,
+) -> JoinHandle {
     let config = draw::Options {
         level_filter,
         terminal_dimensions,
@@ -268,15 +267,16 @@ pub fn render(
 
                 for event in event_recv {
                     match event {
-                        Event::Tick => {
-                            draw::all(
+                        Event::Tick => match progress.upgrade() {
+                            Some(progress) => draw::all(
                                 &mut out,
-                                &progress,
+                                progress,
                                 SHOW_PROGRESS.load(Ordering::Relaxed),
                                 &mut state,
                                 &config,
-                            )?;
-                        }
+                            )?,
+                            None => break,
+                        },
                         Event::Quit => break,
                     }
                 }
@@ -284,6 +284,10 @@ pub fn render(
                 if show_cursor {
                     crosstermion::execute!(out, crosstermion::cursor::Show).ok();
                 }
+
+                // One day we might try this out on windows, but let's not risk it now.
+                #[cfg(unix)]
+                write!(out, "\x1b[2K\r").ok(); // clear the last line.
                 Ok(())
             }
         })

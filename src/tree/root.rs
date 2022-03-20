@@ -5,19 +5,14 @@ use crate::{
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;
+use std::ops::Deref;
 use std::sync::atomic::AtomicUsize;
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 
 /// The top-level of the progress tree.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Root {
-    pub(crate) inner: Arc<Mutex<Item>>,
-}
-
-impl Default for Root {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub(crate) inner: Mutex<Item>,
 }
 
 impl Root {
@@ -25,7 +20,7 @@ impl Root {
     ///
     /// As opposed to [Item](./struct.Item.html) instances, this type can be closed and sent
     /// safely across threads.
-    pub fn new() -> Root {
+    pub fn new() -> Arc<Root> {
         Options::default().into()
     }
 
@@ -71,10 +66,10 @@ impl Root {
     /// Duplicate all content and return it.
     ///
     /// This is an expensive operation, whereas `clone()` is not as it is shallow.
-    pub fn deep_clone(&self) -> Root {
-        Root {
-            inner: Arc::new(Mutex::new(self.inner.lock().deep_clone())),
-        }
+    pub fn deep_clone(&self) -> Arc<Root> {
+        Arc::new(Root {
+            inner: Mutex::new(self.inner.lock().deep_clone()),
+        })
     }
 }
 
@@ -95,7 +90,7 @@ pub struct Options {
 impl Options {
     /// Create a new [`Root`](./tree/struct.Root.html) instance from the
     /// configuration within.
-    pub fn create(self) -> Root {
+    pub fn create(self) -> Arc<Root> {
         self.into()
     }
 }
@@ -109,43 +104,57 @@ impl Default for Options {
     }
 }
 
-impl From<Options> for Root {
+impl From<Options> for Arc<Root> {
     fn from(
         Options {
             initial_capacity,
             message_buffer_capacity,
         }: Options,
     ) -> Self {
-        Root {
-            inner: Arc::new(Mutex::new(Item {
+        Arc::new(Root {
+            inner: Mutex::new(Item {
                 highest_child_id: 0,
                 value: Arc::new(AtomicUsize::default()),
                 key: Key::default(),
                 tree: Arc::new(DashMap::with_capacity(initial_capacity)),
                 messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(message_buffer_capacity))),
-            })),
-        }
+            }),
+        })
     }
 }
 
-impl crate::Root for Root {
+impl crate::WeakRoot for Weak<Root> {
+    type Root = Arc<Root>;
+
+    fn upgrade(&self) -> Option<Self::Root> {
+        Weak::upgrade(self)
+    }
+}
+
+impl crate::Root for Arc<Root> {
+    type WeakRoot = Weak<Root>;
+
     fn messages_capacity(&self) -> usize {
-        self.messages_capacity()
+        self.deref().messages_capacity()
     }
 
     fn num_tasks(&self) -> usize {
-        self.num_tasks()
+        self.deref().num_tasks()
     }
 
     fn sorted_snapshot(&self, out: &mut Vec<(Key, Task)>) {
-        self.sorted_snapshot(out)
+        self.deref().sorted_snapshot(out)
     }
 
     fn copy_messages(&self, out: &mut Vec<Message>) {
-        self.copy_messages(out)
+        self.deref().copy_messages(out)
     }
 
     fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState {
-        self.copy_new_messages(out, prev)
+        self.deref().copy_new_messages(out, prev)
+    }
+
+    fn downgrade(&self) -> Self::WeakRoot {
+        Arc::downgrade(self)
     }
 }

@@ -7,6 +7,7 @@ use prodash::{
     Tree,
 };
 use rand::{seq::SliceRandom, thread_rng, Rng};
+use std::sync::Arc;
 use std::{ops::RangeInclusive, time::Duration};
 
 pub mod args;
@@ -21,7 +22,7 @@ enum Direction {
 const TITLES: &[&str] = &[" Dashboard Demo ", " 仪表板演示 "];
 
 pub fn launch_ambient_gui(
-    progress: Tree,
+    progress: Arc<Tree>,
     renderer: &str,
     args: args::Options,
     throughput: bool,
@@ -32,7 +33,7 @@ pub fn launch_ambient_gui(
         "line" => async move {
             let mut handle = line::render(
                 std::io::stderr(),
-                progress,
+                Arc::downgrade(&progress),
                 line::Options {
                     terminal_dimensions: args.line_column_count.map(|width| (width, 20)).unwrap_or((80, 20)),
                     timestamp: args.line_timestamp,
@@ -59,7 +60,7 @@ pub fn launch_ambient_gui(
             } else {
                 tui::render_with_input(
                     std::io::stdout(),
-                    progress,
+                    Arc::downgrade(&progress),
                     tui::Options {
                         title: TITLES.choose(&mut thread_rng()).copied().unwrap().into(),
                         frames_per_second: args.fps,

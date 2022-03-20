@@ -1,4 +1,4 @@
-use crate::{render::tui::draw, render::tui::ticker, Root, Throughput};
+use crate::{render::tui::draw, render::tui::ticker, Root, Throughput, WeakRoot};
 
 use futures_lite::StreamExt;
 use std::{
@@ -40,11 +40,8 @@ pub struct Options {
     /// If unset, it will be retrieved from the current terminal.
     pub window_size: Option<Rect>,
 
-    /// If true (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
-    ///
-    /// Please note that you should add at least one item to the `prodash::Tree` before launching the application or else
-    /// risk a race causing the TUI to sometimes not come up at all.
-    pub stop_if_empty_progress: bool,
+    /// If true (default: true), we will stop running the TUI once the progress isn't available anymore (went out of scope).
+    pub stop_if_progress_missing: bool,
 }
 
 impl Default for Options {
@@ -55,7 +52,7 @@ impl Default for Options {
             throughput: false,
             recompute_column_width_every_nth_frame: None,
             window_size: None,
-            stop_if_empty_progress: false,
+            stop_if_progress_missing: true,
         }
     }
 }
@@ -129,7 +126,7 @@ pub enum Event {
 /// Failure may occour if there is no terminal to draw into.
 pub fn render_with_input(
     out: impl std::io::Write,
-    progress: impl Root,
+    progress: impl WeakRoot,
     options: Options,
     events: impl futures_core::Stream<Item = Event> + Send + Unpin,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
@@ -139,7 +136,7 @@ pub fn render_with_input(
         window_size,
         recompute_column_width_every_nth_frame,
         throughput,
-        stop_if_empty_progress,
+        stop_if_progress_missing,
     } = options;
     let mut terminal = new_terminal(AlternateRawScreen::try_from(out)?)?;
     terminal.hide_cursor()?;
@@ -157,8 +154,12 @@ pub fn render_with_input(
             state.throughput = Some(Throughput::default());
         }
         let mut interrupt_mode = InterruptDrawInfo::Instantly;
-        let mut entries = Vec::with_capacity(progress.num_tasks());
-        let mut messages = Vec::with_capacity(progress.messages_capacity());
+        let (entries_cap, messages_cap) = progress
+            .upgrade()
+            .map(|p| (p.num_tasks(), p.messages_capacity()))
+            .unwrap_or_default();
+        let mut entries = Vec::with_capacity(entries_cap);
+        let mut messages = Vec::with_capacity(messages_cap);
         let mut events = ticker(duration_per_frame)
             .map(|_| Event::Tick)
             .or(key_receive.map(Event::Input))
@@ -210,8 +211,13 @@ pub fn render_with_input(
             if !skip_redraw {
                 tick += 1;
 
+                let progress = match progress.upgrade() {
+                    Some(progress) => progress,
+                    None if stop_if_progress_missing => break,
+                    None => continue,
+                };
                 progress.sorted_snapshot(&mut entries);
-                if stop_if_empty_progress && entries.is_empty() {
+                if stop_if_progress_missing && entries.is_empty() {
                     break;
                 }
                 let terminal_window_size = terminal.pre_render().expect("pre-render to work");
@@ -241,7 +247,7 @@ pub fn render_with_input(
 /// An easy-to-use version of `render_with_input(…)` that does not allow state manipulation via an event stream.
 pub fn render(
     out: impl std::io::Write,
-    progress: impl Root,
+    progress: impl WeakRoot,
     config: Options,
 ) -> Result<impl std::future::Future<Output = ()>, std::io::Error> {
     render_with_input(out, progress, config, futures_lite::stream::pending())

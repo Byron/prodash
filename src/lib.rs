@@ -67,7 +67,7 @@ pub mod messages;
 pub mod progress;
 
 mod traits;
-pub use traits::{Progress, Root};
+pub use traits::{Progress, Root, WeakRoot};
 
 mod throughput;
 pub use crate::throughput::Throughput;

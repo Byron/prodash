@@ -13,7 +13,7 @@ fn main() -> Result {
     env_logger::init();
 
     let args: args::Options = argh::from_env();
-    let root = Tree::default();
+    let root = Tree::new();
     let renderer = args.renderer.clone().unwrap_or_else(|| "line".into());
     let handle = shared::launch_ambient_gui(root.clone(), &renderer, args, true).unwrap();
     let work = async move {
@@ -25,7 +25,7 @@ fn main() -> Result {
     Ok(())
 }
 
-fn work_for_a_long_time_blocking(root: Tree) {
+fn work_for_a_long_time_blocking(root: Arc<Tree>) {
     let mut bytes = root.add_child("download unknown");
     bytes.init(
         None,
@@ -119,3 +119,4 @@ use shared::args;
 
 use prodash::{unit, Tree};
 use std::error::Error;
+use std::sync::Arc;

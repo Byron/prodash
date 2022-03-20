@@ -148,7 +148,7 @@ async fn work_item(mut progress: Item, speed: f32, changing_names: bool) {
     }
 }
 
-async fn new_chunk_of_work(max: NestingLevel, tree: Tree, speed: f32, changing_names: bool) -> Result {
+async fn new_chunk_of_work(max: NestingLevel, tree: Arc<Tree>, speed: f32, changing_names: bool) -> Result {
     let NestingLevel(max_level) = max;
     let mut progresses = Vec::new();
     let mut level_progress = tree.add_child(format!("level {} of {}", 1, max_level));
@@ -192,6 +192,7 @@ use prodash::{
     Tree,
 };
 use rand::prelude::*;
+use std::sync::Arc;
 use std::{
     error::Error,
     ops::Add,

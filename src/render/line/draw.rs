@@ -103,7 +103,7 @@ fn messages(
 
 pub fn all(
     out: &mut impl io::Write,
-    progress: &impl Root,
+    progress: impl Root,
     show_progress: bool,
     state: &mut State,
     config: &Options,

@@ -130,8 +130,22 @@ pub trait Progress: Send + 'static {
 
 use crate::messages::{Message, MessageCopyState};
 
+/// The top-level root as weak handle, which needs an upgrade to become a usable root.
+///
+/// If the underlying reference isn't present anymore, such upgrade will fail permanently.
+pub trait WeakRoot {
+    /// The type implementing the `Root` trait
+    type Root: Root;
+
+    /// Equivalent to `std::sync::Weak::upgrade()`.
+    fn upgrade(&self) -> Option<Self::Root>;
+}
+
 /// The top level of a progress task hiearchy, with `progress::Task`s identified with `progress::Key`s
 pub trait Root {
+    /// The type implementing the `WeakRoot` trait
+    type WeakRoot: WeakRoot;
+
     /// Returns the maximum amount of messages we can keep before overwriting older ones.
     fn messages_capacity(&self) -> usize;
 
@@ -151,4 +165,7 @@ pub trait Root {
     /// Copy only new messages from the internal ring buffer into the given `out`
     /// vector. Messages are ordered from oldest to newest.
     fn copy_new_messages(&self, out: &mut Vec<Message>, prev: Option<MessageCopyState>) -> MessageCopyState;
+
+    /// Similar to `Arc::downgrade()`
+    fn downgrade(&self) -> Self::WeakRoot;
 }
