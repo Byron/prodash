@@ -5,7 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 19.0.0 (2022-03-20)
+
+### New Features
+
+ - <csr-id-cba841c828142c0dd028dd9413c31f509f2bbb1b/> Improve render-log performance greatly.
+   Previously it would check the current time each time somebody
+   wants to log on any logger, greatly reducing performance as
+   it would block on the mutex rust-std uses internally.
+   
+   Now we use a single thread to provide information about whether or not
+   we may log, whose lifetime is bound to all of the log instances it
+   governs.
+
+### New Features (BREAKING)
+
+ - <csr-id-b6d5245344bde92672cd98aecacb5d94ecca4e19/> Allow rendererers to respond to dropped progress roots
+   Previously it needed extra effort to communicate that a the computation
+   was done and the renderer should stop rendering progress.
+   
+   Now they only obtain a weak progress instance so it can drop if the
+   computation is done, terminating it naturally and in time.
+   
+   Note that in case of the TUI, it would still be needed to respond
+   to the GUI having shut down due to user request.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release over the course of 41 calendar days.
+ - 41 days passed between releases.
+ - 2 commits where understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Improve render-log performance greatly. ([`cba841c`](https://github.com/byron/prodash/commit/cba841c828142c0dd028dd9413c31f509f2bbb1b))
+    - Allow rendererers to respond to dropped progress roots ([`b6d5245`](https://github.com/byron/prodash/commit/b6d5245344bde92672cd98aecacb5d94ecca4e19))
+    - Actually, the correct dashmap version is 5.1 ([`6bdb7e8`](https://github.com/byron/prodash/commit/6bdb7e8ea3a65d51e69436799de3f9862b55dba4))
+</details>
+
 ## 18.0.2 (2022-02-07)
+
+<csr-id-e4f2ab842b34f4a4fe9b2f4c34b664a2e3dba200/>
 
 ### Chore
 
@@ -15,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 5 days passed between releases.
  - 1 commit where understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -27,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v18.0.2 ([`69f4295`](https://github.com/byron/prodash/commit/69f42953ec69da4c2c34c8c137dfe7b7a1c12598))
     - Upgrade dashmap to 5.0.1 (with security fix) ([`e4f2ab8`](https://github.com/byron/prodash/commit/e4f2ab842b34f4a4fe9b2f4c34b664a2e3dba200))
 </details>
 
@@ -458,6 +507,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Upgrade to TUI v0.15
 
+### Other
+
+ - <csr-id-e3665a2100fba190fc0f047ff05f2904f4dcaf4a/> prep release
+ - <csr-id-c91d410e8d6242b78c44119155b5fc3b2956d111/> prepare release
+ - <csr-id-03d1c2067778fb6ec231bf18dd587046a03434bc/> Upgrade to tui 0.15
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
@@ -774,6 +829,22 @@ Add missing trailing paranthesis in throughput display
 * Rename `log-renderer` feature to `progress-tree-log`
 * Rename `tui-renderer*` into `render-tui*` and `line-renderer*` into `render-line*`
 
+### Other
+
+ - <csr-id-66800fd4e6c9f517f19da4e26a75cb3f139353b0/> Attempt to impl throughput in display…
+   …which can't work because it's actually never mutable due to the way
+   drawing work: it operates on a snapshot, a copy, that is not written
+   back.
+   
+   And even if it was, the type system statically concludes sync is needed
+   as well for this to work.
+   
+   Long story short: No state changes are ever allowed with a system like
+   this, and throughput needs to maintain just that.
+   
+   Throughput must be implemented in each renderer.
+ - <csr-id-64cfe9e87e038fb36492307dfb75cbc8204180d8/> Try to manually implement/run a local executor
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
@@ -1049,6 +1120,11 @@ Prevent cursor movement if no progress bar is drawn.
 
 Add new render-line, change feature flag names.
 
+### Other
+
+ - <csr-id-a684188b3eee0cc67fe48b9ae14aa9cd63603caf/> first version of 'slow' event loop which actually won't respond quickly either :D
+ - <csr-id-1bc5c764c9b1190f168d076b2183a27569750421/> bump patch level
+
 ### New Features
 
 * **line**
@@ -1171,6 +1247,10 @@ Factor terminal input into the new `crosstermion` crate.
 
 Due to this work, the default features changed, which is a breaking change for those who relied on it.
 Now when using the `render-tui`, one will also have to specify either the `with-crossbeam` or `render-tui-termion` feature.
+
+### Other
+
+ - <csr-id-bbf2651e379b5758d53a889d9fb220c616d2a096/> Add Key input transformation
 
 ### Commit Statistics
 
@@ -1779,6 +1859,10 @@ a redraw manually.
 
 - Bugfix: Don't allow values of 0 for when to recompute task column widths
  
+
+### Other
+
+ - <csr-id-82baf266045d44ba31aad4e570c687d7c51d0df7/> assure we never try to do 'x % 0' :D
 
 ### Commit Statistics
 
