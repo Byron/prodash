@@ -178,6 +178,7 @@ impl Drop for JoinHandle {
 #[derive(Debug)]
 enum Event {
     Tick,
+    Resize(u16, u16),
     Quit,
 }
 
@@ -200,7 +201,7 @@ pub fn render(
         throughput,
     }: Options,
 ) -> JoinHandle {
-    let config = draw::Options {
+    let mut config = draw::Options {
         level_filter,
         terminal_dimensions,
         keep_running_if_progress_is_empty,
@@ -216,6 +217,8 @@ pub fn render(
     #[cfg(feature = "signal-hook")]
     static TERM_SIGNAL_RECEIVED: AtomicBool = AtomicBool::new(false);
     #[cfg(feature = "signal-hook")]
+    static TERMINAL_RESIZED: AtomicBool = AtomicBool::new(false);
+    #[cfg(feature = "signal-hook")]
     {
         for sig in signal_hook::consts::TERM_SIGNALS {
             // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
@@ -223,6 +226,15 @@ pub fn render(
             unsafe {
                 signal_hook::low_level::register(*sig, || TERM_SIGNAL_RECEIVED.store(true, Ordering::SeqCst)).ok();
             }
+        }
+
+        // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
+        #[allow(unsafe_code)]
+        unsafe {
+            signal_hook::low_level::register(signal_hook::consts::SIGWINCH, || {
+                TERMINAL_RESIZED.store(true, Ordering::SeqCst)
+            })
+            .ok();
         }
     }
 
@@ -259,6 +271,12 @@ pub fn render(
                                 tick_send.send(Event::Quit).ok();
                                 break;
                             }
+                            if TERMINAL_RESIZED.load(Ordering::SeqCst) {
+                                TERMINAL_RESIZED.store(false, Ordering::SeqCst);
+                                if let Ok((x, y)) = crosstermion::terminal::size() {
+                                    tick_send.send(Event::Resize(x, y)).ok();
+                                }
+                            }
                         }
                         if tick_send.send(Event::Tick).is_err() {
                             break;
@@ -269,6 +287,10 @@ pub fn render(
 
                 for event in event_recv {
                     match event {
+                        Event::Resize(x, y) => {
+                            config.terminal_dimensions = (x, y);
+                            draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
+                        }
                         Event::Tick => match progress.upgrade() {
                             Some(progress) => {
                                 state.update_from_progress(&progress);
