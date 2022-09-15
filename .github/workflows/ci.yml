@@ -1,4 +1,4 @@
-name: Rust
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-and-test-linux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,13 +25,12 @@ jobs:
     - name: "Check (crossterm)"
       uses: actions-rs/cargo@v1
       with:
-        command: check
-        args: --features=render-tui-crossterm --all --bins --tests --examples
+        command: test
+        args: --features=render-tui,render-tui-crossterm,render-line,render-line-crossterm,signal-hook,render-line-autoconfigure,progress-tree --all --bins --tests --examples
     - name: benchmarks
       run: make bench
 
   build-and-test-on-windows:
-    name: Windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
@@ -44,9 +43,9 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --features=render-tui-crossterm --all --bins --tests --examples
+          args: --features=render-tui,render-tui-crossterm,render-line,render-line-crossterm,signal-hook,render-line-autoconfigure,progress-tree --all --bins --tests --examples
       - name: "Test (crossterm)"
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features=render-tui-crossterm --all
+          args: --features=render-tui,render-tui-crossterm,render-line,render-line-crossterm,signal-hook,render-line-autoconfigure,progress-tree progress-tree" --all
