@@ -5,7 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 20.0.1 (2022-09-15)
+
+### Bug Fixes
+
+ - <csr-id-80a4850802023e5a0f6fe85e6af416aaeb729e21/> Allow builds to succeed on Windows by not registering SIGWINCH signal.
+   Without said signal, the render line will not automatically resize
+   anymore, which in theory can be compensated for by re-obtaining
+   the terminal dimensions every now and then (currently not done).
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 2 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#12](https://github.com/byron/prodash/issues/12)
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **[#12](https://github.com/byron/prodash/issues/12)**
+    - Allow builds to succeed on Windows by not registering SIGWINCH signal. ([`80a4850`](https://github.com/byron/prodash/commit/80a4850802023e5a0f6fe85e6af416aaeb729e21))
+    - only register SIGWINCH signal on unix ([`5de765b`](https://github.com/byron/prodash/commit/5de765b6c134be6c439583dd89297fe2b3f1e41f))
+    - Adjust CI configuration to catch more cross-platform errors ([`b7e0f2c`](https://github.com/byron/prodash/commit/b7e0f2c97bc6c384dfbb5ed390909a5a6850bb74))
+ * **Uncategorized**
+    - Do away with unsafe code by using safe wrappers instead. ([`447aa0f`](https://github.com/byron/prodash/commit/447aa0f518aaa97dd061813a501e6a0b8512dd88))
+</details>
+
 ## 20.0.0 (2022-09-12)
+
+<csr-id-a3b26782dc074c469b5fc480595d2ac9ef8bc9d0/>
 
 ### New Features
 
@@ -19,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 175 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -31,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v20.0.0 ([`54e0a6a`](https://github.com/byron/prodash/commit/54e0a6ae39ff53b5c6e7abe9f44d003b833bfed6))
     - line renderer adjusts when resizing the terminal. ([`bab2ea0`](https://github.com/byron/prodash/commit/bab2ea09089e2eb8e4e826bb17211a444aa35f31))
     - upgrade dependencies to tui `0.19` and crossterm `0.25` ([`a3b2678`](https://github.com/byron/prodash/commit/a3b26782dc074c469b5fc480595d2ac9ef8bc9d0))
 </details>
