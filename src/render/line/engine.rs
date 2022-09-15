@@ -230,6 +230,7 @@ pub fn render(
 
         // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
         #[allow(unsafe_code)]
+        #[cfg(unix)]
         unsafe {
             signal_hook::low_level::register(signal_hook::consts::SIGWINCH, || {
                 TERMINAL_RESIZED.store(true, Ordering::SeqCst)
