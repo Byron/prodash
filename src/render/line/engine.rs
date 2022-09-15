@@ -1,4 +1,5 @@
 use crate::{progress, render::line::draw, Throughput, WeakRoot};
+use std::sync::Arc;
 use std::{
     io,
     ops::RangeInclusive,
@@ -215,28 +216,17 @@ pub fn render(
     let show_cursor = possibly_hide_cursor(&mut out, hide_cursor && output_is_terminal);
     static SHOW_PROGRESS: AtomicBool = AtomicBool::new(false);
     #[cfg(feature = "signal-hook")]
-    static TERM_SIGNAL_RECEIVED: AtomicBool = AtomicBool::new(false);
+    let term_signal_received: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     #[cfg(feature = "signal-hook")]
-    static TERMINAL_RESIZED: AtomicBool = AtomicBool::new(false);
+    let terminal_resized: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     #[cfg(feature = "signal-hook")]
     {
         for sig in signal_hook::consts::TERM_SIGNALS {
-            // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
-            #[allow(unsafe_code)]
-            unsafe {
-                signal_hook::low_level::register(*sig, || TERM_SIGNAL_RECEIVED.store(true, Ordering::SeqCst)).ok();
-            }
+            signal_hook::flag::register(*sig, term_signal_received.clone()).ok();
         }
 
-        // SAFETY: We use an atomic bool which is non-blocking and safe to do from a signal handler.
-        #[allow(unsafe_code)]
         #[cfg(unix)]
-        unsafe {
-            signal_hook::low_level::register(signal_hook::consts::SIGWINCH, || {
-                TERMINAL_RESIZED.store(true, Ordering::SeqCst)
-            })
-            .ok();
-        }
+        signal_hook::flag::register(signal_hook::consts::SIGWINCH, terminal_resized.clone()).ok();
     }
 
     let handle = std::thread::Builder::new()
@@ -268,12 +258,12 @@ pub fn render(
                     .spawn(move || loop {
                         #[cfg(feature = "signal-hook")]
                         {
-                            if TERM_SIGNAL_RECEIVED.load(Ordering::SeqCst) {
+                            if term_signal_received.load(Ordering::SeqCst) {
                                 tick_send.send(Event::Quit).ok();
                                 break;
                             }
-                            if TERMINAL_RESIZED.load(Ordering::SeqCst) {
-                                TERMINAL_RESIZED.store(false, Ordering::SeqCst);
+                            if terminal_resized.load(Ordering::SeqCst) {
+                                terminal_resized.store(false, Ordering::SeqCst);
                                 if let Ok((x, y)) = crosstermion::terminal::size() {
                                     tick_send.send(Event::Resize(x, y)).ok();
                                 }
