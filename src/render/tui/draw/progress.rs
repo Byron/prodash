@@ -287,7 +287,9 @@ fn add_block_eta(state: progress::State, progress_text: &mut String) {
             if let Some(eta) = maybe_eta {
                 let now = SystemTime::now();
                 if eta > now {
-                    progress_text.push_str(&format!(
+                    use std::fmt::Write;
+                    write!(
+                        progress_text,
                         " → {} to {}",
                         format_duration(eta.duration_since(now).expect("computation to work")),
                         if let progress::State::Blocked(_, _) = state {
@@ -295,7 +297,8 @@ fn add_block_eta(state: progress::State, progress_text: &mut String) {
                         } else {
                             "continue"
                         }
-                    ))
+                    )
+                    .expect("in-memory writes never fail");
                 }
             }
         }
