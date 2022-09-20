@@ -14,6 +14,10 @@ impl Progress for Discard {
 
     fn set(&mut self, _step: usize) {}
 
+    fn set_max(&mut self, _max: Option<Step>) -> Option<Step> {
+        None
+    }
+
     fn step(&self) -> usize {
         0
     }
@@ -83,6 +87,13 @@ where
         match self {
             Either::Left(l) => l.max(),
             Either::Right(r) => r.max(),
+        }
+    }
+
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        match self {
+            Either::Left(l) => l.set_max(max),
+            Either::Right(r) => r.set_max(max),
         }
     }
 
@@ -189,6 +200,10 @@ where
         self.0.max()
     }
 
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        self.0.set_max(max)
+    }
+
     fn step(&self) -> usize {
         self.0.step()
     }
@@ -214,7 +229,7 @@ where
     }
 }
 
-use crate::progress::StepShared;
+use crate::progress::{Step, StepShared};
 use std::time::Instant;
 
 /// Emit a message with throughput information when the instance is dropped.
@@ -248,6 +263,10 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
 
     fn max(&self) -> Option<usize> {
         self.0.max()
+    }
+
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        self.0.set_max(max)
     }
 
     fn step(&self) -> usize {

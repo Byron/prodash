@@ -1,4 +1,4 @@
-use crate::progress::StepShared;
+use crate::progress::{Step, StepShared};
 use crate::{messages::MessageLevel, Progress, Unit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -87,6 +87,12 @@ impl Progress for Log {
 
     fn max(&self) -> Option<usize> {
         self.max
+    }
+
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        let prev = self.max;
+        self.max = max;
+        prev
     }
 
     fn step(&self) -> usize {

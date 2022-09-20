@@ -44,6 +44,11 @@ pub trait Progress: Send + 'static {
         None
     }
 
+    /// Set the maximum value to `max` and return the old maximum value.
+    fn set_max(&mut self, _max: Option<progress::Step>) -> Option<progress::Step> {
+        None
+    }
+
     /// Returns the current step, as controlled by `inc*(…)` calls
     fn step(&self) -> progress::Step;
 

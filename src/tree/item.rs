@@ -6,7 +6,7 @@ use crate::{
 };
 use dashmap::DashMap;
 use parking_lot::Mutex;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{ops::Deref, sync::Arc, time::SystemTime};
 
 /// A `Tree` represents an element of the progress tree.
@@ -102,6 +102,20 @@ impl Item {
             .and_then(|r| r.value().progress.as_ref().and_then(|p| p.done_at))
     }
 
+    /// Set the maximum value to `max` and return the old maximum value.
+    pub fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        self.tree
+            .get_mut(&self.key)?
+            .value_mut()
+            .progress
+            .as_mut()
+            .and_then(|mut p| {
+                let prev = p.done_at;
+                p.done_at = max;
+                prev
+            })
+    }
+
     /// Returns the (cloned) unit associated with this Progress
     pub fn unit(&self) -> Option<Unit> {
         self.tree
@@ -179,8 +193,8 @@ impl Item {
             highest_child_id: 0,
             value: Default::default(),
             key: child_key,
-            tree: self.tree.clone(),
-            messages: self.messages.clone(),
+            tree: Arc::clone(&self.tree),
+            messages: Arc::clone(&self.messages),
         }
     }
 
@@ -225,7 +239,7 @@ impl Item {
     pub(crate) fn deep_clone(&self) -> Item {
         Item {
             key: self.key,
-            value: Default::default(),
+            value: Arc::new(AtomicUsize::new(self.value.load(Ordering::SeqCst))),
             highest_child_id: self.highest_child_id,
             tree: Arc::new(self.tree.deref().clone()),
             messages: Arc::new(Mutex::new(self.messages.lock().clone())),
@@ -254,6 +268,10 @@ impl crate::Progress for Item {
 
     fn max(&self) -> Option<usize> {
         Item::max(self)
+    }
+
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        Item::set_max(self, max)
     }
 
     fn step(&self) -> usize {
