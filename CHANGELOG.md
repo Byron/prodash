@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 20.1.0 (2022-09-20)
+
+### New Features
+
+ - <csr-id-08be317dbd77f0fdb9673b9c24c239ad0d5078c3/> `Progress::counter()` returns a shared step counter.
+   This is useful if multiple threads want to access the same progress, without the need
+   for provide each their own progress and aggregating the result.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 5 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Thanks Clippy
+
+<csr-read-only-do-not-edit/>
+
+[Clippy](https://github.com/rust-lang/rust-clippy) helped 1 time to make code idiomatic. 
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - fix compile warnings for some configurations ([`fe0ac06`](https://github.com/byron/prodash/commit/fe0ac0659c5faba9b9c0b699850ffc9e66b566f0))
+    - thanks clippy ([`deb7791`](https://github.com/byron/prodash/commit/deb77916c1ced591410aba2593284c6a1345d426))
+    - `Progress::counter()` returns a shared step counter. ([`08be317`](https://github.com/byron/prodash/commit/08be317dbd77f0fdb9673b9c24c239ad0d5078c3))
+</details>
+
 ## 20.0.1 (2022-09-15)
 
 ### Bug Fixes
@@ -18,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 2 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 1 unique issue was worked on: [#12](https://github.com/byron/prodash/issues/12)
@@ -34,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - only register SIGWINCH signal on unix ([`5de765b`](https://github.com/byron/prodash/commit/5de765b6c134be6c439583dd89297fe2b3f1e41f))
     - Adjust CI configuration to catch more cross-platform errors ([`b7e0f2c`](https://github.com/byron/prodash/commit/b7e0f2c97bc6c384dfbb5ed390909a5a6850bb74))
  * **Uncategorized**
+    - Release prodash v20.0.1 ([`b98595b`](https://github.com/byron/prodash/commit/b98595b8cc9fd2f0bf3ea8cc22fbd7cf6cb07ab1))
     - Do away with unsafe code by using safe wrappers instead. ([`447aa0f`](https://github.com/byron/prodash/commit/447aa0f518aaa97dd061813a501e6a0b8512dd88))
 </details>
 
