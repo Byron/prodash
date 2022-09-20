@@ -1,3 +1,4 @@
+use crate::progress::StepShared;
 use crate::{messages::MessageLevel, Progress, Unit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -117,5 +118,9 @@ impl Progress for Log {
             MessageLevel::Failure => log::error!("𐄂{} → {}", self.name, message),
             MessageLevel::Success => log::info!("✓{} → {}", self.name, message),
         }
+    }
+
+    fn counter(&self) -> Option<StepShared> {
+        None
     }
 }

@@ -27,6 +27,10 @@ impl Progress for Discard {
     }
 
     fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
+
+    fn counter(&self) -> Option<StepShared> {
+        None
+    }
 }
 
 /// An implementation of [`Progress`] showing either one or the other implementation.
@@ -116,6 +120,13 @@ where
             Either::Right(r) => r.message(level, message),
         }
     }
+
+    fn counter(&self) -> Option<StepShared> {
+        match self {
+            Either::Left(l) => l.counter(),
+            Either::Right(r) => r.counter(),
+        }
+    }
 }
 
 /// An implementation of `Progress` which can be created easily from `Option<impl Progress>`.
@@ -197,8 +208,13 @@ where
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
     }
+
+    fn counter(&self) -> Option<StepShared> {
+        self.0.counter()
+    }
 }
 
+use crate::progress::StepShared;
 use std::time::Instant;
 
 /// Emit a message with throughput information when the instance is dropped.
@@ -252,6 +268,10 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
+    }
+
+    fn counter(&self) -> Option<StepShared> {
+        self.0.counter()
     }
 }
 
