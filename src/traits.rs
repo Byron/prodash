@@ -71,6 +71,14 @@ pub trait Progress: Send + 'static {
     /// made, including indicating success or failure.
     fn message(&mut self, level: MessageLevel, message: impl Into<String>);
 
+    /// If available, return an atomic counter for direct access to the underlying state.
+    ///
+    /// This is useful if multiple threads want to access the same progress, without the need
+    /// for provide each their own progress and aggregating the result.
+    fn counter(&self) -> Option<StepShared> {
+        None
+    }
+
     /// Create a message providing additional information about the progress thus far.
     fn info(&mut self, message: impl Into<String>) {
         self.message(MessageLevel::Info, message)
@@ -129,6 +137,7 @@ pub trait Progress: Send + 'static {
 }
 
 use crate::messages::{Message, MessageCopyState};
+use crate::progress::StepShared;
 
 /// The top-level root as weak handle, which needs an upgrade to become a usable root.
 ///

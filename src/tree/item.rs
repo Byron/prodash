@@ -275,4 +275,8 @@ impl crate::Progress for Item {
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         Item::message(self, level, message)
     }
+
+    fn counter(&self) -> Option<StepShared> {
+        Some(self.value.clone())
+    }
 }
