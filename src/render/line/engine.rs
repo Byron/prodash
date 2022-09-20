@@ -1,4 +1,5 @@
 use crate::{progress, render::line::draw, Throughput, WeakRoot};
+#[cfg(feature = "signal-hook")]
 use std::sync::Arc;
 use std::{
     io,
@@ -179,8 +180,9 @@ impl Drop for JoinHandle {
 #[derive(Debug)]
 enum Event {
     Tick,
-    Resize(u16, u16),
     Quit,
+    #[cfg(feature = "signal-hook")]
+    Resize(u16, u16),
 }
 
 /// Write a line-based representation of `progress` to `out` which is assumed to be a terminal.
@@ -202,6 +204,7 @@ pub fn render(
         throughput,
     }: Options,
 ) -> JoinHandle {
+    #[cfg_attr(not(feature = "signal-hook"), allow(unused_mut))]
     let mut config = draw::Options {
         level_filter,
         terminal_dimensions,
@@ -278,6 +281,7 @@ pub fn render(
 
                 for event in event_recv {
                     match event {
+                        #[cfg(feature = "signal-hook")]
                         Event::Resize(x, y) => {
                             config.terminal_dimensions = (x, y);
                             draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
