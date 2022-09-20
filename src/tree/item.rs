@@ -277,6 +277,6 @@ impl crate::Progress for Item {
     }
 
     fn counter(&self) -> Option<StepShared> {
-        Some(self.value.clone())
+        Some(Arc::clone(&self.value))
     }
 }
