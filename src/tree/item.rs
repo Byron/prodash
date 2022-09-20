@@ -57,7 +57,7 @@ impl Item {
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
     pub fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         if let Some(mut r) = self.tree.get_mut(&self.key) {
-            self.value = Default::default();
+            self.value.store(0, Ordering::SeqCst);
             r.value_mut().progress = (max.is_some() || unit.is_some()).then(|| Value {
                 done_at: max,
                 unit,
