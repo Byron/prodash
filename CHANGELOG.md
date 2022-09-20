@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 20.2.0 (2022-09-20)
+
+### New Features
+
+ - <csr-id-4904065a51594b5bc4f32a247e513b45093373fa/> Add `Progress::set_max()` to set the highgest expected progress value.
+
+### Bug Fixes
+
+ - <csr-id-414bc71e79475335345dbc529566a6efc3afee23/> don't reset the shared counter value on `init`.
+   It's possible to re-initialize the progress, and when that's done
+   it would detach the counter from previous instances that might have
+   been observed by callers to `counter()`, which is surprising.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - don't reset the shared counter value on `init`. ([`414bc71`](https://github.com/byron/prodash/commit/414bc71e79475335345dbc529566a6efc3afee23))
+    - Add `Progress::set_max()` to set the highgest expected progress value. ([`4904065`](https://github.com/byron/prodash/commit/4904065a51594b5bc4f32a247e513b45093373fa))
+    - make more explicit what is cloned (without altering actual behaviour) ([`b023efd`](https://github.com/byron/prodash/commit/b023efdc9c076f15cef1978ad95d932f782bdea7))
+</details>
+
 ## 20.1.1 (2022-09-20)
 
 ### Bug Fixes
@@ -17,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -28,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v20.1.1 ([`d152701`](https://github.com/byron/prodash/commit/d1527018e5156921c3263c9d9afafad8c488a3b9))
     - implement `Progress::counter()` for all utility types. ([`a0e7da7`](https://github.com/byron/prodash/commit/a0e7da7d08331eeeea8ca0cb6e349fe32ce876bc))
 </details>
 
