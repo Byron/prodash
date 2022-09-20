@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 20.1.1 (2022-09-20)
+
+### Bug Fixes
+
+ - <csr-id-a0e7da7d08331eeeea8ca0cb6e349fe32ce876bc/> implement `Progress::counter()` for all utility types.
+   This was forgotten previously as there was a default implementation
+   right from the start.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - implement `Progress::counter()` for all utility types. ([`a0e7da7`](https://github.com/byron/prodash/commit/a0e7da7d08331eeeea8ca0cb6e349fe32ce876bc))
+</details>
+
 ## 20.1.0 (2022-09-20)
 
 ### New Features
@@ -17,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 5 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
@@ -35,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v20.1.0 ([`6591872`](https://github.com/byron/prodash/commit/65918722da151b756f6a3facc3577bd2002feadc))
     - fix compile warnings for some configurations ([`fe0ac06`](https://github.com/byron/prodash/commit/fe0ac0659c5faba9b9c0b699850ffc9e66b566f0))
     - thanks clippy ([`deb7791`](https://github.com/byron/prodash/commit/deb77916c1ced591410aba2593284c6a1345d426))
     - `Progress::counter()` returns a shared step counter. ([`08be317`](https://github.com/byron/prodash/commit/08be317dbd77f0fdb9673b9c24c239ad0d5078c3))
