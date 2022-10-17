@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 21.0.0 (2022-10-17)
+
+### New Features
+
+ - <csr-id-3347a0294c5b95270c34de9f396214353baea36d/> `impl Progress for &mut T: where T: Progress`.
+   This makes it possible to hand borrowed progress implementations to
+   functions that need progress reporting, making the usage of progress
+   easier.
+
+### New Features (BREAKING)
+
+ - <csr-id-300181bdd4b2ef1822dddd1fe814d7e3e5b26779/> remove `Progress: 'static` requirement.
+   This requirement can be added where used and where needed, and
+   originally snuck in because it was easier and `Progress` implementations
+   typically are `'static` as well.
+   
+   However, that requirement made it impossible to implement `Progoress`
+   for `&mut T where T: Progress`.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 27 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' where seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - `impl Progress for &mut T: where T: Progress`. ([`3347a02`](https://github.com/byron/prodash/commit/3347a0294c5b95270c34de9f396214353baea36d))
+    - remove `Progress: 'static` requirement. ([`300181b`](https://github.com/byron/prodash/commit/300181bdd4b2ef1822dddd1fe814d7e3e5b26779))
+</details>
+
 ## 20.2.0 (2022-09-20)
 
 ### New Features
@@ -22,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' where seen in commit messages
 
@@ -33,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v20.2.0 ([`f49f470`](https://github.com/byron/prodash/commit/f49f4703f5d09f9bbe8ec32bd249c42bd129d7ea))
     - don't reset the shared counter value on `init`. ([`414bc71`](https://github.com/byron/prodash/commit/414bc71e79475335345dbc529566a6efc3afee23))
     - Add `Progress::set_max()` to set the highgest expected progress value. ([`4904065`](https://github.com/byron/prodash/commit/4904065a51594b5bc4f32a247e513b45093373fa))
     - make more explicit what is cloned (without altering actual behaviour) ([`b023efd`](https://github.com/byron/prodash/commit/b023efdc9c076f15cef1978ad95d932f782bdea7))
