@@ -155,7 +155,7 @@ pub trait WeakRoot {
     fn upgrade(&self) -> Option<Self::Root>;
 }
 
-/// The top level of a progress task hiearchy, with `progress::Task`s identified with `progress::Key`s
+/// The top level of a progress task hierarchy, with `progress::Task`s identified with `progress::Key`s
 pub trait Root {
     /// The type implementing the `WeakRoot` trait
     type WeakRoot: WeakRoot;
@@ -182,4 +182,91 @@ pub trait Root {
 
     /// Similar to `Arc::downgrade()`
     fn downgrade(&self) -> Self::WeakRoot;
+}
+
+mod impls {
+    use crate::messages::MessageLevel;
+    use crate::progress::{Step, StepShared};
+    use crate::{Progress, Unit};
+    use std::ops::{Deref, DerefMut};
+    use std::time::Instant;
+
+    impl<'a, T> Progress for &'a mut T
+    where
+        T: Progress,
+    {
+        type SubProgress = <T as Progress>::SubProgress;
+
+        fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
+            self.deref_mut().add_child(name)
+        }
+
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.deref_mut().init(max, unit)
+        }
+
+        fn set(&mut self, step: Step) {
+            self.deref_mut().set(step)
+        }
+
+        fn unit(&self) -> Option<Unit> {
+            self.deref().unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.deref().max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.deref_mut().set_max(max)
+        }
+
+        fn step(&self) -> Step {
+            self.deref().step()
+        }
+
+        fn inc_by(&mut self, step: Step) {
+            self.deref_mut().inc_by(step)
+        }
+
+        fn inc(&mut self) {
+            self.deref_mut().inc()
+        }
+
+        fn set_name(&mut self, name: impl Into<String>) {
+            self.deref_mut().set_name(name)
+        }
+
+        fn name(&self) -> Option<String> {
+            self.deref().name()
+        }
+
+        fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+            self.deref_mut().message(level, message)
+        }
+
+        fn counter(&self) -> Option<StepShared> {
+            self.deref().counter()
+        }
+
+        fn info(&mut self, message: impl Into<String>) {
+            self.deref_mut().info(message)
+        }
+
+        fn done(&mut self, message: impl Into<String>) {
+            self.deref_mut().done(message)
+        }
+
+        fn fail(&mut self, message: impl Into<String>) {
+            self.deref_mut().fail(message)
+        }
+
+        fn show_throughput(&mut self, start: Instant) {
+            self.deref_mut().show_throughput(start)
+        }
+
+        fn show_throughput_with(&mut self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.deref_mut().show_throughput_with(start, step, unit, level)
+        }
+    }
 }
