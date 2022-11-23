@@ -30,3 +30,10 @@ tests: clippy check unit-test ## Run all tests we have
 bench: ## Run criterion based benchmark, works on stable Rust
 	cargo bench
 
+##@ Development
+
+fmt: ## run nightly rustfmt for its extra features, but check that it won't upset stable rustfmt
+	cargo +nightly fmt --all -- --config-path rustfmt-nightly.toml
+	cargo +stable fmt --all -- --check
+
+
