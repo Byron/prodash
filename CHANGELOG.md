@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 21.1.0 (2022-11-23)
+
+### New Features
+
+ - <csr-id-c332a6f266a6ae0cacf19cb523e551bb63c1e7ea/> identify each progress item with `Id` using `add_child_with_id()`.
+   An `Id` is four bytes like b"TREE" that are stable and
+   identify progress items (as created by `add_child(…)` within
+   a function call.
+   
+   Callers may use this knowledge to pick specific progress items
+   for consumption, instead of trying to rely on identifying tasks
+   by name which may change.
+   
+   The identifier can also be queried with `Progress::id()`, even
+   though it could be `prodash::progress::UNKNOWN` if the progress
+   item wasn't created with `add_child_with_id()`.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 37 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - `make fmt` ([`5415acc`](https://github.com/byron/prodash/commit/5415acc4cae7bab81a22758fe969bdb8b3deac13))
+    - Make it easy to format 'use'es in the codebase. ([`5b8e54d`](https://github.com/byron/prodash/commit/5b8e54d959f895d762a4a77d194f3947a6302783))
+    - identify each progress item with `Id` using `add_child_with_id()`. ([`c332a6f`](https://github.com/byron/prodash/commit/c332a6f266a6ae0cacf19cb523e551bb63c1e7ea))
+</details>
+
 ## 21.0.0 (2022-10-17)
 
 ### New Features
@@ -28,10 +66,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 27 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -40,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v21.0.0 ([`d7fcf5b`](https://github.com/byron/prodash/commit/d7fcf5bb5a6bad8225c22ce6df848835f5790847))
     - `impl Progress for &mut T: where T: Progress`. ([`3347a02`](https://github.com/byron/prodash/commit/3347a0294c5b95270c34de9f396214353baea36d))
     - remove `Progress: 'static` requirement. ([`300181b`](https://github.com/byron/prodash/commit/300181bdd4b2ef1822dddd1fe814d7e3e5b26779))
 </details>
@@ -63,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 4 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -92,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -120,7 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 4 commits contributed to the release.
  - 5 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -193,7 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 3 commits contributed to the release.
  - 175 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -220,7 +259,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 3 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -266,7 +305,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 4 commits contributed to the release over the course of 41 calendar days.
  - 41 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -296,7 +335,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 5 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -325,7 +364,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 9 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -351,7 +390,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 3 commits contributed to the release.
  - 19 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -379,7 +418,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -405,7 +444,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 2 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -431,7 +470,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 4 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -456,7 +495,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -484,7 +523,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 3 commits contributed to the release.
  - 8 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -554,7 +593,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 4 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -580,7 +619,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 25 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -604,7 +643,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 4 commits contributed to the release over the course of 32 calendar days.
  - 50 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -637,7 +676,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 3 commits contributed to the release.
  - 38 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -661,7 +700,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -685,7 +724,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -710,7 +749,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 6 commits contributed to the release over the course of 5 calendar days.
  - 5 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -754,7 +793,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 13 commits contributed to the release over the course of 109 calendar days.
  - 110 days passed between releases.
  - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -787,7 +826,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 3 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -811,7 +850,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 10 commits contributed to the release.
  - 4 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -849,7 +888,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 2 commits contributed to the release.
  - 49 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -873,7 +912,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 10 commits contributed to the release over the course of 47 calendar days.
  - 59 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -905,7 +944,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 10 commits contributed to the release over the course of 3 calendar days.
  - 3 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -936,7 +975,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - 5 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -973,7 +1012,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 1 commit contributed to the release.
  - 27 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -998,7 +1037,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 1 commit contributed to the release.
  - 4 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1021,7 +1060,7 @@ Add missing trailing paranthesis in throughput display
  - 1 commit contributed to the release.
  - 1 day passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1089,7 +1128,7 @@ Add missing trailing paranthesis in throughput display
  - 91 commits contributed to the release over the course of 19 calendar days.
  - 19 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Thanks Clippy
 
@@ -1207,7 +1246,7 @@ Add missing trailing paranthesis in throughput display
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1230,7 +1269,7 @@ Add missing trailing paranthesis in throughput display
 
  - 5 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1260,7 +1299,7 @@ Add missing trailing paranthesis in throughput display
  - 7 commits contributed to the release over the course of 1 calendar day.
  - 9 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1288,7 +1327,7 @@ cleanup and code simplification in the line renderer.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1316,7 +1355,7 @@ cleanup and code simplification in the line renderer.
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1339,7 +1378,7 @@ Prevent cursor movement if no progress bar is drawn.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1389,7 +1428,7 @@ Add new render-line, change feature flag names.
  - 81 commits contributed to the release over the course of 4 calendar days.
  - 4 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1501,7 +1540,7 @@ Now when using the `render-tui`, one will also have to specify either the `with-
  - 24 commits contributed to the release.
  - 2 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1554,7 +1593,7 @@ If you have been using the event stream to send your own keys, swap `termion::ev
  - 16 commits contributed to the release.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1596,7 +1635,7 @@ for shutting down once the task at hand is complete.
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1627,7 +1666,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
  - 1 commit contributed to the release.
  - 1 day passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1649,7 +1688,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1673,7 +1712,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
  - 4 commits contributed to the release over the course of 33 calendar days.
  - 42 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1698,7 +1737,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1720,7 +1759,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1751,7 +1790,7 @@ a redraw manually.
  - 1 commit contributed to the release.
  - 12 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1774,7 +1813,7 @@ a redraw manually.
  - 2 commits contributed to the release.
  - 1 day passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1798,7 +1837,7 @@ a redraw manually.
  - 5 commits contributed to the release over the course of 21 calendar days.
  - 24 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1824,7 +1863,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1846,7 +1885,7 @@ a redraw manually.
 
  - 2 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1870,7 +1909,7 @@ a redraw manually.
  - 1 commit contributed to the release.
  - 5 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1892,7 +1931,7 @@ a redraw manually.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1916,7 +1955,7 @@ a redraw manually.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1941,7 +1980,7 @@ a redraw manually.
  - 24 commits contributed to the release over the course of 2 calendar days.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -1987,7 +2026,7 @@ a redraw manually.
  - 6 commits contributed to the release over the course of 1 calendar day.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2016,7 +2055,7 @@ a redraw manually.
  - 2 commits contributed to the release.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2039,7 +2078,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2062,7 +2101,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2085,7 +2124,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2114,7 +2153,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2137,7 +2176,7 @@ a redraw manually.
 
  - 4 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2163,7 +2202,7 @@ a redraw manually.
  - 2 commits contributed to the release.
  - 1 day passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2187,7 +2226,7 @@ a redraw manually.
  - 2 commits contributed to the release over the course of 1 calendar day.
  - 15 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2211,7 +2250,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2234,7 +2273,7 @@ a redraw manually.
  - 1 commit contributed to the release.
  - 4 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2257,7 +2296,7 @@ a redraw manually.
  - 2 commits contributed to the release over the course of 5 calendar days.
  - 8 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2280,7 +2319,7 @@ a redraw manually.
 
  - 1 commit contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2302,7 +2341,7 @@ a redraw manually.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2326,7 +2365,7 @@ a redraw manually.
 
  - 3 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -2348,7 +2387,7 @@ a redraw manually.
 
  - 5 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' where seen in commit messages
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
