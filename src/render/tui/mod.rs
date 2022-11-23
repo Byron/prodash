@@ -9,15 +9,17 @@
 * ```should_panic
 * # fn main() -> Result<(), Box<dyn std::error::Error>> {
 * use futures::task::{LocalSpawnExt, SpawnExt};
-* use prodash::tui::ticker;
+* use prodash::render::tui::ticker;
+* use prodash::Root;
 * // obtain a progress tree
 * let root = prodash::Tree::new();
 * // Configure the gui, provide it with a handle to the ever-changing tree
-* let render_fut = prodash::tui::render(
-*     root.clone(),
-*     prodash::tui::Options {
+* let render_fut = prodash::render::tui::render(
+*     std::io::stdout(),
+*     root.downgrade(),
+*     prodash::render::tui::Options {
 *         title: "minimal example".into(),
-*         ..prodash::tui::Options::default()
+*         ..prodash::render::tui::Options::default()
 *     }
 * )?;
 * // As it runs forever, we want a way to stop it.
@@ -30,7 +32,7 @@
 *     use futures::StreamExt;
 *     let mut progress = root.add_child("task");
 *     async move {
-*         progress.init(None, Some("items"));
+*         progress.init(None, None);
 *         let mut count = 0;
 *         let  mut ticks = ticker(std::time::Duration::from_millis(100));
 *         while let Some(_) = ticks.next().await {

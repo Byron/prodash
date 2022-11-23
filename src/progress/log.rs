@@ -1,4 +1,4 @@
-use crate::progress::{Step, StepShared};
+use crate::progress::{Id, Step, StepShared};
 use crate::{messages::MessageLevel, Progress, Unit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -10,6 +10,7 @@ use std::time::Duration;
 /// to see if progress information should actually be emitted.
 pub struct Log {
     name: String,
+    id: Id,
     max: Option<usize>,
     unit: Option<Unit>,
     step: usize,
@@ -37,6 +38,7 @@ impl Log {
         });
         Log {
             name: name.into(),
+            id: crate::progress::UNKNOWN,
             current_level: 0,
             max_level: max_level.unwrap_or(usize::MAX),
             max: None,
@@ -51,8 +53,13 @@ impl Progress for Log {
     type SubProgress = Log;
 
     fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
+        self.add_child_with_id(name, crate::progress::UNKNOWN)
+    }
+
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
         Log {
             name: format!("{}{}{}", self.name, SEP, Into::<String>::into(name)),
+            id,
             current_level: self.current_level + 1,
             max_level: self.max_level,
             step: 0,
@@ -115,6 +122,10 @@ impl Progress for Log {
 
     fn name(&self) -> Option<String> {
         self.name.split(SEP).nth(1).map(ToOwned::to_owned)
+    }
+
+    fn id(&self) -> Id {
+        self.id
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {

@@ -196,7 +196,20 @@ pub fn draw_progress(
             None => state,
         });
 
-    for (line, (entry_index, (key, Task { progress, name: title }))) in entries
+    for (
+        line,
+        (
+            entry_index,
+            (
+                key,
+                Task {
+                    progress,
+                    name: title,
+                    id: _,
+                },
+            ),
+        ),
+    ) in entries
         .iter()
         .enumerate()
         .skip(offset as usize)

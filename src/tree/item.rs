@@ -1,7 +1,7 @@
 use crate::progress::StepShared;
 use crate::{
     messages::{MessageLevel, MessageRingBuffer},
-    progress::{key, Key, State, Step, Task, Value},
+    progress::{key, Id, Key, State, Step, Task, Value},
     unit::Unit,
 };
 use dashmap::DashMap;
@@ -21,7 +21,7 @@ use std::{ops::Deref, sync::Arc, time::SystemTime};
 ///     progress.set(p);
 /// }
 /// progress.done("great success");
-/// let mut  sub_progress = progress.add_child("sub-task 1");
+/// let mut  sub_progress = progress.add_child_with_id("sub-task 1", *b"TSK2");
 /// sub_progress.init(None, None);
 /// sub_progress.set(5);
 /// sub_progress.fail("couldn't finish");
@@ -88,6 +88,14 @@ impl Item {
     /// Get the name of this task's progress
     pub fn name(&self) -> Option<String> {
         self.tree.get(&self.key).map(|r| r.value().name.to_owned())
+    }
+
+    /// Get the stable identifier of this instance.
+    pub fn id(&self) -> Id {
+        self.tree
+            .get(&self.key)
+            .map(|r| r.value().id)
+            .unwrap_or(crate::progress::UNKNOWN)
     }
 
     /// Returns the current step, as controlled by `inc*(…)` calls
@@ -180,11 +188,21 @@ impl Item {
     /// Exceeding the level will be ignored, and new tasks will be added to this instance's
     /// level instead.
     pub fn add_child(&mut self, name: impl Into<String>) -> Item {
+        self.add_child_with_id(name, crate::progress::UNKNOWN)
+    }
+
+    /// Adds a new child `Tree`, whose parent is this instance, with the given `name` and `id`.
+    ///
+    /// **Important**: The depth of the hierarchy is limited to [`tree::Key::max_level`](./struct.Key.html#method.max_level).
+    /// Exceeding the level will be ignored, and new tasks will be added to this instance's
+    /// level instead.
+    pub fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Item {
         let child_key = self.key.add_child(self.highest_child_id);
         self.tree.insert(
             child_key,
             Task {
                 name: name.into(),
+                id,
                 progress: None,
             },
         );
@@ -254,6 +272,10 @@ impl crate::Progress for Item {
         Item::add_child(self, name)
     }
 
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+        Item::add_child_with_id(self, name, id)
+    }
+
     fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         Item::init(self, max, unit)
     }
@@ -288,6 +310,10 @@ impl crate::Progress for Item {
 
     fn name(&self) -> Option<String> {
         Item::name(self)
+    }
+
+    fn id(&self) -> Id {
+        Item::id(self)
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
