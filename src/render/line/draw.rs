@@ -1,15 +1,16 @@
+use std::{collections::VecDeque, io, ops::RangeInclusive, sync::atomic::Ordering};
+
+use crosstermion::{
+    ansi_term::{ANSIString, ANSIStrings, Color, Style},
+    color,
+};
+use unicode_width::UnicodeWidthStr;
+
 use crate::{
     messages::{Message, MessageCopyState, MessageLevel},
     progress::{self, Value},
     unit, Root, Throughput,
 };
-use crosstermion::{
-    ansi_term::{ANSIString, ANSIStrings, Color, Style},
-    color,
-};
-use std::sync::atomic::Ordering;
-use std::{collections::VecDeque, io, ops::RangeInclusive};
-use unicode_width::UnicodeWidthStr;
 
 #[derive(Default)]
 pub struct State {

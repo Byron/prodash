@@ -1,5 +1,6 @@
-use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
+
+use crate::{progress::Step, unit::DisplayValue};
 
 /// A marker for formatting numbers as bytes in renderers.
 #[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]

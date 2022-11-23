@@ -1,5 +1,4 @@
 use criterion::*;
-
 use prodash::{messages::MessageLevel, Tree, TreeOptions};
 
 fn usage(c: &mut Criterion) {

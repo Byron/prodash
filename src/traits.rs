@@ -1,5 +1,6 @@
-use crate::{messages::MessageLevel, progress, progress::Id, Unit};
 use std::time::Instant;
+
+use crate::{messages::MessageLevel, progress, progress::Id, Unit};
 
 /// A trait for describing hierarchical process.
 pub trait Progress: Send {
@@ -153,8 +154,10 @@ pub trait Progress: Send {
     }
 }
 
-use crate::messages::{Message, MessageCopyState};
-use crate::progress::StepShared;
+use crate::{
+    messages::{Message, MessageCopyState},
+    progress::StepShared,
+};
 
 /// The top-level root as weak handle, which needs an upgrade to become a usable root.
 ///
@@ -197,11 +200,16 @@ pub trait Root {
 }
 
 mod impls {
-    use crate::messages::MessageLevel;
-    use crate::progress::{Id, Step, StepShared};
-    use crate::{Progress, Unit};
-    use std::ops::{Deref, DerefMut};
-    use std::time::Instant;
+    use std::{
+        ops::{Deref, DerefMut},
+        time::Instant,
+    };
+
+    use crate::{
+        messages::MessageLevel,
+        progress::{Id, Step, StepShared},
+        Progress, Unit,
+    };
 
     impl<'a, T> Progress for &'a mut T
     where

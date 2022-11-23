@@ -1,7 +1,5 @@
 // Copied and adapted from https://github.com/smol-rs/smol/blob/15447d6859df65fd1992f761ee46067bed62f8a5/src/spawn.rs
-use std::future::Future;
-use std::panic::catch_unwind;
-use std::thread;
+use std::{future::Future, panic::catch_unwind, thread};
 
 use async_executor::Executor;
 pub use async_executor::Task;

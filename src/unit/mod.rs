@@ -1,5 +1,6 @@
-use crate::progress::Step;
 use std::{fmt, ops::Deref, sync::Arc};
+
+use crate::progress::Step;
 
 #[cfg(feature = "unit-bytes")]
 mod bytes;

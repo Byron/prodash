@@ -103,8 +103,9 @@ mod label {
                 );
             }
         }
-        use crate::unit::{self, display};
         use std::time;
+
+        use crate::unit::{self, display};
 
         #[test]
         fn display_current_over_time_shows_throughput() {
@@ -241,8 +242,9 @@ mod label {
 }
 
 mod size {
-    use crate::unit::{display, Unit};
     use std::mem::size_of;
+
+    use crate::unit::{display, Unit};
 
     #[test]
     fn of_mode() {

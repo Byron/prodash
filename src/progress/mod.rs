@@ -1,7 +1,12 @@
+use std::{
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
+    time::SystemTime,
+};
+
 use crate::unit::Unit;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
-use std::time::SystemTime;
 
 ///
 pub mod key;
@@ -12,10 +17,10 @@ mod utils;
 
 #[cfg(feature = "progress-log")]
 mod log;
+pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
+
 #[cfg(feature = "progress-log")]
 pub use self::log::Log;
-
-pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
 
 /// Four bytes of function-local unique and stable identifier for each item added as progress,
 /// like b"TREE" or b"FILE".

@@ -1,13 +1,20 @@
-use crate::progress::StepShared;
-use crate::{
-    messages::{MessageLevel, MessageRingBuffer},
-    progress::{key, Id, Key, State, Step, Task, Value},
-    unit::Unit,
+use std::{
+    ops::Deref,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
+    time::SystemTime,
 };
+
 use dashmap::DashMap;
 use parking_lot::Mutex;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::{ops::Deref, sync::Arc, time::SystemTime};
+
+use crate::{
+    messages::{MessageLevel, MessageRingBuffer},
+    progress::{key, Id, Key, State, Step, StepShared, Task, Value},
+    unit::Unit,
+};
 
 /// A `Tree` represents an element of the progress tree.
 ///

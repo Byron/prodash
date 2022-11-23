@@ -1,13 +1,14 @@
-use crate::render::tui::{
-    utils::{block_width, draw_text_with_ellipsis_nowrap, rect},
-    Line,
-};
 use tui::{
     buffer::Buffer,
     layout::Rect,
     style::{Modifier, Style},
     text::Span,
     widgets::{Block, Borders, Widget},
+};
+
+use crate::render::tui::{
+    utils::{block_width, draw_text_with_ellipsis_nowrap, rect},
+    Line,
 };
 
 pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {

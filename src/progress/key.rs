@@ -1,5 +1,6 @@
-use crate::progress::Task;
 use std::ops::{Index, IndexMut};
+
+use crate::progress::Task;
 
 /// a level in the hierarchy of key components
 ///

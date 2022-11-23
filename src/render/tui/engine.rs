@@ -1,11 +1,15 @@
-use crate::{render::tui::draw, render::tui::ticker, Root, Throughput, WeakRoot};
-
-use futures_lite::StreamExt;
 use std::{
     io::{self, Write},
     time::Duration,
 };
+
+use futures_lite::StreamExt;
 use tui::layout::Rect;
+
+use crate::{
+    render::tui::{draw, ticker},
+    Root, Throughput, WeakRoot,
+};
 
 /// Configure the terminal user interface
 #[derive(Clone)]

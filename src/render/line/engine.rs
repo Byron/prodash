@@ -1,4 +1,3 @@
-use crate::{progress, render::line::draw, Throughput, WeakRoot};
 #[cfg(feature = "signal-hook")]
 use std::sync::Arc;
 use std::{
@@ -7,6 +6,8 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
+
+use crate::{progress, render::line::draw, Throughput, WeakRoot};
 
 /// Options used for configuring a [line renderer][render()].
 #[derive(Clone)]

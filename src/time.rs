@@ -28,8 +28,9 @@ pub const DATE_TIME_HMS: usize = "00:51:45".len();
 
 #[cfg(not(feature = "local-time"))]
 mod utc {
-    use super::DATE_TIME_HMS;
     use std::time::SystemTime;
+
+    use super::DATE_TIME_HMS;
     const DATE_TIME_YMD: usize = "2020-02-13T".len();
 
     /// Return a string representing the current date and time as UTC.
@@ -58,6 +59,5 @@ mod utc {
 
 #[cfg(feature = "local-time")]
 pub use localtime::*;
-
 #[cfg(not(feature = "local-time"))]
 pub use utc::*;

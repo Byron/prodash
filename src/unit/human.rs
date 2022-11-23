@@ -1,6 +1,8 @@
-use crate::{progress::Step, unit::DisplayValue};
-pub use human_format::{Formatter, Scales};
 use std::fmt;
+
+pub use human_format::{Formatter, Scales};
+
+use crate::{progress::Step, unit::DisplayValue};
 
 /// A helper for formatting numbers in a format easily read by humans in renderers, as in `2.54 million objects`
 #[derive(Debug)]

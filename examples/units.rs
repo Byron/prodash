@@ -115,8 +115,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
 type Result = std::result::Result<(), Box<dyn Error + Send + 'static>>;
 
 mod shared;
-use shared::args;
+use std::{error::Error, sync::Arc};
 
 use prodash::{unit, Tree};
-use std::error::Error;
-use std::sync::Arc;
+use shared::args;

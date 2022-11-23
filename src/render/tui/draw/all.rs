@@ -1,3 +1,13 @@
+use std::time::Duration;
+
+use tui::{
+    buffer::Buffer,
+    layout::Rect,
+    style::{Modifier, Style},
+    text::Span,
+    widgets::{Block, Borders, Widget},
+};
+
 use crate::{
     messages::Message,
     progress::{Key, Task},
@@ -7,14 +17,6 @@ use crate::{
         InterruptDrawInfo, Line,
     },
     Throughput,
-};
-use std::time::Duration;
-use tui::{
-    buffer::Buffer,
-    layout::Rect,
-    style::{Modifier, Style},
-    text::Span,
-    widgets::{Block, Borders, Widget},
 };
 
 #[derive(Default)]

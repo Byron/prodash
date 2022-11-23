@@ -256,8 +256,9 @@ where
     }
 }
 
-use crate::progress::{Step, StepShared};
 use std::time::Instant;
+
+use crate::progress::{Step, StepShared};
 
 /// Emit a message with throughput information when the instance is dropped.
 pub struct ThroughputOnDrop<T: Progress>(T, Instant);

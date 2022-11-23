@@ -185,19 +185,23 @@ async fn new_chunk_of_work(max: NestingLevel, tree: Arc<Tree>, speed: f32, chang
 struct NestingLevel(u8);
 type Result = std::result::Result<(), Box<dyn Error + Send>>;
 
-use futures_util::{future::join_all, future::Either, FutureExt};
+use std::{
+    error::Error,
+    ops::Add,
+    sync::Arc,
+    time::{Duration, SystemTime},
+};
+
+use futures_util::{
+    future::{join_all, Either},
+    FutureExt,
+};
 use prodash::{
     progress::{Key, Step},
     tree::Item,
     Tree,
 };
 use rand::prelude::*;
-use std::sync::Arc;
-use std::{
-    error::Error,
-    ops::Add,
-    time::{Duration, SystemTime},
-};
 
 const WORK_STEPS_NEEDED_FOR_UNBOUNDED_TASK: u8 = 100;
 const UNITS: &[&str] = &["Mb", "kb", "items", "files"];
@@ -248,5 +252,4 @@ const CHANCE_TO_BLOCK_PER_STEP: f64 = 1.0 / 100.0;
 const CHANCE_TO_SHOW_ETA: f64 = 0.5;
 
 mod shared;
-use shared::args;
-use shared::spawn;
+use shared::{args, spawn};

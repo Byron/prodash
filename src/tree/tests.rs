@@ -41,7 +41,7 @@ mod message_buffer {
     mod copy_new {
         use crate::{
             messages::{Message, MessageCopyState, MessageRingBuffer},
-            tree::tests::{message_buffer::assert_messages, message_buffer::push},
+            tree::tests::message_buffer::{assert_messages, push},
         };
 
         #[test]

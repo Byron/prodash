@@ -1,8 +1,16 @@
-use crate::progress::{Id, Step, StepShared};
-use crate::{messages::MessageLevel, Progress, Unit};
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
-use std::time::Duration;
+use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    time::Duration,
+};
+
+use crate::{
+    messages::MessageLevel,
+    progress::{Id, Step, StepShared},
+    Progress, Unit,
+};
 
 /// A [`Progress`] implementation which displays progress as it happens without the use of a renderer.
 ///

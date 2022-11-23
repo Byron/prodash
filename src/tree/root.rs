@@ -1,13 +1,16 @@
+use std::{
+    ops::Deref,
+    sync::{atomic::AtomicUsize, Arc, Weak},
+};
+
+use dashmap::DashMap;
+use parking_lot::Mutex;
+
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
     progress::{Id, Key, Task},
     tree::Item,
 };
-use dashmap::DashMap;
-use parking_lot::Mutex;
-use std::ops::Deref;
-use std::sync::atomic::AtomicUsize;
-use std::sync::{Arc, Weak};
 
 /// The top-level of the progress tree.
 #[derive(Debug)]

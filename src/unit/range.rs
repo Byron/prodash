@@ -1,5 +1,6 @@
-use crate::{progress::Step, unit::DisplayValue};
 use std::fmt;
+
+use crate::{progress::Step, unit::DisplayValue};
 
 /// A helper for formatting numbers representing ranges in renderers as in `2 of 5 steps`.
 #[derive(Copy, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Debug)]

@@ -1,7 +1,10 @@
+use std::{
+    collections::VecDeque,
+    sync::atomic::Ordering,
+    time::{Duration, SystemTime},
+};
+
 use crate::{progress, unit};
-use std::collections::VecDeque;
-use std::sync::atomic::Ordering;
-use std::time::{Duration, SystemTime};
 
 const THROTTLE_INTERVAL: Duration = Duration::from_secs(1);
 const ONCE_A_SECOND: Duration = Duration::from_secs(1);

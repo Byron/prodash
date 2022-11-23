@@ -1,8 +1,9 @@
+use std::fmt::{self, Write};
+
 use crate::{
     progress::Step,
     unit::{DisplayValue, Unit},
 };
-use std::fmt::{self, Write};
 
 /// The location at which [`Throughput`] or [`UnitDisplays`][UnitDisplay] should be placed.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]

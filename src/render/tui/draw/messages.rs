@@ -1,9 +1,5 @@
-use crate::{
-    messages::{Message, MessageLevel},
-    render::tui::utils::{block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE},
-    time::{format_time_for_messages, DATE_TIME_HMS},
-};
 use std::time::SystemTime;
+
 use tui::{
     buffer::Buffer,
     layout::Rect,
@@ -12,6 +8,12 @@ use tui::{
     widgets::{Block, Borders, Widget},
 };
 use unicode_width::UnicodeWidthStr;
+
+use crate::{
+    messages::{Message, MessageLevel},
+    render::tui::utils::{block_width, draw_text_with_ellipsis_nowrap, rect, sanitize_offset, VERTICAL_LINE},
+    time::{format_time_for_messages, DATE_TIME_HMS},
+};
 
 pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mut u16, buf: &mut Buffer) {
     let bold = Style::default().add_modifier(Modifier::BOLD);

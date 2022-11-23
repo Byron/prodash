@@ -1,3 +1,5 @@
+use std::{ops::RangeInclusive, sync::Arc, time::Duration};
+
 use futures_util::{future::FutureExt, stream::StreamExt};
 use prodash::{
     render::{
@@ -7,8 +9,6 @@ use prodash::{
     Tree,
 };
 use rand::{seq::SliceRandom, thread_rng, Rng};
-use std::sync::Arc;
-use std::{ops::RangeInclusive, time::Duration};
 
 pub mod args;
 mod spawn;

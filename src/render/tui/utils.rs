@@ -1,5 +1,6 @@
-use async_io::Timer;
 use std::{future::Future, pin::Pin, task::Poll, time::Duration};
+
+use async_io::Timer;
 
 /// Returns a stream of 'ticks', each being duration `dur` apart.
 ///
@@ -21,5 +22,4 @@ pub fn ticker(dur: Duration) -> impl futures_core::Stream<Item = ()> {
 
 pub const VERTICAL_LINE: &str = "│";
 
-pub use tui_react::util::*;
-pub use tui_react::{draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap};
+pub use tui_react::{draw_text_nowrap_fn, draw_text_with_ellipsis_nowrap, util::*};

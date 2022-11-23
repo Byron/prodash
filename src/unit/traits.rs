@@ -1,5 +1,6 @@
-use crate::{progress::Step, unit::display};
 use std::fmt;
+
+use crate::{progress::Step, unit::display};
 
 /// A trait to encapsulate all capabilities needed to display a value with unit within a renderer.
 pub trait DisplayValue {

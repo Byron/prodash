@@ -1,3 +1,17 @@
+use std::{
+    fmt,
+    sync::atomic::Ordering,
+    time::{Duration, SystemTime},
+};
+
+use humantime::format_duration;
+use tui::{
+    buffer::Buffer,
+    layout::Rect,
+    style::{Color, Modifier, Style},
+};
+use tui_react::fill_background;
+
 use crate::{
     progress::{self, Key, Step, Task, Value},
     render::tui::{
@@ -11,18 +25,6 @@ use crate::{
     time::format_now_datetime_seconds,
     unit, Throughput,
 };
-use humantime::format_duration;
-use std::sync::atomic::Ordering;
-use std::{
-    fmt,
-    time::{Duration, SystemTime},
-};
-use tui::{
-    buffer::Buffer,
-    layout::Rect,
-    style::{Color, Modifier, Style},
-};
-use tui_react::fill_background;
 
 const MIN_TREE_WIDTH: u16 = 20;
 
