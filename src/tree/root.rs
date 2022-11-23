@@ -1,6 +1,6 @@
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
-    progress::{Key, Task},
+    progress::{Id, Key, Task},
     tree::Item,
 };
 use dashmap::DashMap;
@@ -41,6 +41,14 @@ impl Root {
     /// Use this method to [track progress](./struct.Item.html) of your first tasks.
     pub fn add_child(&self, name: impl Into<String>) -> Item {
         self.inner.lock().add_child(name)
+    }
+
+    /// Adds a new child `tree::Item`, whose parent is this instance, with the given `name` and `id`.
+    ///
+    /// This builds a hierarchy of `tree::Item`s, each having their own progress.
+    /// Use this method to [track progress](./struct.Item.html) of your first tasks.
+    pub fn add_child_with_id(&self, name: impl Into<String>, id: Id) -> Item {
+        self.inner.lock().add_child_with_id(name, id)
     }
 
     /// Copy the entire progress tree into the given `out` vector, so that

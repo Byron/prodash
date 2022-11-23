@@ -1,4 +1,4 @@
-use crate::{messages::MessageLevel, progress, Unit};
+use crate::{messages::MessageLevel, progress, progress::Id, Unit};
 use std::time::Instant;
 
 /// A trait for describing hierarchical process.
@@ -6,10 +6,18 @@ pub trait Progress: Send {
     /// The type of progress returned by [`add_child()`][Progress::add_child()].
     type SubProgress: Progress;
 
-    /// Adds a new child, whose parent is this instance, with the given name.
+    /// Adds a new child, whose parent is this instance, with the given `name`.
     ///
     /// This will make the child progress to appear contained in the parent progress.
+    /// Note that such progress does not have a stable identifier, which can be added
+    /// with [`add_child_with_id()`][Progress::add_child_with_id()] if desired.
     fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress;
+
+    /// Adds a new child, whose parent is this instance, with the given `name` and `id`.
+    ///
+    /// This will make the child progress to appear contained in the parent progress, and it can be identified
+    /// using `id`.
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress;
 
     /// Initialize the Item for receiving progress information.
     ///
@@ -69,6 +77,10 @@ pub trait Progress: Send {
     /// Get the name of the instance as given when creating it with `add_child(…)`
     /// The progress is allowed to not be named, thus there is no guarantee that a previously set names 'sticks'.
     fn name(&self) -> Option<String>;
+
+    /// Get a stable identifier for the progress instance.
+    /// Note that it could be [unknown][crate::progress::UNKNOWN].
+    fn id(&self) -> Id;
 
     /// Create a `message` of the given `level` and store it with the progress tree.
     ///
@@ -186,7 +198,7 @@ pub trait Root {
 
 mod impls {
     use crate::messages::MessageLevel;
-    use crate::progress::{Step, StepShared};
+    use crate::progress::{Id, Step, StepShared};
     use crate::{Progress, Unit};
     use std::ops::{Deref, DerefMut};
     use std::time::Instant;
@@ -199,6 +211,10 @@ mod impls {
 
         fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
             self.deref_mut().add_child(name)
+        }
+
+        fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+            self.deref_mut().add_child_with_id(name, id)
         }
 
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
@@ -239,6 +255,10 @@ mod impls {
 
         fn name(&self) -> Option<String> {
             self.deref().name()
+        }
+
+        fn id(&self) -> Id {
+            todo!()
         }
 
         fn message(&mut self, level: MessageLevel, message: impl Into<String>) {

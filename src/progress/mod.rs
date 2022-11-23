@@ -17,6 +17,18 @@ pub use self::log::Log;
 
 pub use utils::{Discard, DoOrDiscard, Either, ThroughputOnDrop};
 
+/// Four bytes of function-local unique and stable identifier for each item added as progress,
+/// like b"TREE" or b"FILE".
+///
+/// Note that uniqueness only relates to one particular method call where those interested in its progress
+/// may assume certain stable ids to look for when selecting specific bits of progress to process.
+pub type Id = [u8; 4];
+
+/// The default Id to use if there is no need for an id.
+///
+/// This is the default unless applications wish to make themselves more introspectable.
+pub const UNKNOWN: Id = *b"\0\0\0\0";
+
 /// The amount of steps a progress can make
 pub type Step = usize;
 
@@ -72,6 +84,9 @@ impl Value {
 pub struct Task {
     /// The name of the `Item` or task.
     pub name: String,
+    /// The stable identifier of this task.
+    /// Useful for selecting specific tasks out of a set of them.
+    pub id: Id,
     /// The progress itself, unless this value belongs to an `Item` serving as organizational unit.
     pub progress: Option<Value>,
 }

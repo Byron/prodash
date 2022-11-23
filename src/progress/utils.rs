@@ -1,4 +1,4 @@
-use crate::{messages::MessageLevel, Progress, Unit};
+use crate::{messages::MessageLevel, progress::Id, Progress, Unit};
 
 /// An implementation of [`Progress`] which discards all calls.
 pub struct Discard;
@@ -7,6 +7,10 @@ impl Progress for Discard {
     type SubProgress = Discard;
 
     fn add_child(&mut self, _name: impl Into<String>) -> Self::SubProgress {
+        Discard
+    }
+
+    fn add_child_with_id(&mut self, _name: impl Into<String>, _id: Id) -> Self::SubProgress {
         Discard
     }
 
@@ -28,6 +32,10 @@ impl Progress for Discard {
 
     fn name(&self) -> Option<String> {
         None
+    }
+
+    fn id(&self) -> Id {
+        crate::progress::UNKNOWN
     }
 
     fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
@@ -59,6 +67,13 @@ where
         match self {
             Either::Left(l) => Either::Left(l.add_child(name)),
             Either::Right(r) => Either::Right(r.add_child(name)),
+        }
+    }
+
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+        match self {
+            Either::Left(l) => Either::Left(l.add_child_with_id(name, id)),
+            Either::Right(r) => Either::Right(r.add_child_with_id(name, id)),
         }
     }
 
@@ -125,6 +140,10 @@ where
         }
     }
 
+    fn id(&self) -> Id {
+        todo!()
+    }
+
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         match self {
             Either::Left(l) => l.message(level, message),
@@ -184,6 +203,10 @@ where
         DoOrDiscard(self.0.add_child(name))
     }
 
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+        DoOrDiscard(self.0.add_child_with_id(name, id))
+    }
+
     fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
         self.0.init(max, unit)
     }
@@ -220,6 +243,10 @@ where
         self.0.name()
     }
 
+    fn id(&self) -> Id {
+        self.0.id()
+    }
+
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
     }
@@ -247,6 +274,10 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
 
     fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
         self.0.add_child(name)
+    }
+
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+        self.0.add_child_with_id(name, id)
     }
 
     fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
@@ -283,6 +314,10 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
 
     fn name(&self) -> Option<String> {
         self.0.name()
+    }
+
+    fn id(&self) -> Id {
+        self.0.id()
     }
 
     fn message(&mut self, level: MessageLevel, message: impl Into<String>) {

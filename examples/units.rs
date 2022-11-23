@@ -26,7 +26,7 @@ fn main() -> Result {
 }
 
 fn work_for_a_long_time_blocking(root: Arc<Tree>) {
-    let mut bytes = root.add_child("download unknown");
+    let mut bytes = root.add_child_with_id("download unknown", *b"DLUK");
     bytes.init(
         None,
         Some(unit::dynamic_and_mode(
@@ -34,7 +34,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
             unit::display::Mode::with_throughput(),
         )),
     );
-    let mut bytes_max = root.add_child("download");
+    let mut bytes_max = root.add_child_with_id("download", *b"DLKN");
     bytes_max.init(
         Some(100_000_000),
         Some(unit::dynamic_and_mode(
@@ -43,9 +43,9 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
         )),
     );
 
-    let mut duration = root.add_child("duration unknown");
+    let mut duration = root.add_child_with_id("duration unknown", *b"DRUK");
     duration.init(None, Some(unit::dynamic(unit::Duration)));
-    let mut duration_max = root.add_child("duration");
+    let mut duration_max = root.add_child_with_id("duration", *b"DRKN");
     duration_max.init(
         Some(60 * 60 * 24),
         Some(unit::dynamic_and_mode(
@@ -59,7 +59,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
         f.with_decimals(decimals);
         f
     }
-    let mut human_count = root.add_child("item count unknown");
+    let mut human_count = root.add_child_with_id("item count unknown", *b"ITUK");
     human_count.init(
         None,
         Some(unit::dynamic_and_mode(
@@ -67,7 +67,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
             unit::display::Mode::with_throughput(),
         )),
     );
-    let mut human_count_max = root.add_child("item count");
+    let mut human_count_max = root.add_child_with_id("item count", *b"ITKN");
     human_count_max.init(
         Some(7_542_241),
         Some(unit::dynamic_and_mode(
@@ -76,7 +76,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
         )),
     );
 
-    let mut steps = root.add_child("steps to take unknown");
+    let mut steps = root.add_child_with_id("steps to take unknown", *b"STUK");
     steps.init(
         None,
         Some(unit::dynamic_and_mode(
@@ -84,7 +84,7 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
             unit::display::Mode::with_throughput(),
         )),
     );
-    let mut steps_max = root.add_child("steps to take");
+    let mut steps_max = root.add_child_with_id("steps to take", *b"STKN");
     steps_max.init(
         Some(100),
         Some(unit::dynamic_and_mode(
