@@ -19,7 +19,7 @@
 *     root.downgrade(),
 *     prodash::render::tui::Options {
 *         title: "minimal example".into(),
-*         ..prodash::render::tui::Options::default()
+*         ..Default::default()
 *     }
 * )?;
 * // As it runs forever, we want a way to stop it.

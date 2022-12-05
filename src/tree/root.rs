@@ -95,7 +95,7 @@ pub struct Options {
 impl Options {
     /// Create a new [`Root`](./tree/struct.Root.html) instance from the
     /// configuration within.
-    pub fn create(self) -> Arc<Root> {
+    pub fn create(self) -> Root {
         self.into()
     }
 }
@@ -110,13 +110,19 @@ impl Default for Options {
 }
 
 impl From<Options> for Arc<Root> {
+    fn from(opts: Options) -> Self {
+        Arc::new(opts.into())
+    }
+}
+
+impl From<Options> for Root {
     fn from(
         Options {
             initial_capacity,
             message_buffer_capacity,
         }: Options,
     ) -> Self {
-        Arc::new(Root {
+        Root {
             inner: Mutex::new(Item {
                 highest_child_id: 0,
                 value: Arc::new(AtomicUsize::default()),
@@ -124,7 +130,7 @@ impl From<Options> for Arc<Root> {
                 tree: Arc::new(DashMap::with_capacity(initial_capacity)),
                 messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(message_buffer_capacity))),
             }),
-        })
+        }
     }
 }
 

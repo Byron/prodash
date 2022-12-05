@@ -1,5 +1,5 @@
 use criterion::*;
-use prodash::{messages::MessageLevel, Tree, TreeOptions};
+use prodash::{messages::MessageLevel, tree::root::Options as TreeOptions, tree::Root as Tree};
 
 fn usage(c: &mut Criterion) {
     fn small_tree() -> std::sync::Arc<Tree> {
@@ -8,6 +8,7 @@ fn usage(c: &mut Criterion) {
             message_buffer_capacity: 2,
         }
         .create()
+        .into()
     }
     c.benchmark_group("Tree::add_child")
         .throughput(Throughput::Elements(4))

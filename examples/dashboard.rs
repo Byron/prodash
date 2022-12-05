@@ -17,11 +17,12 @@ fn main() -> Result {
 }
 
 async fn work_forever(mut args: args::Options) -> Result {
-    let progress = prodash::tree::root::Options {
+    let progress: Arc<_> = prodash::tree::root::Options {
         message_buffer_capacity: args.message_scrollback_buffer_size,
         ..Default::default()
     }
-    .create();
+    .create()
+    .into();
     {
         let mut sp = progress.add_child("preparation");
         sp.info("warming up");
