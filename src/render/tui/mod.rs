@@ -12,7 +12,7 @@
 * use prodash::render::tui::ticker;
 * use prodash::Root;
 * // obtain a progress tree
-* let root = prodash::Tree::new();
+* let root = prodash::tree::Root::new();
 * // Configure the gui, provide it with a handle to the ever-changing tree
 * let render_fut = prodash::render::tui::render(
 *     std::io::stdout(),

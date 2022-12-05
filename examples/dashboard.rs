@@ -17,9 +17,9 @@ fn main() -> Result {
 }
 
 async fn work_forever(mut args: args::Options) -> Result {
-    let progress = prodash::TreeOptions {
+    let progress = prodash::tree::root::Options {
         message_buffer_capacity: args.message_scrollback_buffer_size,
-        ..prodash::TreeOptions::default()
+        ..Default::default()
     }
     .create();
     {
@@ -199,7 +199,7 @@ use futures_util::{
 use prodash::{
     progress::{Key, Step},
     tree::Item,
-    Tree,
+    tree::Root as Tree,
 };
 use rand::prelude::*;
 

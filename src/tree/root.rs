@@ -6,17 +6,12 @@ use std::{
 use dashmap::DashMap;
 use parking_lot::Mutex;
 
+use crate::tree::Root;
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
     progress::{Id, Key, Task},
     tree::Item,
 };
-
-/// The top-level of the progress tree.
-#[derive(Debug)]
-pub struct Root {
-    pub(crate) inner: Mutex<Item>,
-}
 
 impl Root {
     /// Create a new tree with default configuration.
@@ -86,15 +81,14 @@ impl Root {
 
 /// A way to configure new [`tree::Root`](./tree/struct.Root.html) instances
 /// ```rust
-/// use prodash::{Tree, TreeOptions};
-/// let tree = TreeOptions::default().create();
-/// let tree2 = TreeOptions { message_buffer_capacity: 100, ..TreeOptions::default() }.create();
+/// let tree = prodash::tree::root::Options::default().create();
+/// let tree2 = prodash::tree::root::Options { message_buffer_capacity: 100, ..Default::default() }.create();
 /// ```
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// The amount of items the tree can hold without being forced to allocate
+    /// The amount of [items][Item] the tree can hold without being forced to allocate.
     pub initial_capacity: usize,
-    /// The amount of messages we can hold before we start overwriting old ones
+    /// The amount of messages we can hold before we start overwriting old ones.
     pub message_buffer_capacity: usize,
 }
 

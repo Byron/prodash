@@ -9,6 +9,11 @@ compile_error!(
     "Please set either the 'render-tui-crossterm' or 'render-tui-termion' feature whne using the 'render-tui'"
 );
 
+use std::{error::Error, sync::Arc};
+
+use prodash::{tree::Root as Tree, unit};
+use shared::args;
+
 fn main() -> Result {
     env_logger::init();
 
@@ -115,7 +120,3 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
 type Result = std::result::Result<(), Box<dyn Error + Send + 'static>>;
 
 mod shared;
-use std::{error::Error, sync::Arc};
-
-use prodash::{unit, Tree};
-use shared::args;

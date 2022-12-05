@@ -7,40 +7,14 @@ use std::{
     time::SystemTime,
 };
 
-use dashmap::DashMap;
 use parking_lot::Mutex;
 
+use crate::tree::Item;
 use crate::{
-    messages::{MessageLevel, MessageRingBuffer},
-    progress::{key, Id, Key, State, Step, StepShared, Task, Value},
+    messages::MessageLevel,
+    progress::{Id, State, Step, StepShared, Task, Value},
     unit::Unit,
 };
-
-/// A `Tree` represents an element of the progress tree.
-///
-/// It can be used to set progress and send messages.
-/// ```rust
-/// let tree = prodash::Tree::new();
-/// let mut progress = tree.add_child("task 1");
-///
-/// progress.init(Some(10), Some("elements".into()));
-/// for p in 0..10 {
-///     progress.set(p);
-/// }
-/// progress.done("great success");
-/// let mut  sub_progress = progress.add_child_with_id("sub-task 1", *b"TSK2");
-/// sub_progress.init(None, None);
-/// sub_progress.set(5);
-/// sub_progress.fail("couldn't finish");
-/// ```
-#[derive(Debug)]
-pub struct Item {
-    pub(crate) key: Key,
-    pub(crate) value: StepShared,
-    pub(crate) highest_child_id: key::Id,
-    pub(crate) tree: Arc<DashMap<Key, Task>>,
-    pub(crate) messages: Arc<Mutex<MessageRingBuffer>>,
-}
 
 impl Drop for Item {
     fn drop(&mut self) {

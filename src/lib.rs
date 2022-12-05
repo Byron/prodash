@@ -40,9 +40,6 @@ pub use atty;
 #[cfg(feature = "progress-tree")]
 ///
 pub mod tree;
-#[cfg(feature = "progress-tree")]
-#[doc(inline)]
-pub use tree::{Options as TreeOptions, Root as Tree};
 
 ///
 pub mod render;
