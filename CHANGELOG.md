@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 22.0.0 (2022-12-05)
+
+### Chore
+
+ - <csr-id-46aeffd13cda49146c8a33e93c8c9b0fbcb15c8b/> switch to Rust edition 2021
+
+### Changed (BREAKING)
+
+ - <csr-id-53cb09dc0314b0e8ce58dc50e0c07a053b963ccd/> remove `Tree` and `TreeOptions` in favor of `tree::Root` and `tree::root::Options`.
+   Previously it was confusing what a tree Root actually is due to the
+   rename, and ambiguity isn't what we would want here.
+
+### New Features (BREAKING)
+
+ - <csr-id-edab37364276864d45241c2946173388a0602f23/> `From<tree::root::Options> for tree::Root`, `tree::root::Options::create()` returns `tree::Root` instead of `Arc`.
+   That way we won't be forced to produce an `Arc` if it's not needed.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 11 days passed between releases.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - switch to Rust edition 2021 ([`46aeffd`](https://github.com/byron/prodash/commit/46aeffd13cda49146c8a33e93c8c9b0fbcb15c8b))
+    - make fmt ([`6e90cb9`](https://github.com/byron/prodash/commit/6e90cb965377762920d4dbb5debe8d47a4be89a2))
+    - `From<tree::root::Options> for tree::Root`, `tree::root::Options::create()` returns `tree::Root` instead of `Arc`. ([`edab373`](https://github.com/byron/prodash/commit/edab37364276864d45241c2946173388a0602f23))
+    - remove `Tree` and `TreeOptions` in favor of `tree::Root` and `tree::root::Options`. ([`53cb09d`](https://github.com/byron/prodash/commit/53cb09dc0314b0e8ce58dc50e0c07a053b963ccd))
+</details>
+
 ## 21.1.0 (2022-11-23)
 
 ### New Features
@@ -26,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 37 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -38,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v21.1.0 ([`6327e15`](https://github.com/byron/prodash/commit/6327e1587d6886f4279ec037ad587dab52a7cedf))
     - `make fmt` ([`5415acc`](https://github.com/byron/prodash/commit/5415acc4cae7bab81a22758fe969bdb8b3deac13))
     - Make it easy to format 'use'es in the codebase. ([`5b8e54d`](https://github.com/byron/prodash/commit/5b8e54d959f895d762a4a77d194f3947a6302783))
     - identify each progress item with `Id` using `add_child_with_id()`. ([`c332a6f`](https://github.com/byron/prodash/commit/c332a6f266a6ae0cacf19cb523e551bb63c1e7ea))
