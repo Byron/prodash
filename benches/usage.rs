@@ -1,5 +1,8 @@
 use criterion::*;
-use prodash::{messages::MessageLevel, tree::root::Options as TreeOptions, tree::Root as Tree};
+use prodash::{
+    messages::MessageLevel,
+    tree::{root::Options as TreeOptions, Root as Tree},
+};
 
 fn usage(c: &mut Criterion) {
     fn small_tree() -> std::sync::Arc<Tree> {

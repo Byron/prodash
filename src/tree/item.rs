@@ -9,10 +9,10 @@ use std::{
 
 use parking_lot::Mutex;
 
-use crate::tree::Item;
 use crate::{
     messages::MessageLevel,
     progress::{Id, State, Step, StepShared, Task, Value},
+    tree::Item,
     unit::Unit,
 };
 

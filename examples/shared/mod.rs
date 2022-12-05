@@ -1,11 +1,13 @@
 use std::{ops::RangeInclusive, sync::Arc, time::Duration};
 
 use futures_util::{future::FutureExt, stream::StreamExt};
-use prodash::render::{
-    line,
-    tui::{self, ticker, Event, Interrupt, Line},
+use prodash::{
+    render::{
+        line,
+        tui::{self, ticker, Event, Interrupt, Line},
+    },
+    tree::Root as Tree,
 };
-use prodash::tree::Root as Tree;
 use rand::{seq::SliceRandom, thread_rng, Rng};
 
 pub mod args;

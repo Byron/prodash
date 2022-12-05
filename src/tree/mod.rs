@@ -1,5 +1,6 @@
-use crate::messages::MessageRingBuffer;
 use dashmap::DashMap;
+
+use crate::messages::MessageRingBuffer;
 
 /// The top-level of the progress tree.
 #[derive(Debug)]

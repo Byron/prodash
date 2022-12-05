@@ -6,11 +6,10 @@ use std::{
 use dashmap::DashMap;
 use parking_lot::Mutex;
 
-use crate::tree::Root;
 use crate::{
     messages::{Message, MessageCopyState, MessageRingBuffer},
     progress::{Id, Key, Task},
-    tree::Item,
+    tree::{Item, Root},
 };
 
 impl Root {

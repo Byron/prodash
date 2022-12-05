@@ -199,8 +199,7 @@ use futures_util::{
 };
 use prodash::{
     progress::{Key, Step},
-    tree::Item,
-    tree::Root as Tree,
+    tree::{Item, Root as Tree},
 };
 use rand::prelude::*;
 
