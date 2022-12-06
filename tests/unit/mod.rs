@@ -1,7 +1,7 @@
 mod dynamic {
     #[cfg(feature = "unit-duration")]
     mod duration {
-        use crate::unit::{self, Duration};
+        use prodash::unit::{self, Duration};
 
         #[test]
         fn value_and_upper_bound_use_own_unit() {
@@ -13,7 +13,7 @@ mod dynamic {
     }
     #[cfg(feature = "unit-human")]
     mod human {
-        use crate::unit::{self, display, human, Human};
+        use prodash::unit::{self, display, human, Human};
 
         #[test]
         fn various_combinations() {
@@ -36,7 +36,7 @@ mod dynamic {
         }
     }
     mod range {
-        use crate::unit::{self, display, Range};
+        use prodash::unit::{self, display, Range};
         #[test]
         fn value_and_upper_bound_with_percentage() {
             let unit = unit::dynamic_and_mode(Range::new("steps"), display::Mode::with_percentage());
@@ -47,7 +47,7 @@ mod dynamic {
     }
     #[cfg(feature = "unit-bytes")]
     mod bytes {
-        use crate::unit::{self, display, Bytes};
+        use prodash::unit::{self, display, Bytes};
 
         #[test]
         fn value_and_upper_bound_use_own_unit() {
@@ -73,7 +73,7 @@ mod dynamic {
 mod label {
     mod with_percentage {
         mod only_values {
-            use crate::unit::{self, display};
+            use prodash::unit::{self, display};
             #[test]
             fn display_current_value_with_upper_bound_percentage_before_value() {
                 assert_eq!(
@@ -89,7 +89,7 @@ mod label {
         }
 
         mod only_unit {
-            use crate::unit::{self, display};
+            use prodash::unit::{self, display};
             #[test]
             fn display_current_value_with_upper_bound_percentage_after_unit() {
                 assert_eq!(
@@ -105,7 +105,7 @@ mod label {
         }
         use std::time;
 
-        use crate::unit::{self, display};
+        use prodash::unit::{self, display};
 
         #[test]
         fn display_current_over_time_shows_throughput() {
@@ -222,7 +222,7 @@ mod label {
         }
     }
     mod without_percentage {
-        use crate::unit;
+        use prodash::unit;
 
         #[test]
         fn display_current_value_no_upper_bound() {
@@ -244,7 +244,7 @@ mod label {
 mod size {
     use std::mem::size_of;
 
-    use crate::unit::{display, Unit};
+    use prodash::unit::{display, Unit};
 
     #[test]
     fn of_mode() {
