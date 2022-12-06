@@ -5,7 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 22.1.0 (2022-12-06)
+
+### New Features
+
+ - <csr-id-ea9aa5815ef2d1c734b85c185ddb65ac731b1195/> `progress::Key` now supports 6 levels of hierarchy instead of 4.
+   That way it's less likely that surprises occour of more than necessary
+   levels are added.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 day passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - `progress::Key` now supports 6 levels of hierarchy instead of 4. ([`ea9aa58`](https://github.com/byron/prodash/commit/ea9aa5815ef2d1c734b85c185ddb65ac731b1195))
+</details>
+
 ## 22.0.0 (2022-12-05)
+
+<csr-id-46aeffd13cda49146c8a33e93c8c9b0fbcb15c8b/>
 
 ### Chore
 
@@ -26,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 11 days passed between releases.
  - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -38,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v22.0.0 ([`8b78fe9`](https://github.com/byron/prodash/commit/8b78fe9614a584096f4fefed38a8965266caf2e9))
     - switch to Rust edition 2021 ([`46aeffd`](https://github.com/byron/prodash/commit/46aeffd13cda49146c8a33e93c8c9b0fbcb15c8b))
     - make fmt ([`6e90cb9`](https://github.com/byron/prodash/commit/6e90cb965377762920d4dbb5debe8d47a4be89a2))
     - `From<tree::root::Options> for tree::Root`, `tree::root::Options::create()` returns `tree::Root` instead of `Arc`. ([`edab373`](https://github.com/byron/prodash/commit/edab37364276864d45241c2946173388a0602f23))
