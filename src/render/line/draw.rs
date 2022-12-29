@@ -1,3 +1,5 @@
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::{collections::VecDeque, io, ops::RangeInclusive, sync::atomic::Ordering};
 
 use crosstermion::{
@@ -27,11 +29,20 @@ pub struct State {
 }
 
 impl State {
-    pub(crate) fn update_from_progress(&mut self, progress: &impl Root) {
+    pub(crate) fn update_from_progress(&mut self, progress: &impl Root) -> bool {
+        let mut hasher = DefaultHasher::new();
+        self.tree.hash(&mut hasher);
+        let prev_hash = hasher.finish();
+
         progress.sorted_snapshot(&mut self.tree);
+        let mut hasher = DefaultHasher::new();
+        self.tree.hash(&mut hasher);
+        let cur_hash = hasher.finish();
+
         self.for_next_copy = progress
             .copy_new_messages(&mut self.messages, self.for_next_copy.take())
             .into();
+        prev_hash != cur_hash
     }
     pub(crate) fn clear(&mut self) {
         self.tree.clear();
@@ -245,7 +256,7 @@ fn draw_progress_bar<'a>(
             const CHARS: [char; 6] = ['=', '=', '=', ' ', ' ', ' '];
             buf.push(
                 styled_brush.paint(
-                    (p.step.load(Ordering::SeqCst) as usize..std::usize::MAX)
+                    (p.step.load(Ordering::SeqCst)..std::usize::MAX)
                         .take(blocks_available as usize)
                         .map(|idx| CHARS[idx % CHARS.len()])
                         .rev()

@@ -1,4 +1,5 @@
 use std::fmt;
+use std::hash::Hasher;
 
 use crate::{progress::Step, unit::DisplayValue};
 
@@ -23,6 +24,11 @@ impl DisplayValue for Range {
     fn separator(&self, w: &mut dyn fmt::Write, _value: Step, _upper: Option<Step>) -> fmt::Result {
         w.write_str(" of ")
     }
+
+    fn dyn_hash(&self, state: &mut dyn Hasher) {
+        self.name.dyn_hash(state)
+    }
+
     fn display_unit(&self, w: &mut dyn fmt::Write, _value: Step) -> fmt::Result {
         w.write_str(self.name)
     }

@@ -238,7 +238,7 @@ pub fn draw_progress(
         draw_text_with_ellipsis_nowrap(line_bound, buf, VERTICAL_LINE, None);
 
         let tree_prefix = level_prefix(entries, entry_index);
-        let progress_rect = rect::offset_x(line_bound, block_width(&tree_prefix) as u16);
+        let progress_rect = rect::offset_x(line_bound, block_width(&tree_prefix));
         draw_text_with_ellipsis_nowrap(line_bound, buf, tree_prefix, None);
         match progress
             .as_ref()
@@ -325,7 +325,6 @@ fn draw_spinner(buf: &mut Buffer, bound: Rect, step: Step, seed: usize, color: C
     if bound.width == 0 {
         return;
     }
-    let step = step as usize;
     let x = bound.x + ((step + seed) % bound.width as usize) as u16;
     let width = 5;
     let bound = rect::intersect(Rect { x, width, ..bound }, bound);

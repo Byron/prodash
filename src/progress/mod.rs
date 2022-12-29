@@ -41,7 +41,7 @@ pub type Step = usize;
 pub type StepShared = Arc<AtomicUsize>;
 
 /// Indicate whether a progress can or cannot be made.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 pub enum State {
     /// Indicates a task is blocked and cannot indicate progress, optionally until the
     /// given time. The task cannot easily be interrupted.
@@ -74,6 +74,21 @@ pub struct Value {
     pub state: State,
 }
 
+impl std::hash::Hash for Value {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let Self {
+            step,
+            done_at,
+            unit,
+            state: our_state,
+        } = self;
+        done_at.hash(state);
+        unit.hash(state);
+        our_state.hash(state);
+        step.load(Ordering::Relaxed).hash(state);
+    }
+}
+
 impl Value {
     /// Returns a number between `Some(0.0)` and `Some(1.0)`, or `None` if the progress is unbounded.
     ///
@@ -85,7 +100,7 @@ impl Value {
 }
 
 /// The value associated with a spot in the hierarchy.
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, Hash)]
 pub struct Task {
     /// The name of the `Item` or task.
     pub name: String,

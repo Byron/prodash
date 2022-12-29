@@ -1,4 +1,5 @@
 use std::fmt;
+use std::hash::Hasher;
 
 use crate::{progress::Step, unit::display};
 
@@ -25,6 +26,11 @@ pub trait DisplayValue {
     fn display_upper_bound(&self, w: &mut dyn fmt::Write, upper_bound: Step, _value: Step) -> fmt::Result {
         fmt::write(w, format_args!("{}", upper_bound))
     }
+
+    /// A way to hash our state without using generics.
+    ///
+    /// This helps to determine quickly if something changed.
+    fn dyn_hash(&self, state: &mut dyn std::hash::Hasher);
 
     /// Emit the unit of `value` to `w`.
     ///
@@ -78,6 +84,10 @@ pub trait DisplayValue {
 }
 
 impl DisplayValue for &'static str {
+    fn dyn_hash(&self, state: &mut dyn Hasher) {
+        state.write(self.as_bytes())
+    }
+
     fn display_unit(&self, w: &mut dyn fmt::Write, _value: usize) -> fmt::Result {
         w.write_fmt(format_args!("{}", self))
     }

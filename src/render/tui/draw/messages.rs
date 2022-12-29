@@ -32,7 +32,7 @@ pub fn pane(messages: &[Message], bound: Rect, overflow_bound: Rect, offset: &mu
         .rev()
         .skip(*offset as usize)
         .take(bound.height as usize)
-        .fold(0, |state, message| state.max(block_width(&message.origin))) as u16;
+        .fold(0, |state, message| state.max(block_width(&message.origin)));
     for (
         line,
         Message {

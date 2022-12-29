@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// The location at which [`Throughput`] or [`UnitDisplays`][UnitDisplay] should be placed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 #[allow(missing_docs)]
 pub enum Location {
     BeforeValue,
@@ -33,7 +33,7 @@ impl Throughput {
 }
 
 /// A way to display a [Unit].
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 pub struct Mode {
     location: Location,
     percent: bool,

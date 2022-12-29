@@ -16,6 +16,11 @@ impl DisplayValue for Duration {
     fn display_upper_bound(&self, w: &mut dyn fmt::Write, upper_bound: Step, _value: Step) -> fmt::Result {
         w.write_str(&compound_duration::format_dhms(upper_bound))
     }
+
+    fn dyn_hash(&self, state: &mut dyn std::hash::Hasher) {
+        state.write(&[])
+    }
+
     fn display_unit(&self, _w: &mut dyn fmt::Write, _value: Step) -> fmt::Result {
         Ok(())
     }

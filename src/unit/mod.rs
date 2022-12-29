@@ -1,6 +1,5 @@
-use std::{fmt, ops::Deref, sync::Arc};
-
 use crate::progress::Step;
+use std::{fmt, ops::Deref, sync::Arc};
 
 #[cfg(feature = "unit-bytes")]
 mod bytes;
@@ -29,7 +28,7 @@ pub use traits::DisplayValue;
 pub mod display;
 
 /// A configurable and flexible unit for use in [Progress::init()][crate::Progress::init()].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub struct Unit {
     kind: Kind,
     mode: Option<display::Mode>,
@@ -42,6 +41,21 @@ pub enum Kind {
     Label(&'static str),
     /// Display a label created dynamically.
     Dynamic(Arc<dyn DisplayValue + Send + Sync>),
+}
+
+impl std::hash::Hash for Kind {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Kind::Label(s) => {
+                0.hash(state);
+                s.dyn_hash(state)
+            }
+            Kind::Dynamic(label) => {
+                1.hash(state);
+                label.dyn_hash(state);
+            }
+        }
+    }
 }
 
 impl fmt::Debug for Kind {

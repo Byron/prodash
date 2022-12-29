@@ -1,4 +1,6 @@
 use std::fmt;
+use std::fmt::Debug;
+use std::hash::Hasher;
 
 pub use human_format::{Formatter, Scales};
 
@@ -34,6 +36,11 @@ impl DisplayValue for Human {
 
     fn display_upper_bound(&self, w: &mut dyn fmt::Write, upper_bound: Step, _value: Step) -> fmt::Result {
         self.format_bytes(w, upper_bound)
+    }
+
+    fn dyn_hash(&self, state: &mut dyn Hasher) {
+        state.write(self.name.as_bytes());
+        state.write_u8(0);
     }
 
     fn display_unit(&self, w: &mut dyn fmt::Write, _value: Step) -> fmt::Result {

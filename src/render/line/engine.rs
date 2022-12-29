@@ -289,8 +289,13 @@ pub fn render(
                         }
                         Event::Tick => match progress.upgrade() {
                             Some(progress) => {
-                                state.update_from_progress(&progress);
-                                draw::all(&mut out, SHOW_PROGRESS.load(Ordering::Relaxed), &mut state, &config)?;
+                                let has_changed = state.update_from_progress(&progress);
+                                draw::all(
+                                    &mut out,
+                                    SHOW_PROGRESS.load(Ordering::Relaxed) && has_changed,
+                                    &mut state,
+                                    &config,
+                                )?;
                             }
                             None => {
                                 state.clear();
