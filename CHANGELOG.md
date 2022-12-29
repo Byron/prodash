@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 23.0.0 (2022-12-29)
+
+### New Features (BREAKING)
+
+ - <csr-id-a1db1b27fc7f14be052bbfc660c9c9b174c1d3cc/> Implement `Hash` for `Task` to avoid redrawing if nothing changes with the Line renderer.
+   That way, if everything stops due to a user prompt, the user's input won't be clobbered
+   continnuously.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 23 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Implement `Hash` for `Task` to avoid redrawing if nothing changes with the Line renderer. ([`a1db1b2`](https://github.com/byron/prodash/commit/a1db1b27fc7f14be052bbfc660c9c9b174c1d3cc))
+</details>
+
 ## 22.1.0 (2022-12-06)
 
 ### New Features
@@ -17,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 day passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -29,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v22.1.0 ([`2ae17c5`](https://github.com/byron/prodash/commit/2ae17c5bd7ab91b9e05a16fb4f771ce0ce0001f4))
     - `progress::Key` now supports 6 levels of hierarchy instead of 4. ([`ea9aa58`](https://github.com/byron/prodash/commit/ea9aa5815ef2d1c734b85c185ddb65ac731b1195))
 </details>
 
