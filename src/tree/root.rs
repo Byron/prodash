@@ -3,7 +3,6 @@ use std::{
     sync::{atomic::AtomicUsize, Arc, Weak},
 };
 
-use dashmap::DashMap;
 use parking_lot::Mutex;
 
 use crate::{
@@ -29,7 +28,14 @@ impl Root {
     /// Returns the current amount of `Item`s stored in the tree.
     /// **Note** that this is at most a guess as tasks can be added and removed in parallel.
     pub fn num_tasks(&self) -> usize {
-        self.inner.lock().tree.len()
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.inner.lock().tree.len()
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.inner.lock().tree.len()
+        }
     }
 
     /// Adds a new child `tree::Item`, whose parent is this instance, with the given `name`.
@@ -52,7 +58,10 @@ impl Root {
     /// it can be traversed from beginning to end in order of hierarchy.
     pub fn sorted_snapshot(&self, out: &mut Vec<(Key, Task)>) {
         out.clear();
+        #[cfg(feature = "progress-tree-hp-hashmap")]
         out.extend(self.inner.lock().tree.iter().map(|r| (*r.key(), r.value().clone())));
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        self.inner.lock().tree.extend_to(out);
         out.sort_by_key(|t| t.0);
     }
 
@@ -126,7 +135,7 @@ impl From<Options> for Root {
                 highest_child_id: 0,
                 value: Arc::new(AtomicUsize::default()),
                 key: Key::default(),
-                tree: Arc::new(DashMap::with_capacity(initial_capacity)),
+                tree: Arc::new(crate::tree::HashMap::with_capacity(initial_capacity)),
                 messages: Arc::new(Mutex::new(MessageRingBuffer::with_capacity(message_buffer_capacity))),
             }),
         }

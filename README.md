@@ -20,6 +20,9 @@ This crate comes with various cargo features to tailor it to your needs.
 
 * **progress-tree** _(default)_
   * Provide a `Progress` and `Root` trait implementation for use with the `render-line` and `render-tui` backed by `dashmap`.
+  * **progress-tree-hp-hashmap** - high-performance registry for pregree tree nodes in case of ultra-heavy insertions and deletions.
+    * If this is necessary, it's probably impossible to resonably visualize the progress tree anyway, but the option exists nonetheless in case
+      it is ever needed. Historically, this was the default, but now it seems simpler is better and just fine for typical programs.
   * **progress-tree-log** _(default)_
     * If logging in the `log` crate is initialized, a `log` will be used to output all messages provided to
       `tree::Item::message(…)` and friends. No actual progress is written.

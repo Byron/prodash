@@ -11,6 +11,7 @@ clippy: ## Run cargo-clippy
 check: ## build features in commmon combination to be sure it all stays together
 	cargo check --all-features
 	cargo check --no-default-features
+	cargo check --features progress-tree,progress-tree-hp-hashmap
 	cargo check --features render-tui,render-tui-crossterm
 	cargo check --features render-tui,render-tui-termion
 	cargo check --features render-line,render-line-termion

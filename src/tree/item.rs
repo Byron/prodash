@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::{
     ops::Deref,
     sync::{
@@ -22,6 +23,15 @@ impl Drop for Item {
     }
 }
 
+impl Debug for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Item")
+            .field("key", &self.key)
+            .field("value", &self.value)
+            .finish_non_exhaustive()
+    }
+}
+
 impl Item {
     /// Initialize the Item for receiving progress information.
     ///
@@ -37,46 +47,93 @@ impl Item {
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
     pub fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
-        if let Some(mut r) = self.tree.get_mut(&self.key) {
-            self.value.store(0, Ordering::SeqCst);
-            r.value_mut().progress = (max.is_some() || unit.is_some()).then(|| Value {
-                done_at: max,
-                unit,
-                step: Arc::clone(&self.value),
-                ..Default::default()
-            })
-        };
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            if let Some(mut r) = self.tree.get_mut(&self.key) {
+                self.value.store(0, Ordering::SeqCst);
+                r.value_mut().progress = (max.is_some() || unit.is_some()).then(|| Value {
+                    done_at: max,
+                    unit,
+                    step: Arc::clone(&self.value),
+                    ..Default::default()
+                })
+            };
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree.get_mut(&self.key, |v| {
+                self.value.store(0, Ordering::SeqCst);
+                v.progress = (max.is_some() || unit.is_some()).then(|| Value {
+                    done_at: max,
+                    unit,
+                    step: Arc::clone(&self.value),
+                    ..Default::default()
+                });
+            });
+        }
     }
 
     fn alter_progress(&mut self, f: impl FnMut(&mut Value)) {
-        if let Some(mut r) = self.tree.get_mut(&self.key) {
-            // NOTE: since we wrap around, if there are more tasks than we can have IDs for,
-            // and if all these tasks are still alive, two progress trees may see the same ID
-            // when these go out of scope, they delete the key and the other tree will not find
-            // its value anymore. Besides, it's probably weird to see tasks changing their progress
-            // all the time…
-            r.value_mut().progress.as_mut().map(f);
-        };
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            if let Some(mut r) = self.tree.get_mut(&self.key) {
+                // NOTE: since we wrap around, if there are more tasks than we can have IDs for,
+                // and if all these tasks are still alive, two progress trees may see the same ID
+                // when these go out of scope, they delete the key and the other tree will not find
+                // its value anymore. Besides, it's probably weird to see tasks changing their progress
+                // all the time…
+                r.value_mut().progress.as_mut().map(f);
+            };
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree.get_mut(&self.key, |v| {
+                v.progress.as_mut().map(f);
+            });
+        }
     }
 
     /// Set the name of this task's progress to the given `name`.
     pub fn set_name(&mut self, name: impl Into<String>) {
-        if let Some(mut r) = self.tree.get_mut(&self.key) {
-            r.value_mut().name = name.into();
-        };
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            if let Some(mut r) = self.tree.get_mut(&self.key) {
+                r.value_mut().name = name.into();
+            };
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree.get_mut(&self.key, |v| {
+                v.name = name.into();
+            });
+        }
     }
 
     /// Get the name of this task's progress
     pub fn name(&self) -> Option<String> {
-        self.tree.get(&self.key).map(|r| r.value().name.to_owned())
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.tree.get(&self.key).map(|r| r.value().name.to_owned())
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree.get(&self.key, |v| v.name.to_owned())
+        }
     }
 
     /// Get the stable identifier of this instance.
     pub fn id(&self) -> Id {
-        self.tree
-            .get(&self.key)
-            .map(|r| r.value().id)
-            .unwrap_or(crate::progress::UNKNOWN)
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.tree
+                .get(&self.key)
+                .map(|r| r.value().id)
+                .unwrap_or(crate::progress::UNKNOWN)
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree.get(&self.key, |v| v.id).unwrap_or(crate::progress::UNKNOWN)
+        }
     }
 
     /// Returns the current step, as controlled by `inc*(…)` calls
@@ -86,30 +143,63 @@ impl Item {
 
     /// Returns the maximum about of items we expect, as provided with the `init(…)` call
     pub fn max(&self) -> Option<Step> {
-        self.tree
-            .get(&self.key)
-            .and_then(|r| r.value().progress.as_ref().and_then(|p| p.done_at))
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.tree
+                .get(&self.key)
+                .and_then(|r| r.value().progress.as_ref().and_then(|p| p.done_at))
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree
+                .get(&self.key, |v| v.progress.as_ref().and_then(|p| p.done_at))
+                .flatten()
+        }
     }
 
     /// Set the maximum value to `max` and return the old maximum value.
     pub fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
-        self.tree
-            .get_mut(&self.key)?
-            .value_mut()
-            .progress
-            .as_mut()
-            .and_then(|mut p| {
-                let prev = p.done_at;
-                p.done_at = max;
-                prev
-            })
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.tree
+                .get_mut(&self.key)?
+                .value_mut()
+                .progress
+                .as_mut()
+                .and_then(|mut p| {
+                    let prev = p.done_at;
+                    p.done_at = max;
+                    prev
+                })
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree
+                .get_mut(&self.key, |v| {
+                    v.progress.as_mut().and_then(|mut p| {
+                        let prev = p.done_at;
+                        p.done_at = max;
+                        prev
+                    })
+                })
+                .flatten()
+        }
     }
 
     /// Returns the (cloned) unit associated with this Progress
     pub fn unit(&self) -> Option<Unit> {
-        self.tree
-            .get(&self.key)
-            .and_then(|r| r.value().progress.as_ref().and_then(|p| p.unit.clone()))
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        {
+            self.tree
+                .get(&self.key)
+                .and_then(|r| r.value().progress.as_ref().and_then(|p| p.unit.clone()))
+        }
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        {
+            self.tree
+                .get(&self.key, |v| v.progress.as_ref().and_then(|p| p.unit.clone()))
+                .flatten()
+        }
     }
 
     /// Set the current progress to the given `step`.
@@ -179,14 +269,15 @@ impl Item {
     /// level instead.
     pub fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Item {
         let child_key = self.key.add_child(self.highest_child_id);
-        self.tree.insert(
-            child_key,
-            Task {
-                name: name.into(),
-                id,
-                progress: None,
-            },
-        );
+        let task = Task {
+            name: name.into(),
+            id,
+            progress: None,
+        };
+        #[cfg(feature = "progress-tree-hp-hashmap")]
+        self.tree.insert(child_key, task);
+        #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+        self.tree.insert(child_key, task);
         self.highest_child_id = self.highest_child_id.wrapping_add(1);
         Item {
             highest_child_id: 0,
@@ -206,7 +297,15 @@ impl Item {
         self.messages.lock().push_overwrite(
             level,
             {
-                let name = self.tree.get(&self.key).map(|v| v.name.to_owned()).unwrap_or_default();
+                let name;
+                #[cfg(feature = "progress-tree-hp-hashmap")]
+                {
+                    name = self.tree.get(&self.key).map(|v| v.name.to_owned()).unwrap_or_default();
+                }
+                #[cfg(not(feature = "progress-tree-hp-hashmap"))]
+                {
+                    name = self.tree.get(&self.key, |v| v.name.to_owned()).unwrap_or_default()
+                }
 
                 #[cfg(feature = "progress-tree-log")]
                 match level {
