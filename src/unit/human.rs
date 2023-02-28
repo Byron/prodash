@@ -1,6 +1,4 @@
-use std::fmt;
-use std::fmt::Debug;
-use std::hash::Hasher;
+use std::{fmt, fmt::Debug, hash::Hasher};
 
 pub use human_format::{Formatter, Scales};
 

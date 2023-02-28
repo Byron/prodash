@@ -1,6 +1,10 @@
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-use std::{collections::VecDeque, io, ops::RangeInclusive, sync::atomic::Ordering};
+use std::{
+    collections::{hash_map::DefaultHasher, VecDeque},
+    hash::{Hash, Hasher},
+    io,
+    ops::RangeInclusive,
+    sync::atomic::Ordering,
+};
 
 use crosstermion::{
     ansi_term::{ANSIString, ANSIStrings, Color, Style},

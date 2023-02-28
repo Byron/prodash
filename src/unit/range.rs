@@ -1,5 +1,4 @@
-use std::fmt;
-use std::hash::Hasher;
+use std::{fmt, hash::Hasher};
 
 use crate::{progress::Step, unit::DisplayValue};
 

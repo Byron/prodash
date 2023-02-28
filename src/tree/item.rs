@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use std::{
+    fmt::Debug,
     ops::Deref,
     sync::{
         atomic::{AtomicUsize, Ordering},
