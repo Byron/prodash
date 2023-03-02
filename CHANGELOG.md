@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 23.1.1 (2023-03-02)
 
 A maintenance release without user-facing changes.
 
@@ -15,7 +15,7 @@ Most notably, `parking_lot` was upgraded to the latest version.
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +27,7 @@ Most notably, `parking_lot` was upgraded to the latest version.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Prepare changelog ([`1a4eb9b`](https://github.com/byron/prodash/commit/1a4eb9b5dea3e100b188be956ab7670f0b8d5ad6))
     - Upgrade dependencies, particularly `parking_lot` ([`7ae8a07`](https://github.com/byron/prodash/commit/7ae8a0793752b713c6605be45688ca81fbb7e75e))
 </details>
 
