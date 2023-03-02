@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+A maintenance release without user-facing changes.
+
+Most notably, `parking_lot` was upgraded to the latest version.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 2 days passed between releases.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Upgrade dependencies, particularly `parking_lot` ([`7ae8a07`](https://github.com/byron/prodash/commit/7ae8a0793752b713c6605be45688ca81fbb7e75e))
+</details>
+
 ## 23.1.0 (2023-02-28)
 
 ### New Features
@@ -21,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 61 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -33,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v23.1.0 ([`45b4b7e`](https://github.com/byron/prodash/commit/45b4b7ea06b08cb30bd1f1ca2c05874bb0cf19ce))
     - No need for `unsound-local-offset` anymore. ([`c53ab9d`](https://github.com/byron/prodash/commit/c53ab9d5d238be4aaabfb8a990c80ca1a7c58dec))
     - Make fmt ([`490336f`](https://github.com/byron/prodash/commit/490336f9920ccde0ebe8d142dc51b390e9afc899))
     - Improve performance of `progress::tree` operations by more than 50%. ([`6f966b4`](https://github.com/byron/prodash/commit/6f966b4f859f1b02775dcb3461bacf46b46ab707))
