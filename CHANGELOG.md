@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 23.1.2 (2023-03-11)
+
+### Bug Fixes
+
+ - <csr-id-7966f79cc7009acb33761cee70398b05b0006cc1/> line renderer now properly detects changes.
+   Previously change-detection was implemented based on the assumption that
+   the progress tree is copied entirely. Now, however, the interesting values
+   are shared.
+   
+   The change-detection was adjusted to keep the state's hash of the most recent
+   drawing, instead of doing everything in line, which saves time hashing as well.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 9 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Line renderer now properly detects changes. ([`7966f79`](https://github.com/byron/prodash/commit/7966f79cc7009acb33761cee70398b05b0006cc1))
+</details>
+
 ## 23.1.1 (2023-03-02)
 
 A maintenance release without user-facing changes.
@@ -15,7 +46,7 @@ Most notably, `parking_lot` was upgraded to the latest version.
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +58,7 @@ Most notably, `parking_lot` was upgraded to the latest version.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v23.1.1 ([`a91c52f`](https://github.com/byron/prodash/commit/a91c52f0407a8adf8f93ad66796e1979e08ce126))
     - Prepare changelog ([`1a4eb9b`](https://github.com/byron/prodash/commit/1a4eb9b5dea3e100b188be956ab7670f0b8d5ad6))
     - Upgrade dependencies, particularly `parking_lot` ([`7ae8a07`](https://github.com/byron/prodash/commit/7ae8a0793752b713c6605be45688ca81fbb7e75e))
 </details>
