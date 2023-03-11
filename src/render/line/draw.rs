@@ -21,6 +21,7 @@ use crate::{
 #[derive(Default)]
 pub struct State {
     tree: Vec<(progress::Key, progress::Task)>,
+    tree_hash: u64,
     messages: Vec<Message>,
     for_next_copy: Option<MessageCopyState>,
     /// The size of the message origin, tracking the terminal height so things potentially off screen don't influence width anymore.
@@ -34,10 +35,6 @@ pub struct State {
 
 impl State {
     pub(crate) fn update_from_progress(&mut self, progress: &impl Root) -> bool {
-        let mut hasher = DefaultHasher::new();
-        self.tree.hash(&mut hasher);
-        let prev_hash = hasher.finish();
-
         progress.sorted_snapshot(&mut self.tree);
         let mut hasher = DefaultHasher::new();
         self.tree.hash(&mut hasher);
@@ -46,7 +43,9 @@ impl State {
         self.for_next_copy = progress
             .copy_new_messages(&mut self.messages, self.for_next_copy.take())
             .into();
-        prev_hash != cur_hash
+        let changed = self.tree_hash != cur_hash;
+        self.tree_hash = cur_hash;
+        changed
     }
     pub(crate) fn clear(&mut self) {
         self.tree.clear();
