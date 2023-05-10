@@ -55,5 +55,5 @@ mod utils;
 
 pub use engine::*;
 /// Useful for bringing up the TUI without bringing in the `tui` crate yourself
-pub use tui as tui_export;
+pub use ratatui as tui_export;
 pub use utils::ticker;

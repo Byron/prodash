@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use tui::{
+use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Color, Modifier, Style},

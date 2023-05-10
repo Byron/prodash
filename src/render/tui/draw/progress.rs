@@ -5,7 +5,7 @@ use std::{
 };
 
 use humantime::format_duration;
-use tui::{
+use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Color, Modifier, Style},
@@ -349,20 +349,20 @@ fn draw_progress_bar_fn(
         for x in fractional_progress_rect.left()..fractional_progress_rect.right() {
             let cell = buf.get_mut(x, y);
             cell.set_fg(color);
-            cell.set_symbol(tui::symbols::block::FULL);
+            cell.set_symbol(ratatui::symbols::block::FULL);
         }
     }
     if fractional_progress_rect.width < bound.width {
         static BLOCK_SECTIONS: [&str; 9] = [
             " ",
-            tui::symbols::block::ONE_EIGHTH,
-            tui::symbols::block::ONE_QUARTER,
-            tui::symbols::block::THREE_EIGHTHS,
-            tui::symbols::block::HALF,
-            tui::symbols::block::FIVE_EIGHTHS,
-            tui::symbols::block::THREE_QUARTERS,
-            tui::symbols::block::SEVEN_EIGHTHS,
-            tui::symbols::block::FULL,
+            ratatui::symbols::block::ONE_EIGHTH,
+            ratatui::symbols::block::ONE_QUARTER,
+            ratatui::symbols::block::THREE_EIGHTHS,
+            ratatui::symbols::block::HALF,
+            ratatui::symbols::block::FIVE_EIGHTHS,
+            ratatui::symbols::block::THREE_QUARTERS,
+            ratatui::symbols::block::SEVEN_EIGHTHS,
+            ratatui::symbols::block::FULL,
         ];
         // Get the index based on how filled the remaining part is
         let index = ((((bound.width as f32 * fraction) - fractional_progress_rect.width as f32) * 8f32).round()

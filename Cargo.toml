@@ -47,7 +47,7 @@ unit-human = ["human_format"]
 unit-duration = ["compound_duration"]
 render-tui-termion = ["crosstermion/tui-react-termion"]
 render-tui-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
-render-tui = ["tui",
+render-tui = ["ratatui",
     "unicode-segmentation",
     "unicode-width",
     "crosstermion/input-async",
@@ -72,7 +72,7 @@ parking_lot = { version = "0.12.1", optional = true, default-features = false }
 log = { version = "0.4.8", optional = true }
 
 # render-tui
-tui = { version = "0.19.0", optional = true, default-features = false }
+ratatui = { version = "0.20.1", optional = true, default-features = false }
 tui-react = { version = "0.19.0", optional = true }
 futures-core = { version = "0.3.4", optional = true, default-features = false }
 futures-lite = { version = "1.5.0", optional = true }
@@ -115,3 +115,8 @@ async-io = "1.1.0"
 name = "usage"
 path = "benches/usage.rs"
 harness = false
+
+[patch.crates-io]
+# Remove this once the ratatui is merged into https://github.com/Byron/tui-crates
+crosstermion = { git = "https://github.com/joshka/tui-crates", branch = "ratatui" }
+tui-react = { git = "https://github.com/joshka/tui-crates", branch = "ratatui" }

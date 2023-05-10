@@ -4,7 +4,7 @@ use std::{
 };
 
 use futures_lite::StreamExt;
-use tui::layout::Rect;
+use ratatui::layout::Rect;
 
 use crate::{
     render::tui::{draw, ticker},

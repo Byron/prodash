@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use tui::{
+use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Modifier, Style},
