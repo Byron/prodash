@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 24.0.0 (2023-05-11)
+
+### Chore (BREAKING)
+
+ - <csr-id-fe5d01736179271f6b7bf20367f5d0e2bb616c4a/> switch from `tui` to `ratatui`.
+   The latter is a maintained fork.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 60 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Thanks Clippy
+
+<csr-read-only-do-not-edit/>
+
+[Clippy](https://github.com/rust-lang/rust-clippy) helped 1 time to make code idiomatic. 
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'ratatui' ([`4920457`](https://github.com/byron/prodash/commit/492045793a23be9ebda7310d89593288a2bd3340))
+    - Thanks clippy ([`25356a3`](https://github.com/byron/prodash/commit/25356a369c345b1e89f7c6c356ff7142020849de))
+    - Switch from `tui` to `ratatui`. ([`fe5d017`](https://github.com/byron/prodash/commit/fe5d01736179271f6b7bf20367f5d0e2bb616c4a))
+</details>
+
 ## 23.1.2 (2023-03-11)
 
 ### Bug Fixes
@@ -21,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 9 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -33,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v23.1.2 ([`c15f8db`](https://github.com/byron/prodash/commit/c15f8db0a7221ad6326544685200b68cb9ff5ddd))
     - Line renderer now properly detects changes. ([`7966f79`](https://github.com/byron/prodash/commit/7966f79cc7009acb33761cee70398b05b0006cc1))
 </details>
 
