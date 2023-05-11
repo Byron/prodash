@@ -15,12 +15,13 @@ pub(crate) type Id = u16;
 pub struct Key(Option<Id>, Option<Id>, Option<Id>, Option<Id>, Option<Id>, Option<Id>);
 
 /// Determines if a sibling is above or below in the given level of hierarchy
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
 #[allow(missing_docs)]
 pub enum SiblingLocation {
     Above,
     Below,
     AboveAndBelow,
+    #[default]
     NotFound,
 }
 
@@ -37,12 +38,6 @@ impl SiblingLocation {
             (Above, Above) => Above,
             (Below, Below) => Below,
         };
-    }
-}
-
-impl Default for SiblingLocation {
-    fn default() -> Self {
-        SiblingLocation::NotFound
     }
 }
 

@@ -230,13 +230,7 @@ fn block_count_sans_ansi_codes(strings: &[ANSIString<'_>]) -> u16 {
     strings.iter().map(|s| s.width() as u16).sum()
 }
 
-fn draw_progress_bar<'a>(
-    p: &Value,
-    style: Style,
-    mut blocks_available: u16,
-    colored: bool,
-    buf: &mut Vec<ANSIString<'a>>,
-) {
+fn draw_progress_bar(p: &Value, style: Style, mut blocks_available: u16, colored: bool, buf: &mut Vec<ANSIString<'_>>) {
     let mut brush = color::Brush::new(colored);
     let styled_brush = brush.style(style);
 
