@@ -41,7 +41,7 @@ pub type Step = usize;
 pub type StepShared = Arc<AtomicUsize>;
 
 /// Indicate whether a progress can or cannot be made.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
+#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
 pub enum State {
     /// Indicates a task is blocked and cannot indicate progress, optionally until the
     /// given time. The task cannot easily be interrupted.
@@ -50,13 +50,8 @@ pub enum State {
     /// given time. The task can be interrupted.
     Halted(&'static str, Option<SystemTime>),
     /// The task is running
+    #[default]
     Running,
-}
-
-impl Default for State {
-    fn default() -> Self {
-        State::Running
-    }
 }
 
 /// Progress associated with some item in the progress tree.
