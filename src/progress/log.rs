@@ -136,7 +136,7 @@ impl Progress for Log {
         self.id
     }
 
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: impl Into<String>) {
         let message: String = message.into();
         match level {
             MessageLevel::Info => log::info!("ℹ{} → {}", self.name, message),

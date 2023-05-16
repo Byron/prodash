@@ -3,7 +3,7 @@ use std::time::Instant;
 use crate::{messages::MessageLevel, progress, progress::Id, Unit};
 
 /// A trait for describing hierarchical progress.
-pub trait Progress: Send {
+pub trait Progress: Send + Sync {
     /// The type of progress returned by [`add_child()`][Progress::add_child()].
     type SubProgress: Progress;
 
@@ -87,7 +87,7 @@ pub trait Progress: Send {
     ///
     /// Use this to provide additional,human-readable information about the progress
     /// made, including indicating success or failure.
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>);
+    fn message(&self, level: MessageLevel, message: impl Into<String>);
 
     /// If available, return an atomic counter for direct access to the underlying state.
     ///
@@ -98,19 +98,19 @@ pub trait Progress: Send {
     }
 
     /// Create a message providing additional information about the progress thus far.
-    fn info(&mut self, message: impl Into<String>) {
+    fn info(&self, message: impl Into<String>) {
         self.message(MessageLevel::Info, message)
     }
     /// Create a message indicating the task is done successfully
-    fn done(&mut self, message: impl Into<String>) {
+    fn done(&self, message: impl Into<String>) {
         self.message(MessageLevel::Success, message)
     }
     /// Create a message indicating the task failed
-    fn fail(&mut self, message: impl Into<String>) {
+    fn fail(&self, message: impl Into<String>) {
         self.message(MessageLevel::Failure, message)
     }
     /// A shorthand to print throughput information
-    fn show_throughput(&mut self, start: Instant) {
+    fn show_throughput(&self, start: Instant) {
         let step = self.step();
         match self.unit() {
             Some(unit) => self.show_throughput_with(start, step, unit, MessageLevel::Info),
@@ -126,7 +126,7 @@ pub trait Progress: Send {
     }
 
     /// A shorthand to print throughput information, with the given step and unit, and message level.
-    fn show_throughput_with(&mut self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel) {
+    fn show_throughput_with(&self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel) {
         use std::fmt::Write;
         let elapsed = start.elapsed().as_secs_f32();
         let steps_per_second = (step as f32 / elapsed) as progress::Step;
@@ -159,7 +159,7 @@ pub trait Progress: Send {
 /// It differs by not being able to add child progress dynamically, but in turn is object safe. It's recommended to
 /// use this trait whenever there is no need to add child progress, at the leaf of a computation.
 // NOTE: keep this in-sync with `Progress`.
-pub trait RawProgress: Send {
+pub trait RawProgress: Send + Sync {
     /// Initialize the Item for receiving progress information.
     ///
     /// If `max` is `Some(…)`, it will be treated as upper bound. When progress is [set(…)](./struct.Item.html#method.set)
@@ -227,7 +227,7 @@ pub trait RawProgress: Send {
     ///
     /// Use this to provide additional,human-readable information about the progress
     /// made, including indicating success or failure.
-    fn message(&mut self, level: MessageLevel, message: String);
+    fn message(&self, level: MessageLevel, message: String);
 
     /// If available, return an atomic counter for direct access to the underlying state.
     ///
@@ -238,19 +238,19 @@ pub trait RawProgress: Send {
     }
 
     /// Create a message providing additional information about the progress thus far.
-    fn info(&mut self, message: String) {
+    fn info(&self, message: String) {
         self.message(MessageLevel::Info, message)
     }
     /// Create a message indicating the task is done successfully
-    fn done(&mut self, message: String) {
+    fn done(&self, message: String) {
         self.message(MessageLevel::Success, message)
     }
     /// Create a message indicating the task failed
-    fn fail(&mut self, message: String) {
+    fn fail(&self, message: String) {
         self.message(MessageLevel::Failure, message)
     }
     /// A shorthand to print throughput information
-    fn show_throughput(&mut self, start: Instant) {
+    fn show_throughput(&self, start: Instant) {
         let step = self.step();
         match self.unit() {
             Some(unit) => self.show_throughput_with(start, step, unit, MessageLevel::Info),
@@ -266,7 +266,7 @@ pub trait RawProgress: Send {
     }
 
     /// A shorthand to print throughput information, with the given step and unit, and message level.
-    fn show_throughput_with(&mut self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel) {
+    fn show_throughput_with(&self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel) {
         use std::fmt::Write;
         let elapsed = start.elapsed().as_secs_f32();
         let steps_per_second = (step as f32 / elapsed) as progress::Step;
@@ -400,7 +400,7 @@ mod impls {
             <T as Progress>::id(self)
         }
 
-        fn message(&mut self, level: MessageLevel, message: String) {
+        fn message(&self, level: MessageLevel, message: String) {
             <T as Progress>::message(self, level, message)
         }
 
@@ -408,23 +408,23 @@ mod impls {
             <T as Progress>::counter(self)
         }
 
-        fn info(&mut self, message: String) {
+        fn info(&self, message: String) {
             <T as Progress>::info(self, message)
         }
 
-        fn done(&mut self, message: String) {
+        fn done(&self, message: String) {
             <T as Progress>::done(self, message)
         }
 
-        fn fail(&mut self, message: String) {
+        fn fail(&self, message: String) {
             <T as Progress>::fail(self, message)
         }
 
-        fn show_throughput(&mut self, start: Instant) {
+        fn show_throughput(&self, start: Instant) {
             <T as Progress>::show_throughput(self, start)
         }
 
-        fn show_throughput_with(&mut self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
             <T as Progress>::show_throughput_with(self, start, step, unit, level)
         }
     }
@@ -487,32 +487,32 @@ mod impls {
             self.deref().id()
         }
 
-        fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
-            self.deref_mut().message(level, message)
+        fn message(&self, level: MessageLevel, message: impl Into<String>) {
+            self.deref().message(level, message)
         }
 
         fn counter(&self) -> Option<StepShared> {
             self.deref().counter()
         }
 
-        fn info(&mut self, message: impl Into<String>) {
-            self.deref_mut().info(message)
+        fn info(&self, message: impl Into<String>) {
+            self.deref().info(message)
         }
 
-        fn done(&mut self, message: impl Into<String>) {
-            self.deref_mut().done(message)
+        fn done(&self, message: impl Into<String>) {
+            self.deref().done(message)
         }
 
-        fn fail(&mut self, message: impl Into<String>) {
-            self.deref_mut().fail(message)
+        fn fail(&self, message: impl Into<String>) {
+            self.deref().fail(message)
         }
 
-        fn show_throughput(&mut self, start: Instant) {
-            self.deref_mut().show_throughput(start)
+        fn show_throughput(&self, start: Instant) {
+            self.deref().show_throughput(start)
         }
 
-        fn show_throughput_with(&mut self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
-            self.deref_mut().show_throughput_with(start, step, unit, level)
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.deref().show_throughput_with(start, step, unit, level)
         }
     }
 }

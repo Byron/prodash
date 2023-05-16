@@ -292,7 +292,7 @@ impl Item {
     ///
     /// Use this to provide additional,human-readable information about the progress
     /// made, including indicating success or failure.
-    pub fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    pub fn message(&self, level: MessageLevel, message: impl Into<String>) {
         let message: String = message.into();
         self.messages.lock().push_overwrite(
             level,
@@ -396,7 +396,7 @@ impl crate::Progress for Item {
         Item::id(self)
     }
 
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: impl Into<String>) {
         Item::message(self, level, message)
     }
 

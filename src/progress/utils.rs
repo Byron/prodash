@@ -38,7 +38,7 @@ impl Progress for Discard {
         crate::progress::UNKNOWN
     }
 
-    fn message(&mut self, _level: MessageLevel, _message: impl Into<String>) {}
+    fn message(&self, _level: MessageLevel, _message: impl Into<String>) {}
 
     fn counter(&self) -> Option<StepShared> {
         None
@@ -144,7 +144,7 @@ where
         todo!()
     }
 
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: impl Into<String>) {
         match self {
             Either::Left(l) => l.message(level, message),
             Either::Right(r) => r.message(level, message),
@@ -247,7 +247,7 @@ where
         self.0.id()
     }
 
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
     }
 
@@ -321,7 +321,7 @@ impl<T: Progress> Progress for ThroughputOnDrop<T> {
         self.0.id()
     }
 
-    fn message(&mut self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: impl Into<String>) {
         self.0.message(level, message)
     }
 
