@@ -5,7 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 25.0.0 (2023-05-16)
+
+### New Features
+
+ - <csr-id-8941f4b5b9c0d00dfd7b82c756b128982f163a06/> Introduce the object-safe `RawProgress` trait.
+   It's automatically implemented for `Progress` and allows for more flexible use
+   of progress particularly in leaf nodes. This is useful if a function needs to take
+   multiple types of progress as it is called from different places in the same function.
+   
+   Without dyn-traits, it's not possible to make such call.
+
+### New Features (BREAKING)
+
+ - <csr-id-84d96c7b6ab07462d6c20147958d5aa1a58a688e/> Make messaging functions thread-safe by taking shared borrow and requring `Sync`.
+   That way it's possible to share the `RawProgress` object across threads and emit messages,
+   much like a logging system that's more integrated with rendering.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 5 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Make messaging functions thread-safe by taking shared borrow and requring `Sync`. ([`84d96c7`](https://github.com/byron/prodash/commit/84d96c7b6ab07462d6c20147958d5aa1a58a688e))
+    - Introduce the object-safe `RawProgress` trait. ([`8941f4b`](https://github.com/byron/prodash/commit/8941f4b5b9c0d00dfd7b82c756b128982f163a06))
+</details>
+
 ## 24.0.0 (2023-05-11)
+
+<csr-id-fe5d01736179271f6b7bf20367f5d0e2bb616c4a/>
 
 ### Chore (BREAKING)
 
@@ -16,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 60 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -34,6 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v24.0.0 ([`41ad0a4`](https://github.com/byron/prodash/commit/41ad0a45ea39e6b283f808768ea60495b3d2b65f))
     - Merge branch 'ratatui' ([`4920457`](https://github.com/byron/prodash/commit/492045793a23be9ebda7310d89593288a2bd3340))
     - Thanks clippy ([`25356a3`](https://github.com/byron/prodash/commit/25356a369c345b1e89f7c6c356ff7142020849de))
     - Switch from `tui` to `ratatui`. ([`fe5d017`](https://github.com/byron/prodash/commit/fe5d01736179271f6b7bf20367f5d0e2bb616c4a))
