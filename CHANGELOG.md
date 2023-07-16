@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 25.0.1 (2023-07-16)
+
+### Bug Fixes
+
+ - <csr-id-17dd8f64563dd96ca454494e24a7f229716f6b1f/> `log` progress now supports a shared counter, just like the tree-item implementation
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 60 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'log-fixes' ([`a38d22c`](https://github.com/byron/prodash/commit/a38d22cf10068ce4275d65eb3e74652c2977b7e2))
+    - Upgrade criterion to the latest version, it compiles more quickly. ([`78272c0`](https://github.com/byron/prodash/commit/78272c0f2a243b9e07165813a0eacc6ade623b90))
+    - `log` progress now supports a shared counter, just like the tree-item implementation ([`17dd8f6`](https://github.com/byron/prodash/commit/17dd8f64563dd96ca454494e24a7f229716f6b1f))
+</details>
+
 ## 25.0.0 (2023-05-16)
 
 ### New Features
@@ -26,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 5 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -38,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v25.0.0 ([`02fcb9b`](https://github.com/byron/prodash/commit/02fcb9bd40ff9c03a46ce68926995a9614328ae0))
     - Make messaging functions thread-safe by taking shared borrow and requring `Sync`. ([`84d96c7`](https://github.com/byron/prodash/commit/84d96c7b6ab07462d6c20147958d5aa1a58a688e))
     - Introduce the object-safe `RawProgress` trait. ([`8941f4b`](https://github.com/byron/prodash/commit/8941f4b5b9c0d00dfd7b82c756b128982f163a06))
 </details>
