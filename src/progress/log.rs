@@ -21,7 +21,7 @@ pub struct Log {
     id: Id,
     max: Option<usize>,
     unit: Option<Unit>,
-    step: usize,
+    step: StepShared,
     current_level: usize,
     max_level: usize,
     trigger: Arc<AtomicBool>,
@@ -50,9 +50,25 @@ impl Log {
             current_level: 0,
             max_level: max_level.unwrap_or(usize::MAX),
             max: None,
-            step: 0,
+            step: Default::default(),
             unit: None,
             trigger,
+        }
+    }
+}
+
+impl Log {
+    fn maybe_log(&self) {
+        if self.current_level > self.max_level {
+            return;
+        }
+        let step = self.step();
+        if self.trigger.swap(false, Ordering::Relaxed) {
+            match (self.max, &self.unit) {
+                (max, Some(unit)) => log::info!("{} → {}", self.name, unit.display(step, max, None)),
+                (Some(max), None) => log::info!("{} → {} / {}", self.name, step, max),
+                (None, None) => log::info!("{} → {}", self.name, step),
+            }
         }
     }
 }
@@ -70,37 +86,28 @@ impl Progress for Log {
             id,
             current_level: self.current_level + 1,
             max_level: self.max_level,
-            step: 0,
+            step: Default::default(),
             max: None,
             unit: None,
             trigger: Arc::clone(&self.trigger),
         }
     }
 
-    fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
+    fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         self.max = max;
         self.unit = unit;
     }
 
-    fn set(&mut self, step: usize) {
-        self.step = step;
-        if self.current_level > self.max_level {
-            return;
-        }
-        if self.trigger.swap(false, Ordering::Relaxed) {
-            match (self.max, &self.unit) {
-                (max, Some(unit)) => log::info!("{} → {}", self.name, unit.display(step, max, None)),
-                (Some(max), None) => log::info!("{} → {} / {}", self.name, step, max),
-                (None, None) => log::info!("{} → {}", self.name, step),
-            }
-        }
+    fn set(&mut self, step: Step) {
+        self.step.store(step, Ordering::SeqCst);
+        self.maybe_log()
     }
 
     fn unit(&self) -> Option<Unit> {
         self.unit.clone()
     }
 
-    fn max(&self) -> Option<usize> {
+    fn max(&self) -> Option<Step> {
         self.max
     }
 
@@ -111,11 +118,12 @@ impl Progress for Log {
     }
 
     fn step(&self) -> usize {
-        self.step
+        self.step.load(Ordering::Relaxed)
     }
 
-    fn inc_by(&mut self, step: usize) {
-        self.set(self.step + step)
+    fn inc_by(&mut self, step: Step) {
+        self.step.fetch_add(step, Ordering::SeqCst);
+        self.maybe_log()
     }
 
     fn set_name(&mut self, name: impl Into<String>) {
@@ -146,6 +154,6 @@ impl Progress for Log {
     }
 
     fn counter(&self) -> Option<StepShared> {
-        None
+        Some(self.step.clone())
     }
 }

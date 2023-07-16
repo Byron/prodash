@@ -166,7 +166,7 @@ impl Item {
                 .value_mut()
                 .progress
                 .as_mut()
-                .and_then(|mut p| {
+                .and_then(|p| {
                     let prev = p.done_at;
                     p.done_at = max;
                     prev
@@ -176,7 +176,7 @@ impl Item {
         {
             self.tree
                 .get_mut(&self.key, |v| {
-                    v.progress.as_mut().and_then(|mut p| {
+                    v.progress.as_mut().and_then(|p| {
                         let prev = p.done_at;
                         p.done_at = max;
                         prev
