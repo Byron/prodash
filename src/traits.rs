@@ -154,6 +154,79 @@ pub trait Progress: Send + Sync {
     }
 }
 
+/// An object-safe trait for describing hierarchical progress.
+///
+/// This will be automatically implemented for any type that implements
+/// [`Progress`].
+pub trait DynProgress: Send + Sync + impls::Sealed {
+    /// See [`Progress::add_child`]
+    fn add_child(&mut self, name: String) -> BoxedDynProgress;
+
+    /// See [`Progress::add_child_with_id`]
+    fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynProgress;
+
+    /// See [`Progress::init`]
+    fn init(&mut self, max: Option<progress::Step>, unit: Option<Unit>);
+
+    /// See [`Progress::set`]
+    fn set(&mut self, step: progress::Step);
+
+    /// See [`Progress::unit`]
+    fn unit(&self) -> Option<Unit>;
+
+    /// See [`Progress::max`]
+    fn max(&self) -> Option<progress::Step>;
+
+    /// See [`Progress::set_max`]
+    fn set_max(&mut self, _max: Option<progress::Step>) -> Option<progress::Step>;
+
+    /// See [`Progress::step`]
+    fn step(&self) -> progress::Step;
+
+    /// See [`Progress::inc_by`]
+    fn inc_by(&mut self, step: progress::Step);
+
+    /// See [`Progress::inc`]
+    fn inc(&mut self);
+
+    /// See [`Progress::set_name`]
+    fn set_name(&mut self, name: String);
+
+    /// See [`Progress::name`]
+    fn name(&self) -> Option<String>;
+
+    /// See [`Progress::id`]
+    fn id(&self) -> Id;
+
+    /// See [`Progress::message`]
+    fn message(&self, level: MessageLevel, message: String);
+
+    /// See [`Progress::counter`]
+    fn counter(&self) -> Option<StepShared>;
+
+    /// See [`Progress::info`]
+    fn info(&self, message: String);
+
+    /// See [`Progress::done`]
+    fn done(&self, message: String);
+
+    /// See [`Progress::fail`]
+    fn fail(&self, message: String);
+
+    /// See [`Progress::show_throughput`]
+    fn show_throughput(&self, start: Instant);
+
+    /// See [`Progress::show_throughput_with`]
+    fn show_throughput_with(&self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel);
+}
+
+/// An opaque type for storing [`DynProgress`].
+pub struct BoxedDynProgress(Box<dyn DynProgress>);
+
+/// A bridge type that implements [`Progress`] for any type that implements
+/// [`DynProgress`].
+pub struct DynProgressToProgressBridge<T: ?Sized>(T);
+
 /// A trait for describing non-hierarchical progress.
 ///
 /// It differs by not being able to add child progress dynamically, but in turn is object safe. It's recommended to
@@ -345,12 +418,14 @@ mod impls {
         time::Instant,
     };
 
-    use crate::traits::RawProgress;
     use crate::{
         messages::MessageLevel,
         progress::{Id, Step, StepShared},
-        Progress, Unit,
+        traits::RawProgress,
+        BoxedDynProgress, DynProgress, DynProgressToProgressBridge, Progress, Unit,
     };
+
+    pub trait Sealed {}
 
     impl<T> RawProgress for T
     where
@@ -513,6 +588,269 @@ mod impls {
 
         fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
             self.deref().show_throughput_with(start, step, unit, level)
+        }
+    }
+
+    impl<T> Sealed for T where T: Progress + ?Sized {}
+
+    impl<T, SubP> DynProgress for T
+    where
+        T: Progress<SubProgress = SubP> + ?Sized,
+        SubP: Progress + 'static,
+    {
+        fn add_child(&mut self, name: String) -> BoxedDynProgress {
+            BoxedDynProgress::new(self.add_child(name))
+        }
+
+        fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynProgress {
+            BoxedDynProgress::new(self.add_child_with_id(name, id))
+        }
+
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.init(max, unit)
+        }
+
+        fn set(&mut self, step: Step) {
+            self.set(step)
+        }
+
+        fn unit(&self) -> Option<Unit> {
+            self.unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.set_max(max)
+        }
+
+        fn step(&self) -> Step {
+            self.step()
+        }
+
+        fn inc_by(&mut self, step: Step) {
+            self.inc_by(step)
+        }
+
+        fn inc(&mut self) {
+            self.inc()
+        }
+
+        fn set_name(&mut self, name: String) {
+            self.set_name(name)
+        }
+
+        fn name(&self) -> Option<String> {
+            self.name()
+        }
+
+        fn id(&self) -> Id {
+            self.id()
+        }
+
+        fn message(&self, level: MessageLevel, message: String) {
+            self.message(level, message)
+        }
+
+        fn counter(&self) -> Option<StepShared> {
+            self.counter()
+        }
+
+        fn info(&self, message: String) {
+            self.info(message)
+        }
+        fn done(&self, message: String) {
+            self.done(message)
+        }
+        fn fail(&self, message: String) {
+            self.fail(message)
+        }
+
+        fn show_throughput(&self, start: Instant) {
+            self.show_throughput(start)
+        }
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.show_throughput_with(start, step, unit, level)
+        }
+    }
+
+    impl BoxedDynProgress {
+        /// Create new boxed dyn Progress
+        pub fn new(progress: impl DynProgress + 'static) -> Self {
+            Self(Box::new(progress))
+        }
+    }
+
+    impl Progress for BoxedDynProgress {
+        type SubProgress = Self;
+
+        fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
+            self.0.add_child(name.into())
+        }
+
+        fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+            self.0.add_child_with_id(name.into(), id)
+        }
+
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.0.init(max, unit)
+        }
+
+        fn set(&mut self, step: Step) {
+            self.0.set(step)
+        }
+
+        fn unit(&self) -> Option<Unit> {
+            self.0.unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.0.max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.0.set_max(max)
+        }
+
+        fn step(&self) -> Step {
+            self.0.step()
+        }
+
+        fn inc_by(&mut self, step: Step) {
+            self.0.inc_by(step)
+        }
+
+        fn inc(&mut self) {
+            self.0.inc()
+        }
+
+        fn set_name(&mut self, name: impl Into<String>) {
+            self.0.set_name(name.into())
+        }
+
+        fn name(&self) -> Option<String> {
+            self.0.name()
+        }
+
+        fn id(&self) -> Id {
+            self.0.id()
+        }
+
+        fn message(&self, level: MessageLevel, message: impl Into<String>) {
+            self.0.message(level, message.into())
+        }
+
+        fn counter(&self) -> Option<StepShared> {
+            self.0.counter()
+        }
+
+        fn info(&self, message: impl Into<String>) {
+            self.0.info(message.into())
+        }
+
+        fn done(&self, message: impl Into<String>) {
+            self.0.done(message.into())
+        }
+
+        fn fail(&self, message: impl Into<String>) {
+            self.0.fail(message.into())
+        }
+
+        fn show_throughput(&self, start: Instant) {
+            self.0.show_throughput(start)
+        }
+
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.0.show_throughput_with(start, step, unit, level)
+        }
+    }
+
+    impl<T> Progress for DynProgressToProgressBridge<T>
+    where
+        T: DynProgress + ?Sized,
+    {
+        type SubProgress = BoxedDynProgress;
+
+        fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
+            self.0.add_child(name.into())
+        }
+
+        fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
+            self.0.add_child_with_id(name.into(), id)
+        }
+
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.0.init(max, unit)
+        }
+
+        fn set(&mut self, step: Step) {
+            self.0.set(step)
+        }
+
+        fn unit(&self) -> Option<Unit> {
+            self.0.unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.0.max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.0.set_max(max)
+        }
+
+        fn step(&self) -> Step {
+            self.0.step()
+        }
+
+        fn inc_by(&mut self, step: Step) {
+            self.0.inc_by(step)
+        }
+
+        fn inc(&mut self) {
+            self.0.inc()
+        }
+
+        fn set_name(&mut self, name: impl Into<String>) {
+            self.0.set_name(name.into())
+        }
+
+        fn name(&self) -> Option<String> {
+            self.0.name()
+        }
+
+        fn id(&self) -> Id {
+            self.0.id()
+        }
+
+        fn message(&self, level: MessageLevel, message: impl Into<String>) {
+            self.0.message(level, message.into())
+        }
+
+        fn counter(&self) -> Option<StepShared> {
+            self.0.counter()
+        }
+
+        fn info(&self, message: impl Into<String>) {
+            self.0.info(message.into())
+        }
+
+        fn done(&self, message: impl Into<String>) {
+            self.0.done(message.into())
+        }
+
+        fn fail(&self, message: impl Into<String>) {
+            self.0.fail(message.into())
+        }
+
+        fn show_throughput(&self, start: Instant) {
+            self.0.show_throughput(start)
+        }
+
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.0.show_throughput_with(start, step, unit, level)
         }
     }
 }
