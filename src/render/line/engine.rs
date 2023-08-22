@@ -74,16 +74,6 @@ pub enum StreamKind {
     Stderr,
 }
 
-#[cfg(feature = "render-line-autoconfigure")]
-impl From<StreamKind> for atty::Stream {
-    fn from(s: StreamKind) -> Self {
-        match s {
-            StreamKind::Stdout => atty::Stream::Stdout,
-            StreamKind::Stderr => atty::Stream::Stderr,
-        }
-    }
-}
-
 /// Convenience
 impl Options {
     /// Automatically configure (and overwrite) the following fields based on terminal configuration.
@@ -94,7 +84,10 @@ impl Options {
     /// * hide-cursor (based on presence of 'signal-hook' feature.
     #[cfg(feature = "render-line-autoconfigure")]
     pub fn auto_configure(mut self, output: StreamKind) -> Self {
-        self.output_is_terminal = atty::is(output.into());
+        self.output_is_terminal = match output {
+            StreamKind::Stdout => is_terminal::is_terminal(std::io::stdout()),
+            StreamKind::Stderr => is_terminal::is_terminal(std::io::stderr()),
+        };
         self.colored = self.output_is_terminal && crosstermion::color::allowed();
         self.terminal_dimensions = crosstermion::terminal::size().unwrap_or((80, 20));
         #[cfg(feature = "signal-hook")]

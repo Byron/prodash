@@ -54,7 +54,7 @@ pub fn launch_ambient_gui(
         }
         .boxed(),
         "tui" => {
-            if atty::isnt(atty::Stream::Stdout) {
+            if !is_terminal::is_terminal(std::io::stdout()) {
                 eprintln!("Need a terminal on stdout to draw progress TUI");
                 futures_lite::future::ready(()).boxed()
             } else {
