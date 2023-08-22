@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 25.0.2 (2023-08-22)
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 37 days passed between releases.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Remove `atty` in favor of `is-terminal` ([`2bfe9ad`](https://github.com/byron/prodash/commit/2bfe9adca357cf48d7310036684eeb85efa5ef46))
+</details>
+
 ## 25.0.1 (2023-07-16)
 
 ### Bug Fixes
@@ -15,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 60 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v25.0.1 ([`3ad8226`](https://github.com/byron/prodash/commit/3ad8226fd7825669d843a9c1bde001de1b702049))
     - Merge branch 'log-fixes' ([`a38d22c`](https://github.com/byron/prodash/commit/a38d22cf10068ce4275d65eb3e74652c2977b7e2))
     - Upgrade criterion to the latest version, it compiles more quickly. ([`78272c0`](https://github.com/byron/prodash/commit/78272c0f2a243b9e07165813a0eacc6ade623b90))
     - `log` progress now supports a shared counter, just like the tree-item implementation ([`17dd8f6`](https://github.com/byron/prodash/commit/17dd8f64563dd96ca454494e24a7f229716f6b1f))
