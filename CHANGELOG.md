@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 25.0.2 (2023-08-22)
 
+### Chore
+
+ - <csr-id-05741765491984487beea7326eff9863b669ab51/> Adjusting changelogs prior to release of prodash v25.0.2
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 37 days passed between releases.
- - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -23,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Adjusting changelogs prior to release of prodash v25.0.2 ([`0574176`](https://github.com/byron/prodash/commit/05741765491984487beea7326eff9863b669ab51))
     - Remove `atty` in favor of `is-terminal` ([`2bfe9ad`](https://github.com/byron/prodash/commit/2bfe9adca357cf48d7310036684eeb85efa5ef46))
 </details>
 
