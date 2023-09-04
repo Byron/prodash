@@ -9,10 +9,10 @@ use std::{
 use crate::{
     messages::MessageLevel,
     progress::{Id, Step, StepShared},
-    Progress, Unit,
+    Count, NestedProgress, Progress, Unit,
 };
 
-/// A [`Progress`] implementation which displays progress as it happens without the use of a renderer.
+/// A [`NestedProgress`] implementation which displays progress as it happens without the use of a renderer.
 ///
 /// Note that this incurs considerable performance cost as each progress calls ends up getting the system time
 /// to see if progress information should actually be emitted.
@@ -73,7 +73,72 @@ impl Log {
     }
 }
 
+impl Count for Log {
+    fn set(&self, step: Step) {
+        self.step.store(step, Ordering::SeqCst);
+        self.maybe_log()
+    }
+
+    fn step(&self) -> usize {
+        self.step.load(Ordering::Relaxed)
+    }
+
+    fn inc_by(&self, step: Step) {
+        self.step.fetch_add(step, Ordering::SeqCst);
+        self.maybe_log()
+    }
+
+    fn counter(&self) -> Option<StepShared> {
+        Some(self.step.clone())
+    }
+}
+
 impl Progress for Log {
+    fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+        self.max = max;
+        self.unit = unit;
+    }
+    fn unit(&self) -> Option<Unit> {
+        self.unit.clone()
+    }
+
+    fn max(&self) -> Option<Step> {
+        self.max
+    }
+
+    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+        let prev = self.max;
+        self.max = max;
+        prev
+    }
+
+    fn set_name(&mut self, name: String) {
+        self.name = self
+            .name
+            .split("::")
+            .next()
+            .map(|parent| format!("{}{}{}", parent.to_owned(), SEP, name))
+            .unwrap_or(name);
+    }
+
+    fn name(&self) -> Option<String> {
+        self.name.split(SEP).nth(1).map(ToOwned::to_owned)
+    }
+
+    fn id(&self) -> Id {
+        self.id
+    }
+
+    fn message(&self, level: MessageLevel, message: String) {
+        match level {
+            MessageLevel::Info => log::info!("ℹ{} → {}", self.name, message),
+            MessageLevel::Failure => log::error!("𐄂{} → {}", self.name, message),
+            MessageLevel::Success => log::info!("✓{} → {}", self.name, message),
+        }
+    }
+}
+
+impl NestedProgress for Log {
     type SubProgress = Log;
 
     fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
@@ -91,69 +156,5 @@ impl Progress for Log {
             unit: None,
             trigger: Arc::clone(&self.trigger),
         }
-    }
-
-    fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
-        self.max = max;
-        self.unit = unit;
-    }
-
-    fn set(&mut self, step: Step) {
-        self.step.store(step, Ordering::SeqCst);
-        self.maybe_log()
-    }
-
-    fn unit(&self) -> Option<Unit> {
-        self.unit.clone()
-    }
-
-    fn max(&self) -> Option<Step> {
-        self.max
-    }
-
-    fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
-        let prev = self.max;
-        self.max = max;
-        prev
-    }
-
-    fn step(&self) -> usize {
-        self.step.load(Ordering::Relaxed)
-    }
-
-    fn inc_by(&mut self, step: Step) {
-        self.step.fetch_add(step, Ordering::SeqCst);
-        self.maybe_log()
-    }
-
-    fn set_name(&mut self, name: impl Into<String>) {
-        let name = name.into();
-        self.name = self
-            .name
-            .split("::")
-            .next()
-            .map(|parent| format!("{}{}{}", parent.to_owned(), SEP, name))
-            .unwrap_or(name);
-    }
-
-    fn name(&self) -> Option<String> {
-        self.name.split(SEP).nth(1).map(ToOwned::to_owned)
-    }
-
-    fn id(&self) -> Id {
-        self.id
-    }
-
-    fn message(&self, level: MessageLevel, message: impl Into<String>) {
-        let message: String = message.into();
-        match level {
-            MessageLevel::Info => log::info!("ℹ{} → {}", self.name, message),
-            MessageLevel::Failure => log::error!("𐄂{} → {}", self.name, message),
-            MessageLevel::Success => log::info!("✓{} → {}", self.name, message),
-        }
-    }
-
-    fn counter(&self) -> Option<StepShared> {
-        Some(self.step.clone())
     }
 }

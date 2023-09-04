@@ -46,7 +46,7 @@ impl Item {
     /// to the progress tree.
     ///
     /// **Note** that this method can be called multiple times, changing the bounded-ness and unit at will.
-    pub fn init(&mut self, max: Option<usize>, unit: Option<Unit>) {
+    pub fn init(&self, max: Option<usize>, unit: Option<Unit>) {
         #[cfg(feature = "progress-tree-hp-hashmap")]
         {
             if let Some(mut r) = self.tree.get_mut(&self.key) {
@@ -73,7 +73,7 @@ impl Item {
         }
     }
 
-    fn alter_progress(&mut self, f: impl FnMut(&mut Value)) {
+    fn alter_progress(&self, f: impl FnMut(&mut Value)) {
         #[cfg(feature = "progress-tree-hp-hashmap")]
         {
             if let Some(mut r) = self.tree.get_mut(&self.key) {
@@ -94,7 +94,7 @@ impl Item {
     }
 
     /// Set the name of this task's progress to the given `name`.
-    pub fn set_name(&mut self, name: impl Into<String>) {
+    pub fn set_name(&self, name: impl Into<String>) {
         #[cfg(feature = "progress-tree-hp-hashmap")]
         {
             if let Some(mut r) = self.tree.get_mut(&self.key) {
@@ -158,7 +158,7 @@ impl Item {
     }
 
     /// Set the maximum value to `max` and return the old maximum value.
-    pub fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+    pub fn set_max(&self, max: Option<Step>) -> Option<Step> {
         #[cfg(feature = "progress-tree-hp-hashmap")]
         {
             self.tree
@@ -205,21 +205,21 @@ impl Item {
     /// Set the current progress to the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    pub fn set(&mut self, step: Step) {
+    pub fn set(&self, step: Step) {
         self.value.store(step, Ordering::SeqCst);
     }
 
     /// Increment the current progress by the given `step`.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    pub fn inc_by(&mut self, step: Step) {
+    pub fn inc_by(&self, step: Step) {
         self.value.fetch_add(step, Ordering::SeqCst);
     }
 
     /// Increment the current progress by one.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
-    pub fn inc(&mut self) {
+    pub fn inc(&self) {
         self.value.fetch_add(1, Ordering::SeqCst);
     }
 
@@ -231,7 +231,7 @@ impl Item {
     /// make progress again.
     ///
     /// The halted-state is undone next time [`tree::Item::running(…)`][Item::running()] is called.
-    pub fn blocked(&mut self, reason: &'static str, eta: Option<SystemTime>) {
+    pub fn blocked(&self, reason: &'static str, eta: Option<SystemTime>) {
         self.alter_progress(|p| p.state = State::Blocked(reason, eta));
     }
 
@@ -243,13 +243,13 @@ impl Item {
     /// make progress again.
     ///
     /// The halted-state is undone next time [`tree::Item::running(…)`][Item::running()] is called.
-    pub fn halted(&mut self, reason: &'static str, eta: Option<SystemTime>) {
+    pub fn halted(&self, reason: &'static str, eta: Option<SystemTime>) {
         self.alter_progress(|p| p.state = State::Halted(reason, eta));
     }
 
     /// Call to indicate that progress is back in running state, which should be called after the reason for
     /// calling `blocked()` or `halted()` has passed.
-    pub fn running(&mut self) {
+    pub fn running(&self) {
         self.alter_progress(|p| p.state = State::Running);
     }
 
@@ -345,23 +345,27 @@ impl Item {
     }
 }
 
+impl crate::Count for Item {
+    fn set(&self, step: usize) {
+        Item::set(self, step)
+    }
+
+    fn step(&self) -> usize {
+        Item::step(self).unwrap_or(0)
+    }
+
+    fn inc_by(&self, step: usize) {
+        self.inc_by(step)
+    }
+
+    fn counter(&self) -> Option<StepShared> {
+        Some(Arc::clone(&self.value))
+    }
+}
+
 impl crate::Progress for Item {
-    type SubProgress = Item;
-
-    fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
-        Item::add_child(self, name)
-    }
-
-    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
-        Item::add_child_with_id(self, name, id)
-    }
-
     fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
         Item::init(self, max, unit)
-    }
-
-    fn set(&mut self, step: usize) {
-        Item::set(self, step)
     }
 
     fn unit(&self) -> Option<Unit> {
@@ -376,15 +380,7 @@ impl crate::Progress for Item {
         Item::set_max(self, max)
     }
 
-    fn step(&self) -> usize {
-        Item::step(self).unwrap_or(0)
-    }
-
-    fn inc_by(&mut self, step: usize) {
-        self.inc_by(step)
-    }
-
-    fn set_name(&mut self, name: impl Into<String>) {
+    fn set_name(&mut self, name: String) {
         Item::set_name(self, name)
     }
 
@@ -396,11 +392,19 @@ impl crate::Progress for Item {
         Item::id(self)
     }
 
-    fn message(&self, level: MessageLevel, message: impl Into<String>) {
+    fn message(&self, level: MessageLevel, message: String) {
         Item::message(self, level, message)
     }
+}
 
-    fn counter(&self) -> Option<StepShared> {
-        Some(Arc::clone(&self.value))
+impl crate::NestedProgress for Item {
+    type SubProgress = Item;
+
+    fn add_child(&mut self, name: impl Into<String>) -> Self {
+        Item::add_child(self, name)
+    }
+
+    fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self {
+        Item::add_child_with_id(self, name, id)
     }
 }

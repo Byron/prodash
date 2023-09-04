@@ -28,7 +28,7 @@ fn usage(c: &mut Criterion) {
         .throughput(Throughput::Elements(5))
         .bench_function("set tree 5 times", |b| {
             let root = small_tree();
-            let mut progress = root.add_child("the one");
+            let progress = root.add_child("the one");
             progress.init(Some(20), Some("element".into()));
             b.iter(|| {
                 progress.set(1);
@@ -44,7 +44,7 @@ fn usage(c: &mut Criterion) {
             "send one message with a full message buffer (worst case performance)",
             |b| {
                 let root = small_tree();
-                let mut progress = root.add_child("the one");
+                let progress = root.add_child("the one");
                 progress.init(Some(20), Some("element".into()));
                 b.iter(|| {
                     progress.message(MessageLevel::Success, "for testing");
