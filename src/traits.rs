@@ -223,9 +223,8 @@ pub trait DynProgress: Send + Sync + impls::Sealed {
 /// An opaque type for storing [`DynProgress`].
 pub struct BoxedDynProgress(Box<dyn DynProgress>);
 
-/// A bridge type that implements [`Progress`] for any type that implements
-/// [`DynProgress`].
-pub struct DynProgressToProgressBridge<T: ?Sized>(T);
+/// A bridge type that implements [`Progress`] for any type that implements [`DynProgress`].
+pub struct DynProgressToProgressBridge<T: ?Sized>(pub T);
 
 /// A trait for describing non-hierarchical progress.
 ///
@@ -677,7 +676,7 @@ mod impls {
     }
 
     impl BoxedDynProgress {
-        /// Create new boxed dyn Progress
+        /// Create new instance from a `DynProgress` implementation.
         pub fn new(progress: impl DynProgress + 'static) -> Self {
             Self(Box::new(progress))
         }
