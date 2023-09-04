@@ -1,3 +1,3 @@
+mod nested_progress;
 mod progress;
-mod raw_progress;
 mod unit;

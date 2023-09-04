@@ -5,18 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 25.0.2 (2023-08-22)
+## Unreleased
 
-### Chore
+This release is all about making `dyn` possible both for nested progress, as well as for 'simple' one (previously known as `RawProgress`).
+Switching to this release naturally makes it possible for users of `Progress` to also use `dyn Progress`, as this trait is now object safe (formerly `RawProgress`).
+If there are compile errors, the code now needs `NestedProgress`, instead of `Progress`, and possibly the import of the `Count` trait.
+Finally, it's recommended to review all usages of `Progress` as they can possibly be replaced with `Count` which provides the guarantee that only counting happens,
+and no change of the progress information itself.
 
- - <csr-id-05741765491984487beea7326eff9863b669ab51/> Adjusting changelogs prior to release of prodash v25.0.2
+### New Features (BREAKING)
+
+ - <csr-id-6aba6e34f3e39bba5e609a0bc780c758cb43c821/> split `Progress` into various super-traits to allow most of them to be dyn-safe.
+   `Progress` is now `NestedProgress`, `RawProgress` is now `Progress`, and there is
+   a new `Count` trait for solely counting things.
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
- - 37 days passed between releases.
+ - 5 commits contributed to the release.
+ - 13 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -27,8 +35,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Fixup nested dyn-traits ([`5e76abf`](https://github.com/byron/prodash/commit/5e76abfbf8dc18afddea68873c50cce677450a54))
+    - Merge branch 'feat/dyn-progress' into simplify ([`c1590e4`](https://github.com/byron/prodash/commit/c1590e4650a9ffcf96a216f6a9fe82a1cf7cc10e))
+    - Split `Progress` into various super-traits to allow most of them to be dyn-safe. ([`6aba6e3`](https://github.com/byron/prodash/commit/6aba6e34f3e39bba5e609a0bc780c758cb43c821))
+    - Add benchmarks for dyn-traits ([`9d03124`](https://github.com/byron/prodash/commit/9d03124667935314a9d4c8e52886b994967f2671))
+    - Refactor ([`54094b6`](https://github.com/byron/prodash/commit/54094b63289446f0582c6b49a666b5d993625dff))
+</details>
+
+## 25.0.2 (2023-08-22)
+
+<csr-id-05741765491984487beea7326eff9863b669ab51/>
+
+### Chore
+
+ - <csr-id-05741765491984487beea7326eff9863b669ab51/> Adjusting changelogs prior to release of prodash v25.0.2
+
+### New Features
+
+ - <csr-id-24d0b2aaa58978990fea90c2f3b387e238acf966/> Add new trait `DynProgress` & type `BoxedDynProgress`
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release over the course of 2 calendar days.
+ - 37 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release prodash v25.0.2 ([`abcc61b`](https://github.com/byron/prodash/commit/abcc61b456e75d4f700f3c476849d7c36c3ece15))
     - Adjusting changelogs prior to release of prodash v25.0.2 ([`0574176`](https://github.com/byron/prodash/commit/05741765491984487beea7326eff9863b669ab51))
     - Remove `atty` in favor of `is-terminal` ([`2bfe9ad`](https://github.com/byron/prodash/commit/2bfe9adca357cf48d7310036684eeb85efa5ef46))
+    - Add new trait `DynProgress` & type `BoxedDynProgress` ([`24d0b2a`](https://github.com/byron/prodash/commit/24d0b2aaa58978990fea90c2f3b387e238acf966))
 </details>
 
 ## 25.0.1 (2023-07-16)
