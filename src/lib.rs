@@ -64,7 +64,9 @@ pub mod messages;
 pub mod progress;
 
 mod traits;
-pub use traits::{Count, NestedProgress, Progress, Root, WeakRoot};
+pub use traits::{
+    BoxedDynProgress, Count, DynProgress, DynProgressToProgressBridge, NestedProgress, Progress, Root, WeakRoot,
+};
 
 mod throughput;
 pub use crate::throughput::Throughput;
