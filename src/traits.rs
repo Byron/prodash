@@ -54,74 +54,20 @@ pub trait Count {
 /// An object-safe trait for describing hierarchical progress.
 ///
 /// This will be automatically implemented for any type that implements
-/// [`Progress`].
-pub trait DynProgress: Send + Sync + impls::Sealed {
-    /// See [`Progress::add_child`]
-    fn add_child(&mut self, name: String) -> BoxedDynProgress;
+/// [`NestedProgress`].
+pub trait DynNestedProgress: Progress + impls::Sealed {
+    /// See [`NestedProgress::add_child`]
+    fn add_child(&mut self, name: String) -> BoxedDynNestedProgress;
 
-    /// See [`Progress::add_child_with_id`]
-    fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynProgress;
-
-    /// See [`Progress::init`]
-    fn init(&mut self, max: Option<progress::Step>, unit: Option<Unit>);
-
-    /// See [`Progress::set`]
-    fn set(&mut self, step: progress::Step);
-
-    /// See [`Progress::unit`]
-    fn unit(&self) -> Option<Unit>;
-
-    /// See [`Progress::max`]
-    fn max(&self) -> Option<progress::Step>;
-
-    /// See [`Progress::set_max`]
-    fn set_max(&mut self, _max: Option<progress::Step>) -> Option<progress::Step>;
-
-    /// See [`Progress::step`]
-    fn step(&self) -> progress::Step;
-
-    /// See [`Progress::inc_by`]
-    fn inc_by(&mut self, step: progress::Step);
-
-    /// See [`Progress::inc`]
-    fn inc(&mut self);
-
-    /// See [`Progress::set_name`]
-    fn set_name(&mut self, name: String);
-
-    /// See [`Progress::name`]
-    fn name(&self) -> Option<String>;
-
-    /// See [`Progress::id`]
-    fn id(&self) -> Id;
-
-    /// See [`Progress::message`]
-    fn message(&self, level: MessageLevel, message: String);
-
-    /// See [`Progress::counter`]
-    fn counter(&self) -> Option<StepShared>;
-
-    /// See [`Progress::info`]
-    fn info(&self, message: String);
-
-    /// See [`Progress::done`]
-    fn done(&self, message: String);
-
-    /// See [`Progress::fail`]
-    fn fail(&self, message: String);
-
-    /// See [`Progress::show_throughput`]
-    fn show_throughput(&self, start: Instant);
-
-    /// See [`Progress::show_throughput_with`]
-    fn show_throughput_with(&self, start: Instant, step: progress::Step, unit: Unit, level: MessageLevel);
+    /// See [`NestedProgress::add_child_with_id`]
+    fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynNestedProgress;
 }
 
-/// An opaque type for storing [`DynProgress`].
-pub struct BoxedDynProgress(Box<dyn DynProgress>);
+/// An opaque type for storing [`DynNestedProgress`].
+pub struct BoxedDynNestedProgress(Box<dyn DynNestedProgress>);
 
-/// A bridge type that implements [`Progress`] for any type that implements [`DynProgress`].
-pub struct DynProgressToProgressBridge<T: ?Sized>(pub T);
+/// A bridge type that implements [`NestedProgress`] for any type that implements [`DynNestedProgress`].
+pub struct DynNestedProgressToNestedProgress<T: ?Sized>(pub T);
 
 /// A trait for describing non-hierarchical progress.
 ///
@@ -291,7 +237,7 @@ mod impls {
     use crate::{
         messages::MessageLevel,
         progress::{Id, Step, StepShared},
-        Count, NestedProgress, Unit,
+        BoxedDynNestedProgress, Count, DynNestedProgress, DynNestedProgressToNestedProgress, NestedProgress, Unit,
     };
 
     pub trait Sealed {}
@@ -418,99 +364,74 @@ mod impls {
         }
     }
 
-    impl<T> Sealed for T where T: Progress + ?Sized {}
+    impl<T> Sealed for T where T: NestedProgress + ?Sized {}
 
-    impl<T, SubP> DynProgress for T
+    impl<T, SubP> DynNestedProgress for T
     where
-        T: Progress<SubProgress = SubP> + ?Sized,
-        SubP: Progress + 'static,
+        T: NestedProgress<SubProgress = SubP> + ?Sized,
+        SubP: NestedProgress + 'static,
     {
-        fn add_child(&mut self, name: String) -> BoxedDynProgress {
-            BoxedDynProgress::new(self.add_child(name))
+        fn add_child(&mut self, name: String) -> BoxedDynNestedProgress {
+            BoxedDynNestedProgress::new(self.add_child(name))
         }
 
-        fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynProgress {
-            BoxedDynProgress::new(self.add_child_with_id(name, id))
-        }
-
-        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
-            self.init(max, unit)
-        }
-
-        fn set(&mut self, step: Step) {
-            self.set(step)
-        }
-
-        fn unit(&self) -> Option<Unit> {
-            self.unit()
-        }
-
-        fn max(&self) -> Option<Step> {
-            self.max()
-        }
-
-        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
-            self.set_max(max)
-        }
-
-        fn step(&self) -> Step {
-            self.step()
-        }
-
-        fn inc_by(&mut self, step: Step) {
-            self.inc_by(step)
-        }
-
-        fn inc(&mut self) {
-            self.inc()
-        }
-
-        fn set_name(&mut self, name: String) {
-            self.set_name(name)
-        }
-
-        fn name(&self) -> Option<String> {
-            self.name()
-        }
-
-        fn id(&self) -> Id {
-            self.id()
-        }
-
-        fn message(&self, level: MessageLevel, message: String) {
-            self.message(level, message)
-        }
-
-        fn counter(&self) -> Option<StepShared> {
-            self.counter()
-        }
-
-        fn info(&self, message: String) {
-            self.info(message)
-        }
-        fn done(&self, message: String) {
-            self.done(message)
-        }
-        fn fail(&self, message: String) {
-            self.fail(message)
-        }
-
-        fn show_throughput(&self, start: Instant) {
-            self.show_throughput(start)
-        }
-        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
-            self.show_throughput_with(start, step, unit, level)
+        fn add_child_with_id(&mut self, name: String, id: Id) -> BoxedDynNestedProgress {
+            BoxedDynNestedProgress::new(self.add_child_with_id(name, id))
         }
     }
 
-    impl BoxedDynProgress {
+    impl BoxedDynNestedProgress {
         /// Create new instance from a `DynProgress` implementation.
-        pub fn new(progress: impl DynProgress + 'static) -> Self {
+        pub fn new(progress: impl DynNestedProgress + 'static) -> Self {
             Self(Box::new(progress))
         }
     }
 
-    impl Progress for BoxedDynProgress {
+    impl Progress for BoxedDynNestedProgress {
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.0.init(max, unit)
+        }
+
+        fn set_name(&mut self, name: String) {
+            self.0.set_name(name)
+        }
+
+        fn name(&self) -> Option<String> {
+            self.0.name()
+        }
+
+        fn id(&self) -> Id {
+            self.0.id()
+        }
+
+        fn message(&self, level: MessageLevel, message: String) {
+            self.0.message(level, message)
+        }
+    }
+
+    impl Count for BoxedDynNestedProgress {
+        fn set(&self, step: Step) {
+            self.0.set(step)
+        }
+
+        fn step(&self) -> Step {
+            self.0.step()
+        }
+
+        fn inc_by(&self, step: Step) {
+            self.0.inc_by(step)
+        }
+
+        fn inc(&self) {
+            self.0.inc()
+        }
+
+        fn counter(&self) -> Option<StepShared> {
+            self.0.counter()
+        }
+    }
+
+    impl NestedProgress for BoxedDynNestedProgress {
         type SubProgress = Self;
 
         fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
@@ -520,41 +441,18 @@ mod impls {
         fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
             self.0.add_child_with_id(name.into(), id)
         }
+    }
 
+    impl<T> Progress for DynNestedProgressToNestedProgress<T>
+    where
+        T: ?Sized + DynNestedProgress,
+    {
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
             self.0.init(max, unit)
         }
 
-        fn set(&mut self, step: Step) {
-            self.0.set(step)
-        }
-
-        fn unit(&self) -> Option<Unit> {
-            self.0.unit()
-        }
-
-        fn max(&self) -> Option<Step> {
-            self.0.max()
-        }
-
-        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
-            self.0.set_max(max)
-        }
-
-        fn step(&self) -> Step {
-            self.0.step()
-        }
-
-        fn inc_by(&mut self, step: Step) {
-            self.0.inc_by(step)
-        }
-
-        fn inc(&mut self) {
-            self.0.inc()
-        }
-
-        fn set_name(&mut self, name: impl Into<String>) {
-            self.0.set_name(name.into())
+        fn set_name(&mut self, name: String) {
+            self.0.set_name(name)
         }
 
         fn name(&self) -> Option<String> {
@@ -565,40 +463,41 @@ mod impls {
             self.0.id()
         }
 
-        fn message(&self, level: MessageLevel, message: impl Into<String>) {
-            self.0.message(level, message.into())
+        fn message(&self, level: MessageLevel, message: String) {
+            self.0.message(level, message)
+        }
+    }
+
+    impl<T> Count for DynNestedProgressToNestedProgress<T>
+    where
+        T: ?Sized + DynNestedProgress,
+    {
+        fn set(&self, step: Step) {
+            self.0.set(step)
+        }
+
+        fn step(&self) -> Step {
+            self.0.step()
+        }
+
+        fn inc_by(&self, step: Step) {
+            self.0.inc_by(step)
+        }
+
+        fn inc(&self) {
+            self.0.inc()
         }
 
         fn counter(&self) -> Option<StepShared> {
             self.0.counter()
         }
-
-        fn info(&self, message: impl Into<String>) {
-            self.0.info(message.into())
-        }
-
-        fn done(&self, message: impl Into<String>) {
-            self.0.done(message.into())
-        }
-
-        fn fail(&self, message: impl Into<String>) {
-            self.0.fail(message.into())
-        }
-
-        fn show_throughput(&self, start: Instant) {
-            self.0.show_throughput(start)
-        }
-
-        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
-            self.0.show_throughput_with(start, step, unit, level)
-        }
     }
 
-    impl<T> Progress for DynProgressToProgressBridge<T>
+    impl<T> NestedProgress for DynNestedProgressToNestedProgress<T>
     where
-        T: DynProgress + ?Sized,
+        T: DynNestedProgress + ?Sized,
     {
-        type SubProgress = BoxedDynProgress;
+        type SubProgress = BoxedDynNestedProgress;
 
         fn add_child(&mut self, name: impl Into<String>) -> Self::SubProgress {
             self.0.add_child(name.into())
@@ -606,78 +505,6 @@ mod impls {
 
         fn add_child_with_id(&mut self, name: impl Into<String>, id: Id) -> Self::SubProgress {
             self.0.add_child_with_id(name.into(), id)
-        }
-
-        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
-            self.0.init(max, unit)
-        }
-
-        fn set(&mut self, step: Step) {
-            self.0.set(step)
-        }
-
-        fn unit(&self) -> Option<Unit> {
-            self.0.unit()
-        }
-
-        fn max(&self) -> Option<Step> {
-            self.0.max()
-        }
-
-        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
-            self.0.set_max(max)
-        }
-
-        fn step(&self) -> Step {
-            self.0.step()
-        }
-
-        fn inc_by(&mut self, step: Step) {
-            self.0.inc_by(step)
-        }
-
-        fn inc(&mut self) {
-            self.0.inc()
-        }
-
-        fn set_name(&mut self, name: impl Into<String>) {
-            self.0.set_name(name.into())
-        }
-
-        fn name(&self) -> Option<String> {
-            self.0.name()
-        }
-
-        fn id(&self) -> Id {
-            self.0.id()
-        }
-
-        fn message(&self, level: MessageLevel, message: impl Into<String>) {
-            self.0.message(level, message.into())
-        }
-
-        fn counter(&self) -> Option<StepShared> {
-            self.0.counter()
-        }
-
-        fn info(&self, message: impl Into<String>) {
-            self.0.info(message.into())
-        }
-
-        fn done(&self, message: impl Into<String>) {
-            self.0.done(message.into())
-        }
-
-        fn fail(&self, message: impl Into<String>) {
-            self.0.fail(message.into())
-        }
-
-        fn show_throughput(&self, start: Instant) {
-            self.0.show_throughput(start)
-        }
-
-        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
-            self.0.show_throughput_with(start, step, unit, level)
         }
     }
 }

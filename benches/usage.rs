@@ -2,7 +2,7 @@ use criterion::*;
 use prodash::{
     messages::MessageLevel,
     tree::{root::Options as TreeOptions, Root as Tree},
-    BoxedDynProgress,
+    BoxedDynNestedProgress, Count,
 };
 
 fn usage(c: &mut Criterion) {
@@ -18,10 +18,9 @@ fn usage(c: &mut Criterion) {
         .throughput(Throughput::Elements(5))
         .bench_function("set tree 5 times", |b| {
             let root = small_tree();
-            let mut progress = root.add_child("the one");
+            let progress = root.add_child("the one");
             progress.init(Some(20), Some("element".into()));
-            let mut progress = BoxedDynProgress::new(progress);
-            use prodash::Progress;
+            let progress = BoxedDynNestedProgress::new(progress);
             b.iter(|| {
                 progress.set(1);
                 progress.set(2);
