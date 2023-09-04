@@ -1,4 +1,6 @@
 use crate::{messages::MessageLevel, progress::Id, Count, NestedProgress, Progress, Unit};
+use std::sync::atomic::AtomicUsize;
+use std::sync::Arc;
 
 /// An implementation of [`NestedProgress`] which discards all calls.
 pub struct Discard;
@@ -12,8 +14,8 @@ impl Count for Discard {
 
     fn inc_by(&self, _step: usize) {}
 
-    fn counter(&self) -> Option<StepShared> {
-        None
+    fn counter(&self) -> StepShared {
+        Arc::new(AtomicUsize::default())
     }
 }
 
@@ -82,7 +84,7 @@ where
             Either::Right(r) => r.inc_by(step),
         }
     }
-    fn counter(&self) -> Option<StepShared> {
+    fn counter(&self) -> StepShared {
         match self {
             Either::Left(l) => l.counter(),
             Either::Right(r) => r.counter(),
@@ -223,7 +225,7 @@ where
         self.0.inc_by(step)
     }
 
-    fn counter(&self) -> Option<StepShared> {
+    fn counter(&self) -> StepShared {
         self.0.counter()
     }
 }
@@ -307,7 +309,7 @@ impl<T: NestedProgress> Count for ThroughputOnDrop<T> {
         self.0.inc_by(step)
     }
 
-    fn counter(&self) -> Option<StepShared> {
+    fn counter(&self) -> StepShared {
         self.0.counter()
     }
 }

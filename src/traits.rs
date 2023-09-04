@@ -42,13 +42,11 @@ pub trait Count {
         self.inc_by(1)
     }
 
-    /// If available, return an atomic counter for direct access to the underlying state.
+    /// Return an atomic counter for direct access to the underlying state.
     ///
     /// This is useful if multiple threads want to access the same progress, without the need
     /// for provide each their own progress and aggregating the result.
-    fn counter(&self) -> Option<StepShared> {
-        None
-    }
+    fn counter(&self) -> StepShared;
 }
 
 /// An object-safe trait for describing hierarchical progress.
@@ -262,7 +260,7 @@ mod impls {
             (*self).inc()
         }
 
-        fn counter(&self) -> Option<StepShared> {
+        fn counter(&self) -> StepShared {
             (*self).counter()
         }
     }
@@ -287,7 +285,7 @@ mod impls {
             self.deref().inc()
         }
 
-        fn counter(&self) -> Option<StepShared> {
+        fn counter(&self) -> StepShared {
             self.deref().counter()
         }
     }
@@ -426,7 +424,7 @@ mod impls {
             self.0.inc()
         }
 
-        fn counter(&self) -> Option<StepShared> {
+        fn counter(&self) -> StepShared {
             self.0.counter()
         }
     }
@@ -488,7 +486,7 @@ mod impls {
             self.0.inc()
         }
 
-        fn counter(&self) -> Option<StepShared> {
+        fn counter(&self) -> StepShared {
             self.0.counter()
         }
     }

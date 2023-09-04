@@ -84,12 +84,12 @@ impl Count for Log {
     }
 
     fn inc_by(&self, step: Step) {
-        self.step.fetch_add(step, Ordering::SeqCst);
+        self.step.fetch_add(step, Ordering::Relaxed);
         self.maybe_log()
     }
 
-    fn counter(&self) -> Option<StepShared> {
-        Some(self.step.clone())
+    fn counter(&self) -> StepShared {
+        self.step.clone()
     }
 }
 

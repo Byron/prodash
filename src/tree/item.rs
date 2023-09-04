@@ -213,14 +213,14 @@ impl Item {
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc_by(&self, step: Step) {
-        self.value.fetch_add(step, Ordering::SeqCst);
+        self.value.fetch_add(step, Ordering::Relaxed);
     }
 
     /// Increment the current progress by one.
     ///
     /// **Note**: that this call has no effect unless `init(…)` was called before.
     pub fn inc(&self) {
-        self.value.fetch_add(1, Ordering::SeqCst);
+        self.value.fetch_add(1, Ordering::Relaxed);
     }
 
     /// Call to indicate that progress cannot be indicated, and that the task cannot be interrupted.
@@ -358,8 +358,8 @@ impl crate::Count for Item {
         self.inc_by(step)
     }
 
-    fn counter(&self) -> Option<StepShared> {
-        Some(Arc::clone(&self.value))
+    fn counter(&self) -> StepShared {
+        Arc::clone(&self.value)
     }
 }
 
