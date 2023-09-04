@@ -37,8 +37,11 @@ pub const UNKNOWN: Id = *b"\0\0\0\0";
 /// The amount of steps a progress can make
 pub type Step = usize;
 
+/// The amount of steps a progress can make, for threadsafe counting.
+pub type AtomicStep = AtomicUsize;
+
 /// As step, but shareable.
-pub type StepShared = Arc<AtomicUsize>;
+pub type StepShared = Arc<AtomicStep>;
 
 /// Indicate whether a progress can or cannot be made.
 #[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
