@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 26.1.0 (2023-09-04)
+
+### New Features
+
+ - <csr-id-0705a734b401d44657be59e83e4cbf58cb4484a8/> add `progress::AtomicStep` to allow referring to it.
+   Previously, only `StepShared` was available, which implies an `Arc`.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Add `progress::AtomicStep` to allow referring to it. ([`0705a73`](https://github.com/byron/prodash/commit/0705a734b401d44657be59e83e4cbf58cb4484a8))
+</details>
+
 ## 26.0.0 (2023-09-04)
 
 This release is all about making `dyn` possible both for nested progress, as well as for 'simple' one (previously known as `RawProgress`).
@@ -27,7 +52,7 @@ and no change of the progress information itself.
 
 <csr-read-only-do-not-edit/>
 
- - 8 commits contributed to the release.
+ - 9 commits contributed to the release.
  - 13 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -39,6 +64,7 @@ and no change of the progress information itself.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v26.0.0 ([`6b94f28`](https://github.com/byron/prodash/commit/6b94f28102b3133e4c1cba3765b55108c528b534))
     - Merge branch 'simplify' ([`5e21df7`](https://github.com/byron/prodash/commit/5e21df796d4c8ddefd71ee1a35df3b591c6d5e58))
     - `Progress::counter()` is now mandatory. ([`6c60835`](https://github.com/byron/prodash/commit/6c60835ae49487a220b1817bc6cea3ebc8bf1aff))
     - Prepare release ([`e1e282a`](https://github.com/byron/prodash/commit/e1e282aa37fc753884407339196809f2b0b72d2d))
