@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 26.0.0 (2023-09-04)
 
 This release is all about making `dyn` possible both for nested progress, as well as for 'simple' one (previously known as `RawProgress`).
 Switching to this release naturally makes it possible for users of `Progress` to also use `dyn Progress`, as this trait is now object safe (formerly `RawProgress`).
@@ -18,14 +18,18 @@ and no change of the progress information itself.
  - <csr-id-6aba6e34f3e39bba5e609a0bc780c758cb43c821/> split `Progress` into various super-traits to allow most of them to be dyn-safe.
    `Progress` is now `NestedProgress`, `RawProgress` is now `Progress`, and there is
    a new `Count` trait for solely counting things.
+ - <csr-id-6c60835ae49487a220b1817bc6cea3ebc8bf1aff/> `Progress::counter()` is now mandatory.
+   This should simplify downstream code and we just accept that we are dealing
+   with a threaded world.
+   This also comes with performance improvements as increments are now 250% faster.
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release.
+ - 8 commits contributed to the release.
  - 13 days passed between releases.
- - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -35,6 +39,9 @@ and no change of the progress information itself.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Merge branch 'simplify' ([`5e21df7`](https://github.com/byron/prodash/commit/5e21df796d4c8ddefd71ee1a35df3b591c6d5e58))
+    - `Progress::counter()` is now mandatory. ([`6c60835`](https://github.com/byron/prodash/commit/6c60835ae49487a220b1817bc6cea3ebc8bf1aff))
+    - Prepare release ([`e1e282a`](https://github.com/byron/prodash/commit/e1e282aa37fc753884407339196809f2b0b72d2d))
     - Fixup nested dyn-traits ([`5e76abf`](https://github.com/byron/prodash/commit/5e76abfbf8dc18afddea68873c50cce677450a54))
     - Merge branch 'feat/dyn-progress' into simplify ([`c1590e4`](https://github.com/byron/prodash/commit/c1590e4650a9ffcf96a216f6a9fe82a1cf7cc10e))
     - Split `Progress` into various super-traits to allow most of them to be dyn-safe. ([`6aba6e3`](https://github.com/byron/prodash/commit/6aba6e34f3e39bba5e609a0bc780c758cb43c821))
