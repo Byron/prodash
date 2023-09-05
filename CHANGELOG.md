@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 26.1.0 (2023-09-04)
+## 26.2.0 (2023-09-05)
 
 ### New Features
 
- - <csr-id-0705a734b401d44657be59e83e4cbf58cb4484a8/> add `progress::AtomicStep` to allow referring to it.
-   Previously, only `StepShared` was available, which implies an `Arc`.
+ - <csr-id-b3cae191413653feef62808b60b7eea52145e55e/> add `BoxedProgress` type that implements `Progress`.
+   This makes working with boxed progress even more flexible.
 
 ### Commit Statistics
 
@@ -27,6 +27,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Add `BoxedProgress` type that implements `Progress`. ([`b3cae19`](https://github.com/byron/prodash/commit/b3cae191413653feef62808b60b7eea52145e55e))
+</details>
+
+## 26.1.0 (2023-09-04)
+
+### New Features
+
+ - <csr-id-0705a734b401d44657be59e83e4cbf58cb4484a8/> add `progress::AtomicStep` to allow referring to it.
+   Previously, only `StepShared` was available, which implies an `Arc`.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release prodash v26.1.0 ([`05bc923`](https://github.com/byron/prodash/commit/05bc92395aeeaf498ab46e479decf1ae71382835))
     - Add `progress::AtomicStep` to allow referring to it. ([`0705a73`](https://github.com/byron/prodash/commit/0705a734b401d44657be59e83e4cbf58cb4484a8))
 </details>
 
