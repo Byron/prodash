@@ -65,8 +65,8 @@ pub mod progress;
 
 mod traits;
 pub use traits::{
-    BoxedDynNestedProgress, Count, DynNestedProgress, DynNestedProgressToNestedProgress, NestedProgress, Progress,
-    Root, WeakRoot,
+    BoxedDynNestedProgress, BoxedProgress, Count, DynNestedProgress, DynNestedProgressToNestedProgress, NestedProgress,
+    Progress, Root, WeakRoot,
 };
 
 mod throughput;

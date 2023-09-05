@@ -64,6 +64,9 @@ pub trait DynNestedProgress: Progress + impls::Sealed {
 /// An opaque type for storing [`DynNestedProgress`].
 pub struct BoxedDynNestedProgress(Box<dyn DynNestedProgress>);
 
+/// An owned version of [`Progress`] which can itself implement said trait.
+pub type BoxedProgress = Box<dyn Progress>;
+
 /// A bridge type that implements [`NestedProgress`] for any type that implements [`DynNestedProgress`].
 pub struct DynNestedProgressToNestedProgress<T: ?Sized>(pub T);
 
@@ -231,7 +234,7 @@ mod impls {
         time::Instant,
     };
 
-    use crate::traits::Progress;
+    use crate::traits::{BoxedProgress, Progress};
     use crate::{
         messages::MessageLevel,
         progress::{Id, Step, StepShared},
@@ -407,6 +410,28 @@ mod impls {
         }
     }
 
+    impl Progress for BoxedProgress {
+        fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
+            self.deref_mut().init(max, unit)
+        }
+
+        fn set_name(&mut self, name: String) {
+            self.deref_mut().set_name(name)
+        }
+
+        fn name(&self) -> Option<String> {
+            self.deref().name()
+        }
+
+        fn id(&self) -> Id {
+            self.deref().id()
+        }
+
+        fn message(&self, level: MessageLevel, message: String) {
+            self.deref().message(level, message)
+        }
+    }
+
     impl Count for BoxedDynNestedProgress {
         fn set(&self, step: Step) {
             self.0.set(step)
@@ -426,6 +451,28 @@ mod impls {
 
         fn counter(&self) -> StepShared {
             self.0.counter()
+        }
+    }
+
+    impl Count for BoxedProgress {
+        fn set(&self, step: Step) {
+            self.deref().set(step)
+        }
+
+        fn step(&self) -> Step {
+            self.deref().step()
+        }
+
+        fn inc_by(&self, step: Step) {
+            self.deref().inc_by(step)
+        }
+
+        fn inc(&self) {
+            self.deref().inc()
+        }
+
+        fn counter(&self) -> StepShared {
+            self.deref().counter()
         }
     }
 
