@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 26.2.0 (2023-09-05)
+## 26.2.1 (2023-09-06)
 
-### New Features
+### Bug Fixes
 
- - <csr-id-b3cae191413653feef62808b60b7eea52145e55e/> add `BoxedProgress` type that implements `Progress`.
-   This makes working with boxed progress even more flexible.
+ - <csr-id-53ea2b81292a5062816bb12af0ab4f7931d5d2fa/> Add missing forwardings for various methods.
+   Not having these could lead to incorrect thoughput display.
 
 ### Commit Statistics
 
@@ -27,6 +27,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Add missing forwardings for various methods. ([`53ea2b8`](https://github.com/byron/prodash/commit/53ea2b81292a5062816bb12af0ab4f7931d5d2fa))
+</details>
+
+## 26.2.0 (2023-09-05)
+
+### New Features
+
+ - <csr-id-b3cae191413653feef62808b60b7eea52145e55e/> add `BoxedProgress` type that implements `Progress`.
+   This makes working with boxed progress even more flexible.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release prodash v26.2.0 ([`8f26902`](https://github.com/byron/prodash/commit/8f2690254576e32624abbfc4b5e18283e7e542f7))
     - Add `BoxedProgress` type that implements `Progress`. ([`b3cae19`](https://github.com/byron/prodash/commit/b3cae191413653feef62808b60b7eea52145e55e))
 </details>
 
