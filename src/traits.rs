@@ -393,6 +393,18 @@ mod impls {
             self.0.init(max, unit)
         }
 
+        fn unit(&self) -> Option<Unit> {
+            self.0.unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.0.max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.0.set_max(max)
+        }
+
         fn set_name(&mut self, name: String) {
             self.0.set_name(name)
         }
@@ -408,11 +420,31 @@ mod impls {
         fn message(&self, level: MessageLevel, message: String) {
             self.0.message(level, message)
         }
+
+        fn show_throughput(&self, start: Instant) {
+            self.0.show_throughput(start)
+        }
+
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.0.show_throughput_with(start, step, unit, level)
+        }
     }
 
     impl Progress for BoxedProgress {
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
             self.deref_mut().init(max, unit)
+        }
+
+        fn unit(&self) -> Option<Unit> {
+            self.deref().unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.deref().max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.deref_mut().set_max(max)
         }
 
         fn set_name(&mut self, name: String) {
@@ -429,6 +461,14 @@ mod impls {
 
         fn message(&self, level: MessageLevel, message: String) {
             self.deref().message(level, message)
+        }
+
+        fn show_throughput(&self, start: Instant) {
+            self.deref().show_throughput(start)
+        }
+
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.deref().show_throughput_with(start, step, unit, level)
         }
     }
 
@@ -496,6 +536,18 @@ mod impls {
             self.0.init(max, unit)
         }
 
+        fn unit(&self) -> Option<Unit> {
+            self.0.unit()
+        }
+
+        fn max(&self) -> Option<Step> {
+            self.0.max()
+        }
+
+        fn set_max(&mut self, max: Option<Step>) -> Option<Step> {
+            self.0.set_max(max)
+        }
+
         fn set_name(&mut self, name: String) {
             self.0.set_name(name)
         }
@@ -510,6 +562,14 @@ mod impls {
 
         fn message(&self, level: MessageLevel, message: String) {
             self.0.message(level, message)
+        }
+
+        fn show_throughput(&self, start: Instant) {
+            self.0.show_throughput(start)
+        }
+
+        fn show_throughput_with(&self, start: Instant, step: Step, unit: Unit, level: MessageLevel) {
+            self.0.show_throughput_with(start, step, unit, level)
         }
     }
 
