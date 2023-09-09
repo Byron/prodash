@@ -530,7 +530,7 @@ mod impls {
 
     impl<T> Progress for DynNestedProgressToNestedProgress<T>
     where
-        T: ?Sized + DynNestedProgress,
+        T: ?Sized + Progress,
     {
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
             self.0.init(max, unit)
@@ -575,7 +575,7 @@ mod impls {
 
     impl<T> Count for DynNestedProgressToNestedProgress<T>
     where
-        T: ?Sized + DynNestedProgress,
+        T: ?Sized + Count,
     {
         fn set(&self, step: Step) {
             self.0.set(step)
