@@ -245,7 +245,7 @@ mod impls {
 
     impl<'a, T> Count for &'a T
     where
-        T: Count,
+        T: Count + ?Sized,
     {
         fn set(&self, step: Step) {
             (*self).set(step)
@@ -270,7 +270,7 @@ mod impls {
 
     impl<'a, T> Count for &'a mut T
     where
-        T: Count,
+        T: Count + ?Sized,
     {
         fn set(&self, step: Step) {
             self.deref().set(step)
@@ -295,7 +295,7 @@ mod impls {
 
     impl<'a, T> Progress for &'a mut T
     where
-        T: Progress,
+        T: Progress + ?Sized,
     {
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
             self.deref_mut().init(max, unit)
@@ -352,7 +352,7 @@ mod impls {
 
     impl<'a, T> NestedProgress for &'a mut T
     where
-        T: NestedProgress,
+        T: NestedProgress + ?Sized,
     {
         type SubProgress = T::SubProgress;
 
@@ -530,7 +530,7 @@ mod impls {
 
     impl<T> Progress for DynNestedProgressToNestedProgress<T>
     where
-        T: ?Sized + DynNestedProgress,
+        T: ?Sized + Progress,
     {
         fn init(&mut self, max: Option<Step>, unit: Option<Unit>) {
             self.0.init(max, unit)
@@ -575,7 +575,7 @@ mod impls {
 
     impl<T> Count for DynNestedProgressToNestedProgress<T>
     where
-        T: ?Sized + DynNestedProgress,
+        T: ?Sized + Count,
     {
         fn set(&self, step: Step) {
             self.0.set(step)
