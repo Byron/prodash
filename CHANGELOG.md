@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+This release relaxes trait-bounds of `Count`, `Progress` and `NestedProgress` to allow `?Sized` as well.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 2 days passed between releases.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #24 from NobodyXu/fix/dyn ([`c905d5c`](https://github.com/byron/prodash/commit/c905d5cb8d62368bb4891cc732ce613d09d6498b))
+    - Relax bound of `Progress`, `Count` impl for `DynNestedProgressToNestedProgress` ([`967ea46`](https://github.com/byron/prodash/commit/967ea46b71c2bb44f7cd75524d101c4bfd2df0bf))
+    - Fix use of `DynNestedProgress` as trait object ([`7eb69ac`](https://github.com/byron/prodash/commit/7eb69ac3f4946c72a0598b3021153045f3e9626b))
+</details>
+
 ## 26.2.1 (2023-09-06)
 
 ### Bug Fixes
@@ -16,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -27,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v26.2.1 ([`f37161f`](https://github.com/byron/prodash/commit/f37161f49f65991fd97ad855cf23a4f0ace3c9bb))
     - Add missing forwardings for various methods. ([`53ea2b8`](https://github.com/byron/prodash/commit/53ea2b81292a5062816bb12af0ab4f7931d5d2fa))
 </details>
 
