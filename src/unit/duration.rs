@@ -1,4 +1,6 @@
-use std::fmt;
+use std::{fmt, time::Duration as StdDuration};
+
+use humantime::format_duration;
 
 use crate::{progress::Step, unit::DisplayValue};
 
@@ -8,13 +10,13 @@ pub struct Duration;
 
 impl DisplayValue for Duration {
     fn display_current_value(&self, w: &mut dyn fmt::Write, value: Step, _upper: Option<Step>) -> fmt::Result {
-        w.write_str(&compound_duration::format_dhms(value))
+        w.write_str(&format_duration(StdDuration::new(value as u64, 0)).to_string())
     }
     fn separator(&self, w: &mut dyn fmt::Write, _value: Step, _upper: Option<Step>) -> fmt::Result {
         w.write_str(" of ")
     }
     fn display_upper_bound(&self, w: &mut dyn fmt::Write, upper_bound: Step, _value: Step) -> fmt::Result {
-        w.write_str(&compound_duration::format_dhms(upper_bound))
+        w.write_str(&format_duration(StdDuration::new(upper_bound as u64, 0)).to_string())
     }
 
     fn dyn_hash(&self, state: &mut dyn std::hash::Hasher) {

@@ -1,25 +1,29 @@
-use std::{fmt, fmt::Debug, hash::Hasher};
+use std::{fmt, hash::Hasher};
 
-pub use human_format::{Formatter, Scales};
+pub use humansize::{format_size_i, FormatSizeOptions, ISizeFormatter};
+#[cfg(doc)]
+use humansize::{BINARY, DECIMAL};
 
 use crate::{progress::Step, unit::DisplayValue};
 
-/// A helper for formatting numbers in a format easily read by humans in renderers, as in `2.54 million objects`
-#[derive(Debug)]
+/// A helper for formatting numbers in a format easily read by humans in
+/// renderers, as in `2.54 million objects`
 pub struct Human {
     /// The name of the represented unit, like 'items' or 'objects'.
     pub name: &'static str,
-    /// The formatter to format the actual numbers.
-    pub formatter: Formatter,
+    /// Formatting options of [`humansize`].
+    pub format_options: FormatSizeOptions,
 }
 
 impl Human {
-    /// A convenience method to create a new new instance and its `formatter` and `name` fields.
-    pub fn new(formatter: Formatter, name: &'static str) -> Self {
-        Human { name, formatter }
+    /// A convenience method to create a new instance with a set of
+    /// [`humansize`] format options, like [`BINARY`] or [`DECIMAL`],
+    /// and a name for the unit.
+    pub fn new(format_options: FormatSizeOptions, name: &'static str) -> Self {
+        Self { name, format_options }
     }
     fn format_bytes(&self, w: &mut dyn fmt::Write, value: Step) -> fmt::Result {
-        let string = self.formatter.format(value as f64);
+        let string = format_size_i(value as f64, self.format_options);
         for token in string.split(' ') {
             w.write_str(token)?;
         }

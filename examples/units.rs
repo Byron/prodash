@@ -59,10 +59,8 @@ fn work_for_a_long_time_blocking(root: Arc<Tree>) {
         )),
     );
 
-    fn formatter(decimals: usize) -> unit::human::Formatter {
-        let mut f = unit::human::Formatter::new();
-        f.with_decimals(decimals);
-        f
+    fn formatter(decimals: usize) -> humansize::FormatSizeOptions {
+        humansize::DECIMAL.decimal_places(decimals).decimal_zeroes(decimals)
     }
     let human_count = root.add_child_with_id("item count unknown", *b"ITUK");
     human_count.init(

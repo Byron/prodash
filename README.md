@@ -71,9 +71,9 @@ This crate comes with various cargo features to tailor it to your needs.
 * **unit-bytes**
   * Supports dynamic byte display using the tiny `bytesize` crate.
 * **unit-human**
-  * Display counts in a way that is easier to grasp for humans, using the tiny `human_format` crate.
+  * Display counts in a way that is easier to grasp for humans, using the tiny `humansize` crate.
 * **unit-duration**
-  * Displays time in seconds like '_5m4s_' using the tiny `compound_duration` crate.
+  * Displays time in seconds like '_5m4s_' using the tiny `humantime` crate.
 
 ## Features
 

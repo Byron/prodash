@@ -13,26 +13,19 @@ mod dynamic {
     }
     #[cfg(feature = "unit-human")]
     mod human {
-        use prodash::unit::{self, display, human, Human};
+        use prodash::unit::{self, display, Human};
 
         #[test]
         fn various_combinations() {
             let unit = unit::dynamic_and_mode(
-                Human::new(
-                    {
-                        let mut f = human::Formatter::new();
-                        f.with_decimals(1);
-                        f
-                    },
-                    "objects",
-                ),
+                Human::new(humansize::DECIMAL.decimal_places(1).decimal_zeroes(1), "objects"),
                 display::Mode::with_percentage(),
             );
             assert_eq!(
                 format!("{}", unit.display(100_002, Some(7_500_000), None)),
-                "100.0k/7.5M objects [1%]"
+                "100.0kB/7.5MB objects [1%]"
             );
-            assert_eq!(format!("{}", unit.display(100_002, None, None)), "100.0k objects");
+            assert_eq!(format!("{}", unit.display(100_002, None, None)), "100.0kB objects");
         }
     }
     mod range {
