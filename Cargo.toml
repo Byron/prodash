@@ -44,7 +44,7 @@ progress-tree-log = ["log"]
 progress-log = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
-unit-duration = ["compound_duration"]
+unit-duration = ["humantime"]
 render-tui-termion = ["crosstermion/tui-react-termion"]
 render-tui-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 render-tui = ["tui",
@@ -76,7 +76,7 @@ tui = { package = "ratatui", version = "0.20.1", optional = true, default-featur
 tui-react = { version = "0.20.0", optional = true }
 futures-core = { version = "0.3.4", optional = true, default-features = false }
 futures-lite = { version = "1.5.0", optional = true }
-humantime = { version = "2.0.0", optional = true }
+humantime = { version = "2.1.0", optional = true }
 unicode-segmentation = { version = "1.6.0", optional = true }
 unicode-width = { version = "0.1.7", optional = true }
 crosstermion = { version = "0.11.0", optional = true, default-features = false }
@@ -93,7 +93,6 @@ is-terminal = { version = "0.4.9", optional = true }
 # units
 bytesize = { version = "1.0.1", optional = true }
 human_format = { version = "1.0.3", optional = true }
-compound_duration = { version = "1.2.0", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
