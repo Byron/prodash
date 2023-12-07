@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 27.0.0 (2023-12-07)
+
+### New Features
+
+ - <csr-id-6acf6fe22a9ec4f7a16626db556c051c2084ccb2/> Change duration formatting to be more human readable.
+   Note that this changes duration output from something like `69d10h40m`
+   to `69d 10h 40m`.
+
+### Reverted (BREAKING)
+
+ - <csr-id-b1fd37d272c59249c151e1dbf498d5e2767f5507/> All `termion`-related features are now removed and obsolete.
+   After the most recent update, certion event-related features in crosstermion
+   stopped working in the context of the GUI, so it's probably best to let it go.
+   
+   By now, `crosstermion` is also very much a more portable replacement.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 7 commits contributed to the release over the course of 44 calendar days.
+ - 89 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Thanks Clippy
+
+<csr-read-only-do-not-edit/>
+
+[Clippy](https://github.com/rust-lang/rust-clippy) helped 1 time to make code idiomatic. 
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'replace-ansi_term' ([`3a50a18`](https://github.com/byron/prodash/commit/3a50a18551c98cb3e0fa8362062e0f6fd41d5d34))
+    - All `termion`-related features are now removed and obsolete. ([`b1fd37d`](https://github.com/byron/prodash/commit/b1fd37d272c59249c151e1dbf498d5e2767f5507))
+    - Thanks clippy ([`3c28eb0`](https://github.com/byron/prodash/commit/3c28eb04e42cf0b2d47e4a6538c2436e8abac274))
+    - Upgrade to `crossterm` v0.27. ([`34397f1`](https://github.com/byron/prodash/commit/34397f1b39dca0d585326728681a70b654db7118))
+    - Change duration formatting to be more human readable. ([`6acf6fe`](https://github.com/byron/prodash/commit/6acf6fe22a9ec4f7a16626db556c051c2084ccb2))
+    - Refactor ([`d032106`](https://github.com/byron/prodash/commit/d0321067244ed3d76eedc0078c881af2ea603c5b))
+    - Replace compound_duration with humantime This is the humantime part of PR https://github.com/Byron/prodash/pull/25 ([`f5143c9`](https://github.com/byron/prodash/commit/f5143c98be0f2f2267c4574805f81a61cd8d613a))
+</details>
+
 ## 26.2.2 (2023-09-09)
 
 This release relaxes trait-bounds of `Count`, `Progress` and `NestedProgress` to allow `?Sized` as well.
@@ -13,7 +60,7 @@ This release relaxes trait-bounds of `Count`, `Progress` and `NestedProgress` to
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 2 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +72,7 @@ This release relaxes trait-bounds of `Count`, `Progress` and `NestedProgress` to
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v26.2.2 ([`bb1eadf`](https://github.com/byron/prodash/commit/bb1eadfc9042cc27b346cc064115a69163f10c05))
     - Prepare next release ([`414506d`](https://github.com/byron/prodash/commit/414506df859584d17eb8ec755534040b813fa953))
     - Merge pull request #24 from NobodyXu/fix/dyn ([`c905d5c`](https://github.com/byron/prodash/commit/c905d5cb8d62368bb4891cc732ce613d09d6498b))
     - Relax bound of `Progress`, `Count` impl for `DynNestedProgressToNestedProgress` ([`967ea46`](https://github.com/byron/prodash/commit/967ea46b71c2bb44f7cd75524d101c4bfd2df0bf))
