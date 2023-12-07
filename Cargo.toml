@@ -18,11 +18,6 @@ path = "examples/dashboard.rs"
 required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "signal-hook", "render-line-autoconfigure", "progress-tree"]
 
 [[example]]
-name = "dashboard-termion"
-path = "examples/dashboard.rs"
-required-features = ["render-tui", "render-tui-termion", "render-line", "render-line-termion", "progress-tree"]
-
-[[example]]
 name = "units"
 path = "examples/units.rs"
 required-features = [
@@ -45,7 +40,6 @@ progress-log = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
 unit-duration = ["humantime"]
-render-tui-termion = ["crosstermion/tui-react-termion"]
 render-tui-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 render-tui = ["tui",
     "unicode-segmentation",
@@ -58,7 +52,6 @@ render-tui = ["tui",
     "humantime"]
 render-line = ["crosstermion/color", "humantime", "unicode-width"]
 render-line-crossterm = ["crosstermion/crossterm"]
-render-line-termion = ["crosstermion/termion"]
 render-line-autoconfigure = ["is-terminal"]
 
 local-time = ["time"]

@@ -17,11 +17,6 @@ jobs:
       run: cargo clippy
     - name: tests
       run: make tests
-    - name: "Check (termion)"
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --features=render-tui-termion --all --bins --tests --examples
     - name: "Check (crossterm)"
       uses: actions-rs/cargo@v1
       with:
