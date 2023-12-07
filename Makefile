@@ -13,12 +13,7 @@ check: ## build features in commmon combination to be sure it all stays together
 	cargo check --no-default-features
 	cargo check --features progress-tree,progress-tree-hp-hashmap
 	cargo check --features render-tui,render-tui-crossterm
-	cargo check --features render-tui,render-tui-termion
-	cargo check --features render-line,render-line-termion
-	cargo check --features render-line,render-line-termion,render-line-autoconfigure
-	cargo check --features render-line,render-line-termion,render-line-autoconfigure,signal-hook
 	cargo check --features render-line,render-line-crossterm
-	cargo check --features render-line,render-line-termion,render-tui,render-tui-termion --example dashboard-termion
 	cargo check --features render-line,render-line-crossterm,render-tui,render-tui-crossterm,signal-hook,render-line-autoconfigure --example dashboard
 	cargo check --features unit-bytes,unit-duration,unit-human,render-tui,render-tui-crossterm,render-line,render-line-crossterm,signal-hook --example units
 	cargo check

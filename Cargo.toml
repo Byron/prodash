@@ -18,11 +18,6 @@ path = "examples/dashboard.rs"
 required-features = ["render-tui", "render-tui-crossterm", "render-line", "render-line-crossterm", "signal-hook", "render-line-autoconfigure", "progress-tree"]
 
 [[example]]
-name = "dashboard-termion"
-path = "examples/dashboard.rs"
-required-features = ["render-tui", "render-tui-termion", "render-line", "render-line-termion", "progress-tree"]
-
-[[example]]
 name = "units"
 path = "examples/units.rs"
 required-features = [
@@ -45,7 +40,6 @@ progress-log = ["log"]
 unit-bytes = ["bytesize"]
 unit-human = ["human_format"]
 unit-duration = ["humantime"]
-render-tui-termion = ["crosstermion/tui-react-termion"]
 render-tui-crossterm = ["crosstermion/tui-react-crossterm", "crosstermion/input-async-crossterm"]
 render-tui = ["tui",
     "unicode-segmentation",
@@ -58,7 +52,6 @@ render-tui = ["tui",
     "humantime"]
 render-line = ["crosstermion/color", "humantime", "unicode-width"]
 render-line-crossterm = ["crosstermion/crossterm"]
-render-line-termion = ["crosstermion/termion"]
 render-line-autoconfigure = ["is-terminal"]
 
 local-time = ["time"]
@@ -72,15 +65,15 @@ parking_lot = { version = "0.12.1", optional = true, default-features = false }
 log = { version = "0.4.8", optional = true }
 
 # render-tui
-tui = { package = "ratatui", version = "0.20.1", optional = true, default-features = false }
-tui-react = { version = "0.20.0", optional = true }
+tui = { package = "ratatui", version = "0.24.0", optional = true, default-features = false }
+tui-react = { version = "0.21.0", optional = true }
 futures-core = { version = "0.3.4", optional = true, default-features = false }
-futures-lite = { version = "1.5.0", optional = true }
+futures-lite = { version = "2.1.0", optional = true }
 humantime = { version = "2.1.0", optional = true }
 unicode-segmentation = { version = "1.6.0", optional = true }
 unicode-width = { version = "0.1.7", optional = true }
-crosstermion = { version = "0.11.0", optional = true, default-features = false }
-async-io = { version = "1.0.0", optional = true }
+crosstermion = { version = "0.12.1", optional = true, default-features = false }
+async-io = { version = "2.2.1", optional = true }
 
 # localtime support for render-tui
 time = { version = "0.3.2", optional = true, features = ["std", "local-offset", "formatting"], default-features = false }
@@ -108,7 +101,7 @@ is-terminal = "0.4.9"
 blocking = "1.0.0"
 once_cell = "1.4.0"
 async-executor = "1.1.0"
-async-io = "1.1.0"
+async-io = "2.2.1"
 
 [[bench]]
 name = "usage"
