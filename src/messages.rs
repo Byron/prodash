@@ -86,7 +86,7 @@ impl MessageRingBuffer {
                     let cursor_ofs: isize = self.cursor as isize - cursor as isize;
                     match cursor_ofs {
                         // there was some capacity left without wrapping around
-                        c if c == 0 => {
+                        0 => {
                             out.extend_from_slice(&self.buf[self.buf.len() - new_elements_below_cap..]);
                         }
                         // cursor advanced
