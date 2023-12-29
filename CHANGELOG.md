@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 28.0.0 (2023-12-29)
+
+### Chore (BREAKING)
+
+ - <csr-id-18686dbd32e6920ab5d7271c32481f7f41eae4de/> upgrade `ratatui` and `crosstermion` to latest versions.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 21 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Upgrade `ratatui` and `crosstermion` to latest versions. ([`18686db`](https://github.com/byron/prodash/commit/18686dbd32e6920ab5d7271c32481f7f41eae4de))
+</details>
+
 ## 27.0.0 (2023-12-07)
 
 ### New Features
@@ -25,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 7 commits contributed to the release over the course of 44 calendar days.
+ - 8 commits contributed to the release over the course of 44 calendar days.
  - 89 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -43,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v27.0.0 ([`967e99a`](https://github.com/byron/prodash/commit/967e99a034cf1f570864b068d9c00baa54290b19))
     - Merge branch 'replace-ansi_term' ([`3a50a18`](https://github.com/byron/prodash/commit/3a50a18551c98cb3e0fa8362062e0f6fd41d5d34))
     - All `termion`-related features are now removed and obsolete. ([`b1fd37d`](https://github.com/byron/prodash/commit/b1fd37d272c59249c151e1dbf498d5e2767f5507))
     - Thanks clippy ([`3c28eb0`](https://github.com/byron/prodash/commit/3c28eb04e42cf0b2d47e4a6538c2436e8abac274))
