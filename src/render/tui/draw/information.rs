@@ -39,7 +39,7 @@ pub fn pane(lines: &[Line], bound: Rect, buf: &mut Buffer) {
                 let blocks_drawn = draw_text_with_ellipsis_nowrap(line_bound, buf, text, bold);
                 let lines_rect = rect::offset_x(line_bound, blocks_drawn + 1);
                 for x in lines_rect.left()..lines_rect.right() {
-                    buf.get_mut(x, lines_rect.y).symbol = "─".into();
+                    buf.get_mut(x, lines_rect.y).set_symbol("─");
                 }
                 offset += 1;
             }

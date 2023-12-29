@@ -94,6 +94,7 @@ compile_error!(
     "Please set either the 'render-tui-crossterm' or 'render-tui-termion' feature whne using the 'render-tui'"
 );
 
+use crosstermion::crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
 use crosstermion::{
     input::{key_input_stream, Key},
     terminal::{tui::new_terminal, AlternateRawScreen},
@@ -175,25 +176,32 @@ pub fn render_with_input(
             let mut skip_redraw = false;
             match event {
                 Event::Tick => {}
-                Event::Input(key) => match key {
-                    Key::Esc | Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('[') => match interrupt_mode {
+                Event::Input(key) if key.kind != KeyEventKind::Release => match key.code {
+                    KeyCode::Char('c') | KeyCode::Char('[') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                        match interrupt_mode {
+                            InterruptDrawInfo::Instantly => break,
+                            InterruptDrawInfo::Deferred(_) => interrupt_mode = InterruptDrawInfo::Deferred(true),
+                        }
+                    }
+                    KeyCode::Esc | KeyCode::Char('q') => match interrupt_mode {
                         InterruptDrawInfo::Instantly => break,
                         InterruptDrawInfo::Deferred(_) => interrupt_mode = InterruptDrawInfo::Deferred(true),
                     },
-                    Key::Char('`') => state.hide_messages = !state.hide_messages,
-                    Key::Char('~') => state.messages_fullscreen = !state.messages_fullscreen,
-                    Key::Char('J') => state.message_offset = state.message_offset.saturating_add(1),
-                    Key::Char('D') => state.message_offset = state.message_offset.saturating_add(10),
-                    Key::Char('j') => state.task_offset = state.task_offset.saturating_add(1),
-                    Key::Char('d') => state.task_offset = state.task_offset.saturating_add(10),
-                    Key::Char('K') => state.message_offset = state.message_offset.saturating_sub(1),
-                    Key::Char('U') => state.message_offset = state.message_offset.saturating_sub(10),
-                    Key::Char('k') => state.task_offset = state.task_offset.saturating_sub(1),
-                    Key::Char('u') => state.task_offset = state.task_offset.saturating_sub(10),
-                    Key::Char('[') => state.hide_info = !state.hide_info,
-                    Key::Char('{') => state.maximize_info = !state.maximize_info,
+                    KeyCode::Char('`') => state.hide_messages = !state.hide_messages,
+                    KeyCode::Char('~') => state.messages_fullscreen = !state.messages_fullscreen,
+                    KeyCode::Char('J') => state.message_offset = state.message_offset.saturating_add(1),
+                    KeyCode::Char('D') => state.message_offset = state.message_offset.saturating_add(10),
+                    KeyCode::Char('j') => state.task_offset = state.task_offset.saturating_add(1),
+                    KeyCode::Char('d') => state.task_offset = state.task_offset.saturating_add(10),
+                    KeyCode::Char('K') => state.message_offset = state.message_offset.saturating_sub(1),
+                    KeyCode::Char('U') => state.message_offset = state.message_offset.saturating_sub(10),
+                    KeyCode::Char('k') => state.task_offset = state.task_offset.saturating_sub(1),
+                    KeyCode::Char('u') => state.task_offset = state.task_offset.saturating_sub(10),
+                    KeyCode::Char('[') => state.hide_info = !state.hide_info,
+                    KeyCode::Char('{') => state.maximize_info = !state.maximize_info,
                     _ => skip_redraw = true,
                 },
+                Event::Input(_) => skip_redraw = true,
                 Event::SetWindowSize(bound) => state.user_provided_window_size = Some(bound),
                 Event::SetTitle(title) => state.title = title,
                 Event::SetInformation(info) => state.information = info,
