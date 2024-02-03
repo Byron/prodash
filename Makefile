@@ -26,6 +26,9 @@ tests: clippy check unit-test ## Run all tests we have
 bench: ## Run criterion based benchmark, works on stable Rust
 	cargo bench
 
+bench-ci: ## Just build the criterion based benchmark, avoid running.
+	cargo bench --no-run
+
 ##@ Development
 
 fmt: ## run nightly rustfmt for its extra features, but check that it won't upset stable rustfmt
