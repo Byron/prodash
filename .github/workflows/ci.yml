@@ -23,7 +23,7 @@ jobs:
         command: test
         args: --features=render-tui,render-tui-crossterm,render-line,render-line-crossterm,signal-hook,render-line-autoconfigure,progress-tree --all --bins --tests --examples
     - name: benchmarks
-      run: make bench
+      run: make bench-ci
 
   build-and-test-on-windows:
     runs-on: windows-latest
