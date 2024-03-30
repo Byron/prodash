@@ -30,9 +30,9 @@ mod dynamic {
             );
             assert_eq!(
                 format!("{}", unit.display(100_002, Some(7_500_000), None)),
-                "100.0k/7.5M objects [1%]"
+                "100.0K/7.5M objects [1%]"
             );
-            assert_eq!(format!("{}", unit.display(100_002, None, None)), "100.0k objects");
+            assert_eq!(format!("{}", unit.display(100_002, None, None)), "100.0K objects");
         }
     }
     mod range {
