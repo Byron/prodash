@@ -33,8 +33,6 @@ This crate comes with various cargo features to tailor it to your needs.
   * If set, timestamps in the message pane of the `render-tui` will be using the local time, not UTC
   * If set, timestamps of the log messages of the `render-line` will be using the local time, not UTC
   * Has no effect without the `render-tui` or `render-line` respectively
-  * **On Unix** one needs to provide flags to rustc when building the binary to acknowledge potential unsoundness: `RUSTFLAGS="--cfg unsound_local_offset" cargo build`
-    will do the job, but there are [other ways](https://doc.rust-lang.org/cargo/reference/config.html#hierarchical-structure) to do that as well.
 * **render-line**
   * Provide a minimal line-based progress renderer which can be limited to a subset of the progress hierarchy.
   * It's like the render-tui, but with far less dependencies and less visual fidelity - all it needs is to move
@@ -50,7 +48,7 @@ This crate comes with various cargo features to tailor it to your needs.
          * If enabled, calls to `render::line::Options::auto_configure()` will configure the display based on whether or not we are in a terminal
            and set its color mode based on what's possible or desired.
        * **signal-hook**
-          * If set, and the `hide_cursor` line renderer option is set, the cursor will be hidden **and** *SIG_INT* and *SIG_TERM* handlers will be 
+          * If set, and the `hide_cursor` line renderer option is set, the cursor will be hidden **and** *SIG_INT* and *SIG_TERM* handlers will be
             installed to reset the cursor on exit. Otherwise you have to make sure to call `shutdown_and_wait()` on the `JoinHandle` returned
             to give the renderer a chance to undo the terminal changes. Failing to do so will leave the cusor hidden once the program has already
             finished.
@@ -65,7 +63,7 @@ This crate comes with various cargo features to tailor it to your needs.
          * Works everywhere natively, but has more dependencies
          * You can set additional features like this `cargo build --features render-tui-crossterm,crossterm/event-stream`
        * **render-tui-termion**
-         * Use the `termion` crate as terminal backend 
+         * Use the `termion` crate as terminal backend
          * It has less dependencies but works only on `unix` systems
          * to get this, disable default features and chose at least `render-tui` and `render-tui-termion`.
 * **unit-bytes**
@@ -89,7 +87,7 @@ This crate comes with various cargo features to tailor it to your needs.
 * The underlying sync data structure, `dashmap`, does not document every use of unsafe
   * I also evaluated `evmap`, which has 25% less uses of unsafe, but a more complex interface.
   * Thus far it seemed 'ok' to use, who knows… we are getting mutable pieces of a hashmap from multiple threads,
-    however, we never hand out multiple handles to the same child which should make actual concurrent access to 
+    however, we never hand out multiple handles to the same child which should make actual concurrent access to
     the same key impossible.
 * If there are more than 2^16 tasks
   * then
@@ -107,7 +105,7 @@ This crate comes with various cargo features to tailor it to your needs.
     * trying to draw beyond the terminal boundary will add a line break automatically, which can cause unexpected overdraw.
   * **fix**
     * count amount of blocks drawn, without ansi codes, and stop drawing at the boundary.
-    
+
 ## Lessons Learned
 
 * `drop()` is not garantueed to be called when the future returns Ready and is in the futures::executor::ThreadPool
