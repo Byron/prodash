@@ -58,7 +58,7 @@ local-time = ["jiff"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-dashmap = { version = "5.1.0", optional = true, default-features = false }
+dashmap = { version = "6.0.1", optional = true, default-features = false }
 parking_lot = { version = "0.12.1", optional = true, default-features = false }
 
 # with-logging
@@ -92,7 +92,7 @@ all-features = true
 
 [dev-dependencies]
 rand = "0.8.1"
-env_logger = { version = "0.10.0", default-features = false, features = ["humantime"] }
+env_logger = { version = "0.11.0", default-features = false, features = ["humantime"] }
 criterion = { version = "0.5.1", default-features = false }
 futures-util = { version = "0.3.4", default-features = false }
 argh = "0.1.3"
