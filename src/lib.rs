@@ -33,10 +33,7 @@ Please have a look at the [dashboard demo](https://github.com/Byron/crates-io-cl
 [![asciicast](https://asciinema.org/a/301838.svg)](https://asciinema.org/a/301838)
 
 Run it with `cargo run --example dashboard` and see what else it can do by checking out `cargo run --example dashboard -- --help`.
-*/
-#[cfg(feature = "atty")]
-pub use atty;
-
+ */
 #[cfg(feature = "progress-tree")]
 ///
 pub mod tree;
