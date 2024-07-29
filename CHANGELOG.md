@@ -5,7 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 29.0.0 (2024-07-29)
+
+### Chore
+
+ - <csr-id-5f066f26e347d80edd3cc9480d362b39ce762bd6/> update ratatui to 0.26.0
+   Requires an update to tui-react / crosstermion to work
+
+### Other
+
+ - <csr-id-aab09862ce8ff64d3c9bafd099e81df89c4c1670/> switch from `time` to `jiff`
+   This swaps out `time` in favor of `jiff` for getting and formatting the
+   local time.
+   
+   Note that this does add the `%Z` to the format string, which will write
+   out time zone abbreviations like `EDT` along with the local datetime
+   itself. The `time` crate doesn't support this, but jiff's tzdb
+   integration let's it do it.
+
+### New Features (BREAKING)
+
+ - <csr-id-f3c3122a571512d0d90edced6f1057f395c9d39f/> upgrade `ratatui` to v0.26
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 8 commits contributed to the release over the course of 177 calendar days.
+ - 213 days passed between releases.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Upgrade dependencies ([`a5dab6e`](https://github.com/byron/prodash/commit/a5dab6e11760acb413663b74bebe0348b6d3ade8))
+    - Merge branch 'ag/jiff' ([`87f66fb`](https://github.com/byron/prodash/commit/87f66fb59923584905fe463bf6579f56459c4efb))
+    - Switch from `time` to `jiff` ([`aab0986`](https://github.com/byron/prodash/commit/aab09862ce8ff64d3c9bafd099e81df89c4c1670))
+    - Fix CI ([`10800f3`](https://github.com/byron/prodash/commit/10800f3ee3518d5c95e83c8dbe9bbc25da362bd1))
+    - Upgrade `ratatui` to v0.26 ([`f3c3122`](https://github.com/byron/prodash/commit/f3c3122a571512d0d90edced6f1057f395c9d39f))
+    - Avoid running benchmarks on CI for faster runs ([`73bce79`](https://github.com/byron/prodash/commit/73bce79cdfb651ae6ddcb09e297f33389302c40e))
+    - Update to latest versions of `tui-react` and `crosstermion` ([`0cca41f`](https://github.com/byron/prodash/commit/0cca41f4a7a9e6fae995a802b551daa0d3d5ec12))
+    - Update ratatui to 0.26.0 ([`5f066f2`](https://github.com/byron/prodash/commit/5f066f26e347d80edd3cc9480d362b39ce762bd6))
+</details>
+
 ## 28.0.0 (2023-12-29)
+
+<csr-id-18686dbd32e6920ab5d7271c32481f7f41eae4de/>
 
 ### Chore (BREAKING)
 
@@ -15,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 21 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v28.0.0 ([`986909c`](https://github.com/byron/prodash/commit/986909cc4eef785c4f5e9f5f8184723a21ccb721))
     - Upgrade `ratatui` and `crosstermion` to latest versions. ([`18686db`](https://github.com/byron/prodash/commit/18686dbd32e6920ab5d7271c32481f7f41eae4de))
 </details>
 
