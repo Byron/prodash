@@ -2,24 +2,23 @@
 mod localtime {
     use std::time::SystemTime;
 
+    use jiff::Zoned;
+
     /// Return a string representing the current date and time as localtime.
     ///
     /// Available with the `localtime` feature toggle.
     pub fn format_now_datetime_seconds() -> String {
-        let t = time::OffsetDateTime::now_utc();
-        t.to_offset(time::UtcOffset::local_offset_at(t).unwrap_or(time::UtcOffset::UTC))
-            .format(&time::format_description::parse("%F %T").expect("format known to work"))
-            .expect("formatting always works")
+        Zoned::now().strftime("%F %T %Z").to_string()
     }
 
     /// Return a string representing the current time as localtime.
     ///
     /// Available with the `localtime` feature toggle.
     pub fn format_time_for_messages(time: SystemTime) -> String {
-        time::OffsetDateTime::from(time)
-            .to_offset(time::UtcOffset::current_local_offset().unwrap_or(time::UtcOffset::UTC))
-            .format(&time::format_description::parse("[hour]:[minute]:[second]").expect("format known to work"))
-            .expect("formatting always works")
+        Zoned::try_from(time)
+            .expect("system time is always in range -9999-01-01..=9999-12-31")
+            .strftime("%T")
+            .to_string()
     }
 }
 

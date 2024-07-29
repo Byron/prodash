@@ -54,7 +54,7 @@ render-line = ["crosstermion/color", "humantime", "unicode-width"]
 render-line-crossterm = ["crosstermion/crossterm"]
 render-line-autoconfigure = ["is-terminal"]
 
-local-time = ["time"]
+local-time = ["jiff"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
@@ -76,7 +76,7 @@ crosstermion = { version = "0.14.0", optional = true, default-features = false }
 async-io = { version = "2.2.1", optional = true }
 
 # localtime support for render-tui
-time = { version = "0.3.2", optional = true, features = ["std", "local-offset", "formatting"], default-features = false }
+jiff = { version = "0.1.1", optional = true }
 
 # line renderer
 ctrlc = { version = "3.1.4", optional = true, default-features = false, features = ['termination'] }
