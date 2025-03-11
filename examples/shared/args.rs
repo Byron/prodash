@@ -63,17 +63,9 @@ pub struct Options {
     #[argh(option)]
     pub line_end: Option<prodash::progress::key::Level>,
 
-    /// if set (default: false), we will stop running the TUI once there the list of drawable progress items is empty.
-    #[argh(switch)]
-    pub stop_if_empty_progress: bool,
-
     /// set the renderer to use, defaults to "tui", and furthermore allows "line" and "log".
     ///
     /// If set ot "log", there will only be logging. Set 'RUST_LOG=info' before running the program to see them.
     #[argh(option, short = 'R')]
     pub renderer: Option<String>,
-
-    /// has not effect - use the NO_COLOR environment variable instead.
-    #[argh(switch)]
-    pub no_line_color: bool,
 }

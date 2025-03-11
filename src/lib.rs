@@ -1,4 +1,5 @@
 #![deny(unsafe_code, missing_docs)]
+#![allow(clippy::empty_docs)]
 
 /*!
 Prodash is a dashboard for displaying the progress of concurrent application.

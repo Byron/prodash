@@ -140,7 +140,7 @@ pub(crate) fn headline(
 
 struct ProgressFormat<'a>(&'a Option<Value>, u16, Option<unit::display::Throughput>);
 
-impl<'a> fmt::Display for ProgressFormat<'a> {
+impl fmt::Display for ProgressFormat<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             Some(p) => match p.unit.as_ref() {
