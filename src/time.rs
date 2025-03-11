@@ -30,29 +30,20 @@ mod utc {
     use std::time::SystemTime;
 
     use super::DATE_TIME_HMS;
-    const DATE_TIME_YMD: usize = "2020-02-13T".len();
 
     /// Return a string representing the current date and time as UTC.
     ///
     /// Available without the `localtime` feature toggle.
     pub fn format_time_for_messages(time: SystemTime) -> String {
-        String::from_utf8_lossy(
-            &humantime::format_rfc3339_seconds(time).to_string().as_bytes()
-                [DATE_TIME_YMD..DATE_TIME_YMD + DATE_TIME_HMS],
-        )
-        .into_owned()
+        let time = jiff::Timestamp::try_from(time).expect("reasonable system time");
+        time.strftime("%T").to_string()
     }
 
     /// Return a string representing the current time as UTC.
     ///
     /// Available without the `localtime` feature toggle.
     pub fn format_now_datetime_seconds() -> String {
-        String::from_utf8_lossy(
-            &humantime::format_rfc3339_seconds(std::time::SystemTime::now())
-                .to_string()
-                .as_bytes()[.."2020-02-13T00:51:45".len()],
-        )
-        .into_owned()
+        jiff::Timestamp::now().strftime("%FT%T").to_string()
     }
 }
 

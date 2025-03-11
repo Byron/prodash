@@ -1,13 +1,9 @@
 #![deny(unsafe_code)]
 
 #[cfg(not(feature = "render-tui"))]
-compile_error!(
-    "The `render-tui` feature must be set, along with either `render-tui-crossterm` or `render-tui-termion`"
-);
-#[cfg(not(any(feature = "render-tui-crossterm", feature = "render-tui-termion")))]
-compile_error!(
-    "Please set either the 'render-tui-crossterm' or 'render-tui-termion' feature whne using the 'render-tui'"
-);
+compile_error!("The `render-tui` feature must be set, along with the `render-tui-crossterm`");
+#[cfg(not(any(feature = "render-tui-crossterm")))]
+compile_error!("Please set the 'render-tui-crossterm' feature when using the 'render-tui'");
 
 use std::{error::Error, sync::Arc};
 

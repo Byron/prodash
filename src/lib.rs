@@ -1,4 +1,5 @@
 #![deny(unsafe_code, missing_docs)]
+#![allow(clippy::empty_docs)]
 
 /*!
 Prodash is a dashboard for displaying the progress of concurrent application.
@@ -46,7 +47,7 @@ pub use log::info;
 #[cfg(feature = "progress-tree-log")]
 pub use log::warn;
 
-#[cfg(any(feature = "humantime", feature = "local-time"))]
+#[cfg(any(feature = "jiff", feature = "local-time"))]
 ///
 pub mod time;
 
