@@ -5,7 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 29.0.1 (2025-03-11)
+
+### Other
+
+ - <csr-id-88d33994876c7b2454cb1d827ebb2933bdecddd2/> switch from `humantime` to `jiff`
+   Since prodash switched over to Jiff, Jiff has grown support for the
+   "friendly" duration format. It is meant to be a replacement for
+   `humantime` formatting of durations.
+ - <csr-id-373b6b1d0a95cff3085bda46ab629728d4fd6e43/> bump jiff to 0.2
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 5 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Thanks Clippy
+
+<csr-read-only-do-not-edit/>
+
+[Clippy](https://github.com/rust-lang/rust-clippy) helped 1 time to make code idiomatic. 
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #32 from BurntSushi/ag/moar-jiff ([`eaf1c26`](https://github.com/byron/prodash/commit/eaf1c26169a89fca693e5cbf8be4f1cd5fccbf25))
+    - Thanks clippy ([`521c6e1`](https://github.com/byron/prodash/commit/521c6e16464778ca468996fbc6d66c4ffa6d4edb))
+    - Switch from `humantime` to `jiff` ([`88d3399`](https://github.com/byron/prodash/commit/88d33994876c7b2454cb1d827ebb2933bdecddd2))
+    - Bump jiff to 0.2 ([`373b6b1`](https://github.com/byron/prodash/commit/373b6b1d0a95cff3085bda46ab629728d4fd6e43))
+    - Remove unused feature ([`9c476cf`](https://github.com/byron/prodash/commit/9c476cf1a3f31d79d49e56c80b3d2eff7c3f618d))
+</details>
+
 ## 29.0.0 (2024-07-29)
+
+<csr-id-5f066f26e347d80edd3cc9480d362b39ce762bd6/>
+<csr-id-aab09862ce8ff64d3c9bafd099e81df89c4c1670/>
 
 ### Chore
 
@@ -31,8 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 8 commits contributed to the release over the course of 177 calendar days.
- - 213 days passed between releases.
+ - 9 commits contributed to the release.
  - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -43,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v29.0.0 ([`4583a59`](https://github.com/byron/prodash/commit/4583a593d35e248b828dd486b7a6e8305b1a538c))
     - Upgrade dependencies ([`a5dab6e`](https://github.com/byron/prodash/commit/a5dab6e11760acb413663b74bebe0348b6d3ade8))
     - Merge branch 'ag/jiff' ([`87f66fb`](https://github.com/byron/prodash/commit/87f66fb59923584905fe463bf6579f56459c4efb))
     - Switch from `time` to `jiff` ([`aab0986`](https://github.com/byron/prodash/commit/aab09862ce8ff64d3c9bafd099e81df89c4c1670))
@@ -101,8 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 8 commits contributed to the release over the course of 44 calendar days.
- - 89 days passed between releases.
+ - 8 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -295,7 +335,7 @@ and no change of the progress information itself.
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release over the course of 2 calendar days.
+ - 4 commits contributed to the release.
  - 37 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -393,7 +433,6 @@ and no change of the progress information itself.
 <csr-read-only-do-not-edit/>
 
  - 4 commits contributed to the release.
- - 60 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -629,7 +668,6 @@ Most notably, `parking_lot` was upgraded to the latest version.
 <csr-read-only-do-not-edit/>
 
  - 4 commits contributed to the release.
- - 37 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -1375,7 +1413,7 @@ Most notably, `parking_lot` was upgraded to the latest version.
     - Remove crosstermion, it now lives in https://github.com/Byron/tui-crates ([`f560f84`](https://github.com/byron/prodash/commit/f560f84436c1bd2b5af8b0af44e8e86200d22cc2))
 </details>
 
-## v13.0.0 (2021-05-02)
+## v13.0.0 (2021-05-03)
 
 <csr-id-e3665a2100fba190fc0f047ff05f2904f4dcaf4a/>
 <csr-id-c91d410e8d6242b78c44119155b5fc3b2956d111/>
@@ -2281,7 +2319,7 @@ One might argue that the flush should happen in the terminal instance itself, bu
     - Bump patch level ([`f8b06a6`](https://github.com/byron/prodash/commit/f8b06a6a298928caaf2a6e6e9b2e3135d0ae443b))
 </details>
 
-## v4.0.4 (2020-06-29)
+## v4.0.4 (2020-06-30)
 
 - Simplify `message()` trait bounds
 
@@ -2888,7 +2926,7 @@ a redraw manually.
     - ETA messages in blocked unbounded tasks ([`d42c0d5`](https://github.com/byron/prodash/commit/d42c0d52f803595a48594a91b3278ce57ff8b95b))
 </details>
 
-## v1.1.6 (2020-03-02)
+## v1.1.6 (2020-03-03)
 
 * improve API symmetry by providing a `Tree::name()` to accompany `Tree::set_name(…)`
 
@@ -2912,7 +2950,7 @@ a redraw manually.
     - Put changelog into lib.rs, where it already was :) ([`dfc810b`](https://github.com/byron/prodash/commit/dfc810b7b012e536353ceeed61f2ca7ed935930d))
 </details>
 
-## v1.1.5 (2020-02-23)
+## v1.1.5 (2020-02-24)
 
 * Flush stdout when the TUI stopped running. That way, the alternate/original screen will be shown right away.
 

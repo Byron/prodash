@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "29.0.0"
+version = "29.0.1"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2021"
