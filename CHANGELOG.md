@@ -5,7 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+Update `bytesize` from v1 to v2.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #33 from EliahKagan/bump-bytesize ([`4ff81bf`](https://github.com/byron/prodash/commit/4ff81bf9f61d161a50485c95fb7f3ed9386115c4))
+    - Bump `bytesize` from major version 1 to 2 ([`61dfa7d`](https://github.com/byron/prodash/commit/61dfa7d779e26e4cbbb6e6fa7fdc14294224bfba))
+</details>
+
 ## 29.0.1 (2025-03-11)
+
+<csr-id-88d33994876c7b2454cb1d827ebb2933bdecddd2/>
+<csr-id-373b6b1d0a95cff3085bda46ab629728d4fd6e43/>
 
 ### Other
 
@@ -19,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release.
+ - 6 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -36,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v29.0.1 ([`58ea133`](https://github.com/byron/prodash/commit/58ea1339d263638b5fa041b86eccd305d28a743a))
     - Merge pull request #32 from BurntSushi/ag/moar-jiff ([`eaf1c26`](https://github.com/byron/prodash/commit/eaf1c26169a89fca693e5cbf8be4f1cd5fccbf25))
     - Thanks clippy ([`521c6e1`](https://github.com/byron/prodash/commit/521c6e16464778ca468996fbc6d66c4ffa6d4edb))
     - Switch from `humantime` to `jiff` ([`88d3399`](https://github.com/byron/prodash/commit/88d33994876c7b2454cb1d827ebb2933bdecddd2))
