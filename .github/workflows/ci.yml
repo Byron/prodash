@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+    - main
+    - "run-ci/**"
+    - "**/run-ci/**"
   pull_request:
-    branches: [ main ]
+    branches:
+    - main
 
 jobs:
   build-and-test-linux:
