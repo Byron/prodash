@@ -14,7 +14,7 @@ jobs:
   build-and-test-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: fmt
       run: cargo fmt --all -- --check
     - name: clippy
@@ -32,7 +32,7 @@ jobs:
   build-and-test-on-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - uses: actions-rs/toolchain@v1
       with:
         profile: default
