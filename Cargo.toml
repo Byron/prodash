@@ -6,7 +6,7 @@ description = "A dashboard for visualizing progress of asynchronous and possibly
 edition = "2021"
 include = ["src/**/*", "README.md", "LICENSE.md", "CHANGELOG.md"]
 license = "MIT"
-repository = "https://github.com/Byron/prodash"
+repository = "https://github.com/GitoxideLabs/prodash"
 readme = "README.md"
 rust-version = "1.74"
 
