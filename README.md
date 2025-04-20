@@ -1,4 +1,4 @@
-![Rust](https://github.com/Byron/prodash/workflows/Rust/badge.svg)
+![Rust](https://github.com/GitoxideLabs/prodash/workflows/Rust/badge.svg)
 [![Crates.io](https://img.shields.io/crates/v/prodash.svg)](https://crates.io/crates/prodash)
 
 **prodash** allows to integrate progress reporting into concurrent applications and provides renderers for displaying it in various ways.
