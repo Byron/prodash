@@ -1,6 +1,6 @@
 [package]
 name = "prodash"
-version = "29.0.2"
+version = "30.0.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 description = "A dashboard for visualizing progress of asynchronous and possibly blocking tasks"
 edition = "2021"
@@ -33,7 +33,7 @@ required-features = [
 ]
 
 [features]
-default = ["progress-tree", "progress-tree-log"]
+default = ["progress-tree"]
 progress-tree = ["parking_lot"]
 progress-tree-hp-hashmap = ["dashmap"]
 progress-tree-log = ["log"]
