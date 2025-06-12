@@ -22,7 +22,7 @@ By default, a TUI is provided to visualize all state. Have a look at [the exampl
 
 # Logging
 
-If the feature `progress-tree-log` is enabled (default), most calls to `progress` will also be logged.
+If the feature `progress-tree-log` is enabled, most calls to `progress` will also be logged.
 That way, even without a terminal user interface, there will be progress messages.
 Please note that logging to stdout should not be performed with this feature enabled and a terminal user interface is shown, as this will
 seriously interfere with the TUI.
