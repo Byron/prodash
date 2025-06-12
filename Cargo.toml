@@ -33,7 +33,7 @@ required-features = [
 ]
 
 [features]
-default = ["progress-tree", "progress-tree-log"]
+default = ["progress-tree"]
 progress-tree = ["parking_lot"]
 progress-tree-hp-hashmap = ["dashmap"]
 progress-tree-log = ["log"]
