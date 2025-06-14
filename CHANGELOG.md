@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 30.0.1 (2025-06-14)
+
+### Documentation
+
+ - <csr-id-b1e26fed9842300bdaf2d0fdae1b789580b91acb/> Don't describe `progress-tree-log` as a default feature
+   Since it is no longer a default feature as of version 30.0.0 (#39).
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #42 from EliahKagan/update-doc-next ([`0f261de`](https://github.com/byron/prodash/commit/0f261de75dfcb9b1f865f5219cf8dc2a42c8e39b))
+    - Don't describe `progress-tree-log` as a default feature in readme ([`901359a`](https://github.com/byron/prodash/commit/901359a7d55c62d7dfce48b720b1349d75a0bd95))
+    - Merge pull request #41 from EliahKagan/update-doc ([`cf70e4a`](https://github.com/byron/prodash/commit/cf70e4a5092baa67f41caf6e2c3f6e0646b962f6))
+    - Don't describe `progress-tree-log` as a default feature ([`b1e26fe`](https://github.com/byron/prodash/commit/b1e26fed9842300bdaf2d0fdae1b789580b91acb))
+</details>
+
 ## 30.0.0 (2025-06-12)
 
 <csr-id-25f8851b458838044550478e5aa5e44922e063f1/>
@@ -18,9 +46,6 @@ progress-by-logging will have to add the feature themselves.
    - Update the project URL in `Cargo.toml`, as well as a badge URL in
    the readme, to point to `GitoxideLabs/prodash`, since the repo
    was moved (though the old URL will still work as a redirect).
-- Add a `SECURITY.md` file with the same wording as in `gitoxide`
-     and `cargo-smart-release`, with a hyperlink to draft a `prodash`
-     advisory.
 
 ### Other
 
@@ -46,7 +71,7 @@ progress-by-logging will have to add the feature themselves.
 
 <csr-read-only-do-not-edit/>
 
- - 15 commits contributed to the release.
+ - 16 commits contributed to the release.
  - 59 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -58,6 +83,7 @@ progress-by-logging will have to add the feature themselves.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release prodash v30.0.0 ([`85003b1`](https://github.com/byron/prodash/commit/85003b18cf7ddaf1f8f245015c082a8e7a5c4857))
     - Merge pull request #39 from elijah629/patch-1 ([`427f168`](https://github.com/byron/prodash/commit/427f168684d2930445f1ec25fb873a251a42609d))
     - Bump major version and write changelog to document breaking change. ([`1bea21c`](https://github.com/byron/prodash/commit/1bea21c5785e8463e035be29b15592c1549590d0))
     - Progress-tree-log should not be default ([`8e5986d`](https://github.com/byron/prodash/commit/8e5986da4edbf06495469bc423ced62dea9e715f))
@@ -76,7 +102,7 @@ progress-by-logging will have to add the feature themselves.
 </details>
 
 <csr-unknown>
-This is similar to:https://github.com/GitoxideLabs/cargo-smart-release/pull/55<csr-unknown/>
+Add a SECURITY.md file with the same wording as in gitoxideand cargo-smart-release, with a hyperlink to draft a prodashadvisory.<csr-unknown/>
 
 ## 29.0.2 (2025-04-13)
 
